@@ -1,0 +1,14 @@
+tests/cases/compiler/interfacedeclWithPredicatesError3.ts(5,9): error TS1005: 'identifier as argument for 'type'' expected.
+
+
+==== tests/cases/compiler/interfacedeclWithPredicatesError3.ts (1 errors) ====
+    interface UsersShow{
+        user_id?: number;
+        screen_name?: string;
+        text: string;
+    } with {
+            
+        type(5) == string;
+    ~~~~~~~~~~~~~~~~~~~~~
+!!! error TS1005: 'identifier as argument for 'type'' expected.
+    }

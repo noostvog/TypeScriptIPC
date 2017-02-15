@@ -289,7 +289,8 @@ namespace ts {
                     visitNode(cbNode, (<InterfaceDeclaration>node).name) ||
                     visitNodes(cbNodes, (<InterfaceDeclaration>node).typeParameters) ||
                     visitNodes(cbNodes, (<ClassDeclaration>node).heritageClauses) ||
-                    visitNodes(cbNodes, (<InterfaceDeclaration>node).members);
+                    visitNodes(cbNodes, (<InterfaceDeclaration>node).members) ||
+                    visitNodes(cbNodes, (<InterfaceDeclaration>node).predicates);
             case SyntaxKind.TypeAliasDeclaration:
                 return visitNodes(cbNodes, node.decorators) ||
                     visitNodes(cbNodes, node.modifiers) ||
@@ -2428,6 +2429,181 @@ namespace ts {
 
             return members;
         }
+
+        function parseInterfacePredicates(): NodeArray<Statement> {
+            let predicates: NodeArray<Statement>;
+            if (parseOptional(SyntaxKind.WithKeyword)) {
+                parseExpected(SyntaxKind.OpenBraceToken);
+                // TODO: this parses all kinds of statements, however: we only want function calls  with as parameters identifiers or other function calls
+                predicates = parseList(ParsingContext.BlockStatements, parseStatement); // parseInterfacePredicate);
+                checkValidPredicates(predicates)
+                parseExpected(SyntaxKind.CloseBraceToken);
+                return predicates;
+            }
+            else {
+                return createMissingList<Statement>();
+            }
+        }
+
+        function checkValidPredicates(predicates: NodeArray<Node>): boolean {
+            for (const predicate of predicates) {
+                if (predicate.kind === SyntaxKind.ExpressionStatement) {
+                    if (!checkValidPredicateExpression((<ExpressionStatement>predicate).expression, "Call expression")) {
+                        return false;
+                    }
+                }
+                else {
+                    const start = predicate.pos;
+                    const end = predicate.end;
+                    parseErrorAtPosition(start, end - start, Diagnostics._0_expected, "Expression");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function checkValidPredicateExpression(expr: Node, mainErrorMessage: string): boolean {
+            let errorMessage = "";
+            if (expr.kind === SyntaxKind.CallExpression) {
+                // it is a call expression: check arguments
+                // arguments must be identifiers or call expressions itself
+                return checkValidPredicateArguments((<CallExpression>expr).arguments)
+            }
+            else if (expr.kind === SyntaxKind.BinaryExpression) {
+                const binaryexpr: BinaryExpression = <BinaryExpression>expr;
+                if (binaryexpr.operatorToken.kind === SyntaxKind.EqualsEqualsToken) {
+                    // links moet CallExpression met als naam type staan
+                    if (binaryexpr.left.kind === SyntaxKind.CallExpression) {
+                        const callexpr = (<CallExpression>binaryexpr.left).expression;
+                        // testen of callexpr een Identifier is
+                        if (callexpr.kind === SyntaxKind.Identifier) {
+                            if ((<Identifier>callexpr).text === "type") {
+                                // TODO arguments must be identifiers
+                                for (const arg of (<CallExpression>binaryexpr.left).arguments) {
+                                    if (arg.kind !== SyntaxKind.Identifier) {
+                                        errorMessage = "identifier as argument for 'type'";
+                                    }
+                                }
+                                if (!isValidPredicateType(binaryexpr.right)) {
+                                    errorMessage = "String, Number, Boolean or Object type as right side";
+                                }
+                            }
+                            else {
+                                // procedurenaam is geen identifier :s
+                                errorMessage = "Function call 'type' as left side";
+                            }
+                        }
+                        else {
+                            errorMessage = "Function call 'type' as left side";
+                        }
+                    }
+                    else {
+                        errorMessage = "Function call 'type' as left side";
+                    }
+                }
+                else {
+                    errorMessage = "==";
+                }
+            }
+            else {
+                errorMessage = mainErrorMessage;
+            }
+            if (errorMessage === "") {
+                return true;
+            }
+            else {
+                const start = expr.pos;
+                const end = expr.end;
+                parseErrorAtPosition(start, end - start, Diagnostics._0_expected, errorMessage);
+                return false;
+            }
+
+        }
+
+        function checkValidPredicateArguments(args: Node[]): boolean {
+            for (const argument of args) {
+                if (!checkValidPredicateArgument(argument)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function isValidPredicateValue(expr: Node): boolean {
+            switch (expr.kind) {
+                case SyntaxKind.Identifier:
+                case SyntaxKind.NumericLiteral:
+                case SyntaxKind.StringLiteral:
+                case SyntaxKind.TrueKeyword:
+                case SyntaxKind.FalseKeyword:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        function isValidPredicateType(expr: Node): boolean {
+            switch (expr.kind) {
+                // case SyntaxKind.AnyKeyword:
+                case SyntaxKind.StringKeyword:
+                case SyntaxKind.NumberKeyword:
+                case SyntaxKind.BooleanKeyword:
+                // case SyntaxKind.SymbolKeyword:
+                // case SyntaxKind.VoidKeyword:
+                // case SyntaxKind.NullKeyword:
+                // case SyntaxKind.UndefinedKeyword:
+                // case SyntaxKind.NeverKeyword:
+                case SyntaxKind.ObjectKeyword:
+                    return true;
+                case SyntaxKind.Identifier:
+                    // TODO I think because of wrong expectations this is not intepreted as a keyword (/type) but as text
+                    switch ((<Identifier>expr).text) {
+                        case "string":
+                        case "number":
+                        case "boolean":
+                        case "Object":
+                            return true;
+                        default:
+                            return false;
+                    }
+                default:
+                    return false;
+            }
+        }
+
+        function checkValidPredicateArgument(argument: Node): boolean {
+            return isValidPredicateValue(argument) || checkValidPredicateExpression(argument, "Identifier, number, string, boolean or call expression");
+        }
+/*
+        function parseInterfacePredicate(): any {
+            //based on parseLeftHandSideExpression, but makes sure only function calls are accepted
+            //let expression = <LeftHandSideExpression>parseExpectedToken(SyntaxKind.Identifier, true, Diagnostics._0_expected, "identifier");
+            let expression = parseExpected(SyntaxKind.Identifier);
+            if(expression){
+                if (token() === SyntaxKind.OpenParenToken) { //geen parseExpected want wordt in parseArgumentList geparsed
+                    const callExpr = <CallExpression>createNode(SyntaxKind.CallExpression, expression.pos);
+                    callExpr.expression = expression;
+                    callExpr.arguments = parseArgumentList();
+                    parseSemicolon();
+                    return addJSDocComment(finishNode(callExpr));
+                } else {
+                    let error = "expected open haakje na identifier"
+                    error;
+                    return;
+                    //komt ie hier in als het fout loopt?
+                }
+            }else{
+                let error = "expected identifier but got anothertoken";
+                error;
+                return;
+            }
+            //let expression = <LeftHandSideExpression>parsePrimaryExpression(); //name of function
+
+            //const expressionStatement = <ExpressionStatement>createNode(SyntaxKind.ExpressionStatement, fullStart);
+            //expressionStatement.expression = expression;
+            //parseSemicolon();
+            //return addJSDocComment(finishNode(expressionStatement));
+            //return expression;
+        }*/
 
         function isStartOfMappedType() {
             nextToken();
@@ -5439,6 +5615,8 @@ namespace ts {
             node.typeParameters = parseTypeParameters();
             node.heritageClauses = parseHeritageClauses();
             node.members = parseObjectTypeMembers();
+            //node.predicates = parseOptional(SyntaxKind.WithKeyword) ? parseStatement() : undefined;
+            node.predicates = parseInterfacePredicates();
             return addJSDocComment(finishNode(node));
         }
 

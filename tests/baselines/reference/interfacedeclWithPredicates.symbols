@@ -1,0 +1,19 @@
+=== tests/cases/compiler/interfacedeclWithPredicates.ts ===
+interface UsersShow{
+>UsersShow : Symbol(UsersShow, Decl(interfacedeclWithPredicates.ts, 0, 0))
+
+    user_id?: number;
+>user_id : Symbol(UsersShow.user_id, Decl(interfacedeclWithPredicates.ts, 0, 20))
+
+    screen_name?: string;
+>screen_name : Symbol(UsersShow.screen_name, Decl(interfacedeclWithPredicates.ts, 1, 21))
+
+    text: string;
+>text : Symbol(UsersShow.text, Decl(interfacedeclWithPredicates.ts, 2, 25))
+
+} with {
+    xor(present(user_id), present(screen_name));
+    type(user_id) == number; // obsolete but to test syntax
+    type(screen_name) == string; // obsolete but to test syntax
+    type(text) == string; // obsolete but to test syntax
+}
