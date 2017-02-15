@@ -1,0 +1,4 @@
+=== tests/cases/conformance/nathalie/nathalietest.ts ===
+var nathalie = "nathalie";
+>nathalie : Symbol(nathalie, Decl(nathalietest.ts, 0, 3))
+

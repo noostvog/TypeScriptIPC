@@ -1,0 +1,45 @@
+=== tests/cases/compiler/interfacedeclWithPredicates.ts ===
+interface UsersShow{
+>UsersShow : UsersShow
+
+    user_id?: number;
+>user_id : number
+
+    screen_name?: string;
+>screen_name : string
+
+    text: string;
+>text : string
+
+} with {
+    xor(present(user_id), present(screen_name));
+>xor(present(user_id), present(screen_name)) : any
+>xor : any
+>present(user_id) : any
+>present : any
+>user_id : any
+>present(screen_name) : any
+>present : any
+>screen_name : any
+
+    type(user_id) == number; // obsolete but to test syntax
+>type(user_id) == number : boolean
+>type(user_id) : any
+>type : any
+>user_id : any
+>number : any
+
+    type(screen_name) == string; // obsolete but to test syntax
+>type(screen_name) == string : boolean
+>type(screen_name) : any
+>type : any
+>screen_name : any
+>string : any
+
+    type(text) == string; // obsolete but to test syntax
+>type(text) == string : boolean
+>type(text) : any
+>type : any
+>text : any
+>string : any
+}

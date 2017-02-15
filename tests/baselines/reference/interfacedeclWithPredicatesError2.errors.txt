@@ -1,0 +1,14 @@
+tests/cases/compiler/interfacedeclWithPredicatesError2.ts(5,9): error TS1005: 'Function call 'type' as left side' expected.
+
+
+==== tests/cases/compiler/interfacedeclWithPredicatesError2.ts (1 errors) ====
+    interface UsersShow{
+        user_id?: number;
+        screen_name?: string;
+        text: string;
+    } with {
+            
+        types(test) == string;
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS1005: 'Function call 'type' as left side' expected.
+    }

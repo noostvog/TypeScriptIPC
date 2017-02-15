@@ -1744,6 +1744,7 @@
         typeParameters?: NodeArray<TypeParameterDeclaration>;
         heritageClauses?: NodeArray<HeritageClause>;
         members: NodeArray<TypeElement>;
+        predicates: any;
     }
 
     export interface HeritageClause extends Node {
