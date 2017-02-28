@@ -4262,13 +4262,27 @@ namespace ts {
         }
 
         function resolveDeclaredMembers(type: InterfaceType): InterfaceTypeWithDeclaredMembers {
+
             if (!(<InterfaceTypeWithDeclaredMembers>type).declaredProperties) {
+                if(type.symbol.name === "TestNathalie"){
+                    true;
+                }
                 const symbol = type.symbol;
                 (<InterfaceTypeWithDeclaredMembers>type).declaredProperties = getNamedMembers(symbol.members);
                 (<InterfaceTypeWithDeclaredMembers>type).declaredCallSignatures = getSignaturesOfSymbol(symbol.members["__call"]);
                 (<InterfaceTypeWithDeclaredMembers>type).declaredConstructSignatures = getSignaturesOfSymbol(symbol.members["__new"]);
                 (<InterfaceTypeWithDeclaredMembers>type).declaredStringIndexInfo = getIndexInfoOfSymbol(symbol, IndexKind.String);
                 (<InterfaceTypeWithDeclaredMembers>type).declaredNumberIndexInfo = getIndexInfoOfSymbol(symbol, IndexKind.Number);
+                (<InterfaceTypeWithDeclaredMembers>type).declaredPredicates = [];
+                for(const declaration of symbol.declarations) {
+                    // Interface declarations also possibly have predicates
+                    if(declaration.kind === SyntaxKind.InterfaceDeclaration) {
+                        for (const predicate of (<InterfaceDeclaration>declaration).predicates) {
+                            (<InterfaceTypeWithDeclaredMembers>type).declaredPredicates.push(predicate);
+                        }
+                    }
+                }
+
             }
             return <InterfaceTypeWithDeclaredMembers>type;
         }
@@ -7198,6 +7212,15 @@ namespace ts {
             headMessage?: DiagnosticMessage,
             containingMessageChain?: DiagnosticMessageChain): boolean {
 
+            //Conditional debugging point
+            //console.log(source.symbol.name);
+            //printLine("test");
+            if(!(target.symbol == undefined || target.symbol.name !== "TestNathalie")){
+
+                true;
+            }
+            //Debug.assert(target.symbol == undefined || target.symbol.name !== "TestNathalie", "testnathalietest");
+
             let errorInfo: DiagnosticMessageChain;
             let sourceStack: Type[];
             let targetStack: Type[];
@@ -7780,6 +7803,10 @@ namespace ts {
                 for (const targetProp of properties) {
                     const sourceProp = getPropertyOfType(source, targetProp.name);
 
+                    // debug
+                    if(targetProp.name == "nathalie"){
+                        true;
+                    }
                     if (sourceProp !== targetProp) {
                         if (!sourceProp) {
                             if (!(targetProp.flags & SymbolFlags.Optional) || requireOptionalProperties) {
@@ -7787,6 +7814,16 @@ namespace ts {
                                     reportError(Diagnostics.Property_0_is_missing_in_type_1, symbolToString(targetProp), typeToString(source));
                                 }
                                 return Ternary.False;
+                            } else
+                            {
+                                const predicatesOK = arePredicatesSatisfied(source, target);
+                                if(!predicatesOK) {
+                                    if(reportErrors){
+                                        // TODO better error message
+                                        reportError(Diagnostics.Types_of_property_0_are_incompatible, symbolToString(targetProp));
+                                    }
+                                    return Ternary.False;
+                                }
                             }
                         }
                         else if (!(targetProp.flags & SymbolFlags.Prototype)) {
@@ -7834,6 +7871,15 @@ namespace ts {
                                 return Ternary.False;
                             }
                             result &= related;
+                            const predicatesOK = arePredicatesSatisfied(source, target);
+                            if(!predicatesOK) {
+                                if(reportErrors){
+                                    // TODO better error message
+                                    reportError(Diagnostics.Types_of_property_0_are_incompatible, symbolToString(targetProp));
+                                }
+                                return Ternary.False;
+                            }
+                            result &= predicatesOK;
                             // When checking for comparability, be more lenient with optional properties.
                             if (relation !== comparableRelation && sourceProp.flags & SymbolFlags.Optional && !(targetProp.flags & SymbolFlags.Optional)) {
                                 // TypeScript 1.0 spec (April 2014): 3.8.3
@@ -7854,6 +7900,141 @@ namespace ts {
                 }
                 return result;
             }
+
+            function arePredicatesSatisfied(source: Type, target: Type): Ternary {
+
+                if (getObjectFlags(target) & ObjectFlags.Interface) {
+                    // TODO the cast to _with declared members_ is not tested by an if test
+                    const predicates = (<InterfaceTypeWithDeclaredMembers>target).declaredPredicates;
+                    if (!predicates || predicates.length == 0) {
+                        return Ternary.True;
+                    }
+                    let predexprs = predicates.map((pred: any) => pred.expression);
+                    if(!allPredicatesSatisfied(source, predexprs)) {
+                        return Ternary.False;
+                    }
+                }
+                return Ternary.True;
+
+                function allPredicatesSatisfied(source:Type, predicates: Expression[]): Ternary{
+                    for (const predicate of predicates) {
+                        //predicate is sowieso een call expression
+                        //moet dat getypechecked worden?
+                        //assume top level is callexpression, args van present zijn identifiers,... => checken while type checking interface?
+                        if(!isPredicateSatisfied(source, predicate)) {
+                            return Ternary.False;
+                        }
+                    }
+                    return Ternary.True;
+                }
+
+                function isCallPredicateSatisfied(source: Type, callexpr: CallExpression): Ternary{
+                    switch ((<Identifier>callexpr.expression).text) {
+                        case "present":
+                            if(!arePresent(source, callexpr.arguments.map((arg:Identifier) => arg.text))){
+                                return Ternary.False;
+                            }
+                            break;
+                        case "and":
+                            if(!allPredicatesSatisfied(source, callexpr.arguments)) {
+                                return Ternary.False;
+                            }
+                            break;
+                        case "or":
+                            if(!anyPredicatesSatisfied(source, callexpr.arguments)) {
+                                return Ternary.False;
+                            }
+                            break;
+                        case "not":
+                            if(anyPredicatesSatisfied(source, callexpr.arguments)){
+                                return Ternary.False;
+                            }
+                            break;
+                        case "implic":
+                            // TODO: require while typechecking interface that implic can only have two args?
+                            if(!implicPredicatesSatisfied(source, callexpr.arguments)){
+                                return Ternary.False;
+                            }
+                            break;
+                        case "iff":
+                            // TODO: idem
+                            if(!iffPredicatesSatisfied(source, callexpr.arguments)){
+                                return Ternary.False;
+                            }
+                            break;
+                        default:
+                            return Ternary.False;
+                    }
+                    return Ternary.True;
+                }
+
+                function isBinaryPredicateSatisfied(source: Type, expr: BinaryExpression): Ternary{
+                    switch((<Identifier>(<CallExpression>expr.left).expression).text){
+                        case "type":
+                            const argname = (<Identifier>(<CallExpression>expr.left).arguments[0]).text;
+                            const argtype = getTypeOfPropertyOfType(source, argname);
+                            const desiredtype_str = (<Identifier>expr.right).text;
+                            const desiredtype = getGlobalType(desiredtype_str);
+                            if(argtype) {
+                                return isRelatedTo(argtype, desiredtype);
+                            }
+                            return Ternary.True;
+                        default:
+                            return Ternary.False;
+                    }
+                }
+                function isPredicateSatisfied(source: Type, expr: Expression): Ternary {
+                    switch(expr.kind){
+                        case SyntaxKind.BinaryExpression:
+                            return isBinaryPredicateSatisfied(source, <BinaryExpression> expr);
+                        case SyntaxKind.CallExpression:
+                            return isCallPredicateSatisfied(source, <CallExpression> expr);
+                        default:
+                            return Ternary.False;
+                    }
+
+                }
+                function implicPredicatesSatisfied(source: Type, predicates: Expression[]): Ternary {
+                    const arg1 = isPredicateSatisfied(source, predicates[0]);
+                    const arg2 = isPredicateSatisfied(source, predicates[1]);
+                    if(arg1 && !arg2) {
+                        return Ternary.False;
+                    }
+                    return Ternary.True;
+                }
+
+                function iffPredicatesSatisfied(source: Type, predicates: Expression[]): Ternary {
+                    // TODO the .reverse() will turn out horribly wrong when there are more than two arguments:
+                    // make sure this is not the case when typechecking the interface
+                    return implicPredicatesSatisfied(source, predicates)
+                        && implicPredicatesSatisfied(source, predicates.reverse());
+                }
+
+                function anyPredicatesSatisfied(source: Type, predicates: Expression[]): Ternary {
+                    for(const predicate of predicates){
+                        if(isPredicateSatisfied(source, <CallExpression>predicate)){
+                            return Ternary.True;
+                        }
+                    }
+                    return Ternary.False;
+
+                }
+                function arePresent(source: Type, args: string[]): Ternary {
+                    //reuse check if fields are present? Is simply a undefined check;
+                    source = getApparentType(source);
+                    if (source.flags & TypeFlags.Object) {
+                        for (const name of args) {
+                            const resolved = resolveStructuredTypeMembers(<ObjectType>source);
+                            const symbol = resolved.members.get(name);
+                            if (!(symbol && symbolIsValue(symbol))) {
+                                return Ternary.False;
+                            }
+                        }
+                    }
+                    return Ternary.True;
+                }
+            }
+
 
             function propertiesIdenticalTo(source: Type, target: Type): Ternary {
                 if (!(source.flags & TypeFlags.Object && target.flags & TypeFlags.Object)) {
@@ -18415,6 +18596,9 @@ namespace ts {
         }
 
         function checkInterfaceDeclaration(node: InterfaceDeclaration) {
+            if(node.symbol.name == "TestNathalie"){
+                true;
+            }
             // Grammar checking
             checkGrammarDecorators(node) || checkGrammarModifiers(node) || checkGrammarInterfaceDeclaration(node);
 
