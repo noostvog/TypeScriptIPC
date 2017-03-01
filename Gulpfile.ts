@@ -384,7 +384,7 @@ gulp.task(builtLocalCompiler, false, [servicesFile], () => {
         .pipe(localCompilerProject())
         .pipe(prependCopyright())
         .pipe(sourcemaps.write("."))
-        .pipe(gulp.dest("."));
+        .pipe(gulp.dest("src/compiler"));
 });
 
 gulp.task(servicesFile, false, ["lib", "generate-diagnostics"], () => {
@@ -416,7 +416,7 @@ gulp.task(servicesFile, false, ["lib", "generate-diagnostics"], () => {
                 file.path = nodeStandaloneDefinitionsFile;
                 return content.replace(/declare (namespace|module) ts/g, 'declare module "typescript"');
             }))
-    ]).pipe(gulp.dest("."));
+    ]).pipe(gulp.dest("src/services"));
 });
 
 // cancellationToken.js
@@ -442,7 +442,7 @@ gulp.task(typingsInstallerJs, false, [servicesFile], () => {
         .pipe(cancellationTokenProject())
         .pipe(prependCopyright())
         .pipe(sourcemaps.write("."))
-        .pipe(gulp.dest("."));
+        .pipe(gulp.dest("src/server/typingsInstaller"));
 });
 
 const serverFile = path.join(builtLocalDirectory, "tsserver.js");
@@ -455,7 +455,7 @@ gulp.task(serverFile, false, [servicesFile, typingsInstallerJs, cancellationToke
         .pipe(serverProject())
         .pipe(prependCopyright())
         .pipe(sourcemaps.write("."))
-        .pipe(gulp.dest("."));
+        .pipe(gulp.dest("src/server"));
 });
 
 const tsserverLibraryFile = path.join(builtLocalDirectory, "tsserverlibrary.js");
@@ -547,7 +547,7 @@ gulp.task(run, false, [servicesFile], () => {
         .pipe(sourcemaps.init())
         .pipe(testProject())
         .pipe(sourcemaps.write(".", { includeContent: false, sourceRoot: "../../" }))
-        .pipe(gulp.dest("."));
+        .pipe(gulp.dest("src/harness"));
 });
 
 const internalTests = "internal/";
@@ -765,7 +765,7 @@ gulp.task("browserify", "Runs browserify on run.js to produce a file suitable fo
                 });
         }))
         .pipe(sourcemaps.write(".", { includeContent: false }))
-        .pipe(gulp.dest("."));
+        .pipe(gulp.dest("src/harness"));
 });
 
 
