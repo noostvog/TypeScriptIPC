@@ -373,6 +373,12 @@ namespace ts {
 
         // Enum value count
         Count,
+
+            // Predicates <nathalie>
+            PredicatePresentExpression,
+            PredicateTypeExpression,
+            PredicateLogicalExpression,
+
         // Markers
         FirstAssignment = EqualsToken,
         LastAssignment = CaretEqualsToken,
@@ -1402,6 +1408,34 @@ namespace ts {
     export interface SuperCall extends CallExpression {
         expression: SuperExpression;
     }
+
+    // Interface predicates <nathalie>
+    // TODO: nog specifieker gaan dan dit? IPV PredicateCallExpression: PresentPredicateExpression, LogicalPredicateExpression,... TypePredicateExpression
+    // TODO niet te diep, dus niet OrPredicateExpression, AndPredicateExpression,...
+    // TODO wat te doen met "not"
+    // export type Predicate = NodeArray<PredicateExpression>;
+    export type PredicateExpression = PredicatePresentExpression | PredicateLogicalExpression | PredicateTypeExpression;
+
+    export interface PredicatePresentExpression extends Node {
+        kind: SyntaxKind.PredicatePresentExpression;
+        expression: Identifier;
+        arguments: NodeArray<Identifier>;
+    }
+    export interface PredicateLogicalExpression extends Node {
+        kind: SyntaxKind.PredicateLogicalExpression;
+        expression: Identifier;
+        arguments: NodeArray<PredicateExpression>;
+    }
+    // TODO nog toevoegen aan SyntaxKind files
+    export interface PredicateTypeExpression extends Node {
+        kind: SyntaxKind.PredicateTypeExpression;
+        left_get: Identifier; // TODO dit moet misschien nog anders voor als er iets anders dan type(...) is, en left dus niet gewoon op de "..." kan slagen
+        left_arg: Identifier;
+        operatorToken: BinaryOperatorToken;
+        right: Identifier; // type
+    }
+
+    // <!--einde interfaces-->
 
     export interface ExpressionWithTypeArguments extends TypeNode {
         kind: SyntaxKind.ExpressionWithTypeArguments;
@@ -2873,6 +2907,7 @@ namespace ts {
         declaredConstructSignatures: Signature[];  // Declared construct signatures
         declaredStringIndexInfo: IndexInfo;        // Declared string indexing info
         declaredNumberIndexInfo: IndexInfo;        // Declared numeric indexing info
+        declaredPredicates: NodeArray<PredicateExpression>; // TODO: een beter type geven
     }
 
     // Type references (TypeFlags.Reference). When a class or interface has type parameters or

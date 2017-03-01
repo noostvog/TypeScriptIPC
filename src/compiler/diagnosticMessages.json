@@ -3246,5 +3246,17 @@
     "Octal literal types must use ES2015 syntax. Use the syntax '{0}'.": {
         "category": "Error",
         "code": 8017
+    },
+    "Octal literals are not allowed in enums members initializer. Use the syntax '{0}'.": {
+        "category": "Error",
+        "code": 8018
+    },
+    "Predicates of interface {0} are not satisfied": {
+        "category": "Error",
+        "code": 95001
+    },
+    "Predicate {0} was not satisfied in type {1}": {
+        "category": "Error",
+        "code": 95002
     }
 }

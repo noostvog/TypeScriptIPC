@@ -1224,6 +1224,10 @@ declare namespace ts {
         LastJSDocNode = 288,
         FirstJSDocTagNode = 278,
         LastJSDocTagNode = 291,
+	// nathalie
+        PredicatePresentExpression = 301,
+        PredicateTypeExpression = 302,
+        PredicateLogicalExpression = 303,
     }
     const enum NodeFlags {
         None = 0,
@@ -1487,10 +1491,21 @@ declare namespace ts {
         name: PropertyName;
         body?: FunctionBody;
     }
+
     interface ConstructorDeclaration extends FunctionLikeDeclaration, ClassElement {
         kind: SyntaxKind.Constructor;
         body?: FunctionBody;
     }
+
+    interface InterfaceTypeWithDeclaredMembers extends InterfaceType {
+        declaredProperties: Symbol[];
+        declaredCallSignatures: Signature[];
+        declaredConstructSignatures: Signature[];
+        declaredStringIndexInfo: IndexInfo;
+        declaredNumberIndexInfo: IndexInfo;
+        declaredPredicates: any; // TODO: make this more specific
+    }
+
     interface SemicolonClassElement extends ClassElement {
         kind: SyntaxKind.SemicolonClassElement;
     }

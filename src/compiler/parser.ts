@@ -437,6 +437,17 @@ namespace ts {
                 return visitNode(cbNode, (<PartiallyEmittedExpression>node).expression);
             case SyntaxKind.JSDocLiteralType:
                     return visitNode(cbNode, (<JSDocLiteralType>node).literal);
+            case SyntaxKind.PredicateLogicalExpression:
+                return visitNode(cbNode, (<PredicateLogicalExpression>node).expression) ||
+                    visitNodes(cbNode, (<PredicateLogicalExpression>node).arguments);
+            case SyntaxKind.PredicateTypeExpression:
+                return visitNode(cbNode, (<PredicateTypeExpression>node).left_get) ||
+                        visitNode(cbNode, (<PredicateTypeExpression>node).left_arg) ||
+                        visitNode(cbNode, (<PredicateTypeExpression>node).operatorToken) ||
+                        visitNode(cbNode, (<PredicateTypeExpression>node).right);
+            case SyntaxKind.PredicatePresentExpression:
+                return visitNode(cbNode, (<PredicatePresentExpression>node).expression) ||
+                    visitNodes(cbNode, (<PredicatePresentExpression>node).arguments);
         }
     }
 
@@ -2430,66 +2441,93 @@ namespace ts {
             return members;
         }
 
-        function parseInterfacePredicates(): NodeArray<Statement> {
-            let predicates: NodeArray<Statement>;
+        function parseInterfacePredicates(): NodeArray<PredicateExpression> {
             if (parseOptional(SyntaxKind.WithKeyword)) {
                 parseExpected(SyntaxKind.OpenBraceToken);
                 // TODO: this parses all kinds of statements, however: we only want function calls  with as parameters identifiers or other function calls
-                predicates = parseList(ParsingContext.BlockStatements, parseStatement); // parseInterfacePredicate);
-                checkValidPredicates(predicates)
+                const predicates: NodeArray<Statement> = parseList(ParsingContext.BlockStatements, parseStatement); // parseInterfacePredicate);
+                const parsedpredicates: NodeArray<PredicateExpression> = checkValidPredicates(predicates);
                 parseExpected(SyntaxKind.CloseBraceToken);
-                return predicates;
+                if (!parsedpredicates) {
+                    return createMissingList<PredicateExpression>();
+                }
+                return parsedpredicates;
             }
             else {
-                return createMissingList<Statement>();
+                return createMissingList<PredicateExpression>();
             }
-        }
 
-        function checkValidPredicates(predicates: NodeArray<Node>): boolean {
-            for (const predicate of predicates) {
-                if (predicate.kind === SyntaxKind.ExpressionStatement) {
-                    if (!checkValidPredicateExpression((<ExpressionStatement>predicate).expression, "Call expression")) {
-                        return false;
+            function checkValidPredicates(predicates: NodeArray<Node>): NodeArray<PredicateExpression> {
+                const checkedPredicates: NodeArray<PredicateExpression> = createNodeArray<PredicateExpression>();
+                for (const predicate of predicates) {
+                    if (predicate.kind === SyntaxKind.ExpressionStatement) {
+                        const checkedPredicate = checkValidPredicateExpression((<ExpressionStatement>predicate).expression, "Call expression");
+                        if (!checkedPredicate) {
+                            return undefined;
+                        }
+                        checkedPredicates.push(checkedPredicate);
+                    }
+                    else {
+                        const start = predicate.pos;
+                        const end = predicate.end;
+                        parseErrorAtPosition(start, end - start, Diagnostics._0_expected, "Expression");
+                        return undefined;
                     }
                 }
-                else {
-                    const start = predicate.pos;
-                    const end = predicate.end;
-                    parseErrorAtPosition(start, end - start, Diagnostics._0_expected, "Expression");
-                    return false;
-                }
+                return checkedPredicates;
             }
-            return true;
-        }
 
-        function checkValidPredicateExpression(expr: Node, mainErrorMessage: string): boolean {
-            let errorMessage = "";
-            if (expr.kind === SyntaxKind.CallExpression) {
-                // it is a call expression: check arguments
-                // arguments must be identifiers or call expressions itself
-                return checkValidPredicateArguments((<CallExpression>expr).arguments)
-            }
-            else if (expr.kind === SyntaxKind.BinaryExpression) {
-                const binaryexpr: BinaryExpression = <BinaryExpression>expr;
-                if (binaryexpr.operatorToken.kind === SyntaxKind.EqualsEqualsToken) {
-                    // links moet CallExpression met als naam type staan
-                    if (binaryexpr.left.kind === SyntaxKind.CallExpression) {
-                        const callexpr = (<CallExpression>binaryexpr.left).expression;
-                        // testen of callexpr een Identifier is
-                        if (callexpr.kind === SyntaxKind.Identifier) {
-                            if ((<Identifier>callexpr).text === "type") {
-                                // TODO arguments must be identifiers
-                                for (const arg of (<CallExpression>binaryexpr.left).arguments) {
-                                    if (arg.kind !== SyntaxKind.Identifier) {
+            function checkValidPredicateExpression(expr: Node, mainErrorMessage: string): PredicateExpression {
+                let errorMessage = "";
+                if (expr.kind === SyntaxKind.CallExpression) {
+                    const callexpr = (<CallExpression>expr).expression;
+                    if (!(callexpr.kind === SyntaxKind.Identifier)) {
+                        const start = expr.pos;
+                        const end = expr.end;
+                        parseErrorAtPosition(start, end - start, Diagnostics._0_expected, "Identifier for the procedure name");
+                        return undefined;
+                    }
+                    const functionname = <Identifier>callexpr;
+                    if (functionname.text == "present") {
+                        const args = checkValidPresentArguments((<CallExpression>expr).arguments);
+                        return <PredicatePresentExpression>{ kind: SyntaxKind.PredicatePresentExpression, expression: functionname, arguments: args };
+                    }
+                    // TODO check while type checking interface that if it is not present, it is still a valid logical expression
+                    const args = checkValidPredicateArguments((<CallExpression>expr).arguments);
+                    if (!args) {
+                        return undefined;
+                    }
+                    // TODO this is ugly, there must be another way "createNode" or something
+                    return <PredicateLogicalExpression>{ kind: SyntaxKind.PredicateLogicalExpression, expression: functionname, arguments: args };
+                }
+                else if (expr.kind === SyntaxKind.BinaryExpression) {
+                    const binaryexpr: BinaryExpression = <BinaryExpression>expr;
+                    if (binaryexpr.operatorToken.kind === SyntaxKind.EqualsEqualsToken) {
+                        // links moet CallExpression met als naam type staan
+                        if (binaryexpr.left.kind === SyntaxKind.CallExpression) {
+                            const callexpr = (<CallExpression>binaryexpr.left).expression;
+                            // testen of callexpr een Identifier is
+                            if (callexpr.kind === SyntaxKind.Identifier) {
+                                const args = (<CallExpression>binaryexpr.left).arguments;
+                                if (args.length == 1) {
+                                    if (args[0].kind === SyntaxKind.Identifier) {
+                                        const type = isValidPredicateType(binaryexpr.right)
+                                        if (type) {
+                                            return <PredicateTypeExpression>{ right: type, left_arg: <Identifier>args[0], left_get: <Identifier>callexpr, kind: SyntaxKind.PredicateTypeExpression };
+                                        }
+                                        else {
+                                            errorMessage = "String, Number, Boolean or Object type as right side";
+                                        }
+                                    }
+                                    else {
                                         errorMessage = "identifier as argument for 'type'";
                                     }
                                 }
-                                if (!isValidPredicateType(binaryexpr.right)) {
-                                    errorMessage = "String, Number, Boolean or Object type as right side";
+                                else {
+                                    errorMessage = "Only one argument for the binary expression"
                                 }
                             }
                             else {
-                                // procedurenaam is geen identifier :s
                                 errorMessage = "Function call 'type' as left side";
                             }
                         }
@@ -2498,84 +2536,103 @@ namespace ts {
                         }
                     }
                     else {
-                        errorMessage = "Function call 'type' as left side";
+                        errorMessage = "==";
                     }
                 }
                 else {
-                    errorMessage = "==";
+                    errorMessage = mainErrorMessage;
                 }
-            }
-            else {
-                errorMessage = mainErrorMessage;
-            }
-            if (errorMessage === "") {
-                return true;
-            }
-            else {
-                const start = expr.pos;
-                const end = expr.end;
-                parseErrorAtPosition(start, end - start, Diagnostics._0_expected, errorMessage);
-                return false;
-            }
-
-        }
-
-        function checkValidPredicateArguments(args: Node[]): boolean {
-            for (const argument of args) {
-                if (!checkValidPredicateArgument(argument)) {
-                    return false;
+                if (errorMessage !== "") {
+                    const start = expr.pos;
+                    const end = expr.end;
+                    parseErrorAtPosition(start, end - start, Diagnostics._0_expected, errorMessage);
+                    return undefined;
                 }
+/*
+                function reportErrorMessage(errorMessage){
+                    const start = expr.pos;
+                    const end = expr.end;
+                    parseErrorAtPosition(start, end - start, Diagnostics._0_expected, errorMessage);
+                }*/
             }
-            return true;
-        }
 
-        function isValidPredicateValue(expr: Node): boolean {
-            switch (expr.kind) {
-                case SyntaxKind.Identifier:
-                case SyntaxKind.NumericLiteral:
-                case SyntaxKind.StringLiteral:
-                case SyntaxKind.TrueKeyword:
-                case SyntaxKind.FalseKeyword:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-        function isValidPredicateType(expr: Node): boolean {
-            switch (expr.kind) {
-                // case SyntaxKind.AnyKeyword:
-                case SyntaxKind.StringKeyword:
-                case SyntaxKind.NumberKeyword:
-                case SyntaxKind.BooleanKeyword:
-                // case SyntaxKind.SymbolKeyword:
-                // case SyntaxKind.VoidKeyword:
-                // case SyntaxKind.NullKeyword:
-                // case SyntaxKind.UndefinedKeyword:
-                // case SyntaxKind.NeverKeyword:
-                case SyntaxKind.ObjectKeyword:
-                    return true;
-                case SyntaxKind.Identifier:
-                    // TODO I think because of wrong expectations this is not intepreted as a keyword (/type) but as text
-                    switch ((<Identifier>expr).text) {
-                        case "string":
-                        case "number":
-                        case "boolean":
-                        case "Object":
-                            return true;
-                        default:
-                            return false;
+            function checkValidPresentArguments(args: Node[]): NodeArray<Identifier> {
+                const result: NodeArray<Identifier> = createNodeArray<Identifier>();
+                for (const argument of args) {
+                    const predarg = isValidPredicateValue(argument);
+                    if (!predarg) {
+                        return undefined;
                     }
-                default:
-                    return false;
+                    result.push(predarg);
+                }
+                return result;
+            }
+            function checkValidPredicateArguments(args: Node[]): NodeArray<PredicateExpression> {
+                const result: NodeArray<PredicateExpression> = createNodeArray<PredicateExpression>();
+                for (const argument of args) {
+                    const predarg = checkValidPredicateArgument(argument);
+                    if (!predarg) {
+                        return undefined;
+                    }
+                    result.push(predarg);
+                }
+                return result;
+            }
+
+
+             function isValidPredicateValue(expr: Node): Identifier {
+                if (expr.kind === SyntaxKind.Identifier) {
+                    // TODO valid values checken in typechecker?
+                    return <Identifier>expr;
+                }
+                return undefined;
+             }
+            function isValidPredicateType(expr: Node): Identifier {
+                // TODO niet zeker maar die keywords worden niet gebruikt door parser?
+                if (expr.kind === SyntaxKind.Identifier) {
+                    // TODO valid types checken in typechecker?
+                    return <Identifier>expr;
+                }
+                return undefined;
+                /*
+                switch (expr.kind) {
+                    // case SyntaxKind.AnyKeyword:
+                    //case SyntaxKind.StringKeyword:
+                    //case SyntaxKind.NumberKeyword:
+                    //case SyntaxKind.BooleanKeyword:
+                    // case SyntaxKind.SymbolKeyword:
+                    // case SyntaxKind.VoidKeyword:
+                    // case SyntaxKind.NullKeyword:
+                    // case SyntaxKind.UndefinedKeyword:
+                    // case SyntaxKind.NeverKeyword:
+                    case SyntaxKind.ObjectKeyword:
+                        return true;
+                    case SyntaxKind.Identifier:
+                        // TODO I think because of wrong expectations this is not intepreted as a keyword (/type) but as text
+                        switch ((<Identifier>expr).text) {
+                            case "String":
+                            case "Number":
+                            case "Boolean":
+                            case "Object":
+                                return true;
+                            default:
+                                return false;
+                        }
+                    default:
+                        return false;
+                }*/
+            }
+
+            function checkValidPredicateArgument(argument: Node): PredicateExpression {
+                return checkValidPredicateExpression(argument, "Identifier, number, string, boolean or call expression");
             }
         }
 
-        function checkValidPredicateArgument(argument: Node): boolean {
-            return isValidPredicateValue(argument) || checkValidPredicateExpression(argument, "Identifier, number, string, boolean or call expression");
-        }
+
 /*
         function parseInterfacePredicate(): any {
             //based on parseLeftHandSideExpression, but makes sure only function calls are accepted
+
             //let expression = <LeftHandSideExpression>parseExpectedToken(SyntaxKind.Identifier, true, Diagnostics._0_expected, "identifier");
             let expression = parseExpected(SyntaxKind.Identifier);
             if(expression){
@@ -5615,7 +5672,7 @@ namespace ts {
             node.typeParameters = parseTypeParameters();
             node.heritageClauses = parseHeritageClauses();
             node.members = parseObjectTypeMembers();
-            //node.predicates = parseOptional(SyntaxKind.WithKeyword) ? parseStatement() : undefined;
+            // node.predicates = parseOptional(SyntaxKind.WithKeyword) ? parseStatement() : undefined;
             node.predicates = parseInterfacePredicates();
             return addJSDocComment(finishNode(node));
         }
