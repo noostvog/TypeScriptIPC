@@ -336,6 +336,10 @@ declare namespace ts {
         MergeDeclarationMarker = 296,
         EndOfDeclarationMarker = 297,
         Count = 298,
+            //<nathalie>
+        PredicatePresentExpression = 301,
+        PredicateTypeExpression = 302,
+        PredicateLogicalExpression = 303,
         FirstAssignment = 57,
         LastAssignment = 69,
         FirstCompoundAssignment = 58,
@@ -1779,6 +1783,7 @@ declare namespace ts {
         declaredConstructSignatures: Signature[];
         declaredStringIndexInfo: IndexInfo;
         declaredNumberIndexInfo: IndexInfo;
+        declaredPredicates: any; // TODO: make this more specific
     }
     interface TypeReference extends ObjectType {
         target: GenericType;
