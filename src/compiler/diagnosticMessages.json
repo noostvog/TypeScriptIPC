@@ -3258,5 +3258,25 @@
     "Predicate {0} was not satisfied in type {1}": {
         "category": "Error",
         "code": 95002
+    },
+    "The field {0} is used in a predicate but not described in the interface": {
+        "category": "Error",
+        "code": 95003
+    },
+    "The type predicate expects one of the following types: string, number, boolean, any, object, symbol, void": {
+        "category": "Error",
+        "code": 95004
+    },
+    "The 'iff' and 'implic' predicates expect exactly two arguments": {
+        "category": "Error",
+        "code": 95005
+    },
+    "{0} is an unknown predicate operation, expected the following predicate(s): {1}": {
+        "category": "Error",
+        "code": 95007
+    },
+    "The type predicate can only be used wiht an equality operator": {
+        "category": "Error",
+        "code": 95008
     }
 }

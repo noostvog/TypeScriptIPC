@@ -2492,7 +2492,6 @@ namespace ts {
                         const args = checkValidPresentArguments((<CallExpression>expr).arguments);
                         return <PredicatePresentExpression>{ kind: SyntaxKind.PredicatePresentExpression, expression: functionname, arguments: args };
                     }
-                    // TODO check while type checking interface that if it is not present, it is still a valid logical expression
                     const args = checkValidPredicateArguments((<CallExpression>expr).arguments);
                     if (!args) {
                         return undefined;
@@ -2513,7 +2512,7 @@ namespace ts {
                                     if (args[0].kind === SyntaxKind.Identifier) {
                                         const type = isValidPredicateType(binaryexpr.right)
                                         if (type) {
-                                            return <PredicateTypeExpression>{ right: type, left_arg: <Identifier>args[0], left_get: <Identifier>callexpr, kind: SyntaxKind.PredicateTypeExpression };
+                                            return <PredicateTypeExpression>{ right: type, left_arg: <Identifier>args[0], left_get: <Identifier>callexpr, kind: SyntaxKind.PredicateTypeExpression, operatorToken: binaryexpr.operatorToken };
                                         }
                                         else {
                                             errorMessage = "String, Number, Boolean or Object type as right side";

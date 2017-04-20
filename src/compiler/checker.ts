@@ -7912,9 +7912,7 @@ namespace ts {
 
                 function allPredicatesSatisfied(source: Type, predicates: NodeArray<PredicateExpression>, mainLevel: boolean): Ternary {
                     for (const predicate of predicates) {
-                        // predicate is sowieso een call expression
-                        // moet dat getypechecked worden?
-                        // assume top level is callexpression, args van present zijn identifiers,... => checken while type checking interface?
+                        // assume top level is callexpression => checken while type checking interface?
                         if (!isPredicateSatisfied(source, predicate)) {
                             if (mainLevel) {
                                 reportError(Diagnostics.Predicate_0_was_not_satisfied_in_type_1, predicateToString(predicate), typeToString(source));
@@ -7958,13 +7956,11 @@ namespace ts {
                             }
                             break;
                         case "implic":
-                            // TODO: require while typechecking interface that implic can only have two args?
                             if (!implicPredicatesSatisfied(source, callexpr.arguments)) {
                                 return Ternary.False;
                             }
                             break;
                         case "iff":
-                            // TODO: idem
                             if (!iffPredicatesSatisfied(source, callexpr.arguments)) {
                                 return Ternary.False;
                             }
@@ -7990,7 +7986,7 @@ namespace ts {
                                 return related;
                             }
                             return Ternary.True;
-                        default: // TODO moet al gevangen zijn in de typecheck van interface
+                        default:
                             return Ternary.False;
                     }
                 }
@@ -8025,8 +8021,6 @@ namespace ts {
                 }
 
                 function iffPredicatesSatisfied(source: Type, predicates: NodeArray<PredicateExpression>): Ternary {
-                    // TODO ugly +  will turn out horribly wrong when there are more than two arguments:
-                    // make sure this is not the case when typechecking the interface
                     const reversed = createNodeArray<PredicateExpression>();
                     reversed.push(predicates[0]);
                     reversed.push(predicates[1]);
@@ -18648,6 +18642,7 @@ namespace ts {
                     }
                 }
                 checkObjectTypeForDuplicateDeclarations(node);
+                checkInterfacePredicateDeclarations(node);
             }
             forEach(getInterfaceBaseTypeNodes(node), heritageElement => {
                 if (!isEntityNameExpression(heritageElement.expression)) {
@@ -18662,6 +18657,79 @@ namespace ts {
                 checkTypeForDuplicateIndexSignatures(node);
                 registerForUnusedIdentifiersCheck(node);
             }
+
+        }
+
+        function checkInterfacePredicateDeclarations(node: InterfaceDeclaration) {
+
+            node.predicates.map(checkInterfacePredicateDeclaration);
+
+            function checkInterfacePredicateDeclaration(predicate: PredicateExpression) {
+                switch (predicate.kind) {
+                    case SyntaxKind.PredicateTypeExpression:
+                        checkInterfacePredicateTypeExpression(<PredicateTypeExpression>predicate); break;
+                    case SyntaxKind.PredicateLogicalExpression:
+                        checkInterfacePredicateLogicalExpression(<PredicateLogicalExpression>predicate); break;
+                    case SyntaxKind.PredicatePresentExpression:
+                        checkInterfacePredicatePresentExpression(<PredicatePresentExpression>predicate); break;
+                }
+            }
+            function checkInterfacePredicateTypeExpression(predicate: PredicateTypeExpression) {
+                if (predicate.left_get.text !== "type") {
+                    error(node, Diagnostics._0_is_an_unknown_predicate_operation_expected_the_following_predicate_s_Colon_1, predicate.left_get.text,  "type");
+                }
+                checkValidParameter(predicate.left_arg);
+                if (predicate.operatorToken.kind !== SyntaxKind.EqualsEqualsToken) {
+                    error(node, Diagnostics.The_type_predicate_can_only_be_used_wiht_an_equality_operator);
+                }
+                switch (predicate.right.text) {
+                    case "any":
+                    case "number":
+                    case "boolean":
+                    case "string":
+                    case "symbol":
+                    case "void":
+                    case "object": break;
+                    default: error(node, Diagnostics.The_type_predicate_expects_one_of_the_following_types_Colon_string_number_boolean_any_object_symbol_void);
+
+                }
+            }
+            function checkInterfacePredicateLogicalExpression(predicate: PredicateLogicalExpression) {
+                // check valid logical expression
+                // check valid veldjesnamen
+                // check exact two arguments for iff and implic
+                switch (predicate.expression.text) {
+                    case "or":
+                    case "and":
+                    case "not":
+                        break;
+                    case "implic":
+                    case "iff":
+                        if (predicate.arguments.length !== 2) {
+                            error(node, Diagnostics.The_iff_and_implic_predicates_expect_exactly_two_arguments)
+                        }
+                        break;
+                    default:
+                        error(node, Diagnostics._0_is_an_unknown_predicate_operation_expected_the_following_predicate_s_Colon_1, predicate.expression.text, "or, and, not, implic, iff")
+                }
+                predicate.arguments.map(checkInterfacePredicateDeclaration);
+            }
+            function checkInterfacePredicatePresentExpression(predicate: PredicatePresentExpression) {
+                // check valid veldjesnaam/namen
+                if (predicate.expression.text !== "present") {
+                    error(node, Diagnostics._0_is_an_unknown_predicate_operation_expected_the_following_predicate_s_Colon_1, predicate.expression.text, "present");
+                }
+                predicate.arguments.map(checkValidParameter);
+            }
+            function checkValidParameter(name: Identifier) {
+                for (const member of node.members) {
+                    if (member.symbol.name == name.text) {
+                        return;
+                    }
+                }
+                error(node, Diagnostics.The_field_0_is_used_in_a_predicate_but_not_described_in_the_interface, name.text);
+            }
+
         }
 
         function checkTypeAliasDeclaration(node: TypeAliasDeclaration) {
