@@ -1421,13 +1421,14 @@ namespace ts {
         expression: Identifier;
         arguments: NodeArray<Identifier>;
     }
-    //// TODO: dit moet toch omgekeer met de type expression? :s :s :S
+
     export interface PredicateLogicalExpression extends Node {
         kind: SyntaxKind.PredicateLogicalExpression;
         expression: Identifier;
         arguments: NodeArray<PredicateExpression>;
     }
-    // TODO nog toevoegen aan SyntaxKind files
+
+    // TODO nog toevoegen aan SyntaxKind files?
     export interface PredicateTypeExpression extends Node {
         kind: SyntaxKind.PredicateTypeExpression;
         left_get: Identifier;

@@ -7977,8 +7977,11 @@ namespace ts {
                             const argname = expr.left_arg.text;
                             const argtype = getTypeOfPropertyOfType(source, argname);
                             const desiredtype_str = (expr.right).text;
-                            const desiredtype = getGlobalType(desiredtype_str);
+                            const capitalized = desiredtype_str.charAt(0).toUpperCase() + desiredtype_str.slice(1);
+                            // TODO better parse a "type" symbol in the parser, this is hacky
+                            const desiredtype = getGlobalType(capitalized);
                             if (argtype) {
+                                // TODO isRelatedTo overkill? Better to have an === relationship? We only use simple type anyway, that's basically what is done in isRelatedTo
                                 const related = isRelatedTo(argtype, desiredtype);
                                 if (!related) {
                                     reportError(Diagnostics.Types_of_property_0_are_incompatible, argname);
