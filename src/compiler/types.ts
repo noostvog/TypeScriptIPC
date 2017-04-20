@@ -1444,6 +1444,7 @@
         expression: Identifier;
         arguments: NodeArray<Identifier>;
     }
+    //// TODO: dit moet toch omgekeer met de type expression? :s :s :S
     export interface PredicateLogicalExpression extends Node {
         kind: SyntaxKind.PredicateLogicalExpression;
         expression: Identifier;
@@ -1452,7 +1453,7 @@
     // TODO nog toevoegen aan SyntaxKind files
     export interface PredicateTypeExpression extends Node {
         kind: SyntaxKind.PredicateTypeExpression;
-        left_get: Identifier; // TODO dit moet misschien nog anders voor als er iets anders dan type(...) is, en left dus niet gewoon op de "..." kan slagen
+        left_get: Identifier;
         left_arg: Identifier;
         operatorToken: BinaryOperatorToken;
         right: Identifier; // type
