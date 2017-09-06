@@ -8040,7 +8040,7 @@ namespace ts {
                     if (source.flags & TypeFlags.Object) {
                         for (const name of args) {
                             const resolved = resolveStructuredTypeMembers(<ObjectType>source);
-                            const symbol = resolved.members.get(name);
+                            const symbol = resolved.members[name];
                             if (!(symbol && symbolIsValue(symbol))) {
                                 if (reportErrors) {
                                     reportError(Diagnostics.Property_0_is_missing_in_type_1, name, typeToString(source))
