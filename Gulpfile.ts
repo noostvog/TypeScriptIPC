@@ -54,15 +54,15 @@ const cmdLineOptions = minimist(process.argv.slice(2), {
     },
     default: {
         soft: false,
-        colors: process.env.colors || process.env.color || true,
-        debug: process.env.debug || process.env.d,
-        host: process.env.TYPESCRIPT_HOST || process.env.host || "node",
-        browser: process.env.browser || process.env.b || "IE",
-        tests: process.env.test || process.env.tests || process.env.t,
-        light: process.env.light || false,
-        reporter: process.env.reporter || process.env.r,
-        lint: process.env.lint || true,
-        files: process.env.f || process.env.file || process.env.files || "",
+        colors: process.env['colors'] || process.env['color'] || true,
+        debug: process.env['debug'] || process.env['d'],
+        host: process.env['TYPESCRIPT_HOST'] || process.env['host'] || "node",
+        browser: process.env['browser'] || process.env['b'] || "IE",
+        tests: process.env['test'] || process.env['tests'] || process.env['t'],
+        light: process.env['light'] || false,
+        reporter: process.env['reporter'] || process.env['r'],
+        lint: process.env['lint'] || true,
+        files: process.env['f'] || process.env['file'] || process.env['files'] || "",
     }
 });
 
@@ -570,12 +570,12 @@ function deleteTemporaryProjectOutput() {
 
 let savedNodeEnv: string;
 function setNodeEnvToDevelopment() {
-    savedNodeEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = "development";
+    savedNodeEnv = process.env['NODE_ENV'];
+    process.env['NODE_ENV'] = "development";
 }
 
 function restoreSavedNodeEnv() {
-    process.env.NODE_ENV = savedNodeEnv;
+    process.env['NODE_ENV'] = savedNodeEnv;
 }
 
 let testTimeout = 40000;
@@ -602,7 +602,7 @@ function runConsoleTests(defaultReporter: string, runInParallel: boolean, done: 
             } while (fs.existsSync(taskConfigsFolder));
             fs.mkdirSync(taskConfigsFolder);
 
-            workerCount = process.env.workerCount || os.cpus().length;
+            workerCount = parseInt(process.env['workerCount']) || os.cpus().length;
         }
 
         if (tests || light || taskConfigsFolder) {
@@ -1015,7 +1015,7 @@ gulp.task("lint", "Runs tslint on the compiler sources. Optional arguments are: 
             cb();
         }, (cb) => {
             files = files.filter(file =>  fileMatcher.test(file.path)).sort((filea, fileb) => filea.stat.size - fileb.stat.size);
-            const workerCount = (process.env.workerCount && +process.env.workerCount) || os.cpus().length;
+            const workerCount = (process.env['workerCount'] && +process.env['workerCount']) || os.cpus().length;
             for (let i = 0; i < workerCount; i++) {
                 spawnLintWorker(files, finished);
             }

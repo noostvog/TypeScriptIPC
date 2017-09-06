@@ -22,11 +22,11 @@ namespace ts.server {
     function getGlobalTypingsCacheLocation() {
         switch (process.platform) {
             case "win32": {
-                const basePath = process.env.LOCALAPPDATA ||
-                    process.env.APPDATA ||
+                const basePath = process.env['LOCALAPPDATA'] ||
+                    process.env['APPDATA'] ||
                     (os.homedir && os.homedir()) ||
-                    process.env.USERPROFILE ||
-                    (process.env.HOMEDRIVE && process.env.HOMEPATH && normalizeSlashes(process.env.HOMEDRIVE + process.env.HOMEPATH)) ||
+                    process.env['USERPROFILE'] ||
+                    (process.env['HOMEDRIVE'] && process.env['HOMEPATH'] && normalizeSlashes(process.env['HOMEDRIVE'] + process.env['HOMEPATH'])) ||
                     os.tmpdir();
                 return combinePaths(normalizeSlashes(basePath), "Microsoft/TypeScript");
             }
@@ -43,13 +43,13 @@ namespace ts.server {
     }
 
     function getNonWindowsCacheLocation(platformIsDarwin: boolean) {
-        if (process.env.XDG_CACHE_HOME) {
-            return process.env.XDG_CACHE_HOME;
+        if (process.env['XDG_CACHE_HOME']) {
+            return process.env['XDG_CACHE_HOME'];
         }
         const usersDir = platformIsDarwin ? "Users" : "home"
         const homePath = (os.homedir && os.homedir()) ||
-            process.env.HOME ||
-            ((process.env.LOGNAME || process.env.USER) && `/${usersDir}/${process.env.LOGNAME || process.env.USER}`) ||
+            process.env['HOME'] ||
+            ((process.env['LOGNAME'] || process.env['USER']) && `/${usersDir}/${process.env['LOGNAME'] || process.env['USER']}`) ||
             os.tmpdir();
         const cacheFolder = platformIsDarwin
             ? "Library/Caches"
