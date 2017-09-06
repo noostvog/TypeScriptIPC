@@ -249,6 +249,7 @@ function getCompilerSettings(base: tsc.Settings, useBuiltCompiler?: boolean): ts
     copy.noImplicitThis = true;
     copy.pretty = true;
     copy.types = [];
+    copy.target = "es6";
     for (const key in base) {
         copy[key] = base[key];
     }
