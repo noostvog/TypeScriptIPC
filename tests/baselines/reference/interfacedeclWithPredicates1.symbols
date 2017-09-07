@@ -1,0 +1,17 @@
+=== tests/cases/compiler/interfacedeclWithPredicates1.ts ===
+interface UsersShow{
+>UsersShow : Symbol(UsersShow, Decl(interfacedeclWithPredicates1.ts, 0, 0))
+
+    user_id?: number;
+>user_id : Symbol(UsersShow.user_id, Decl(interfacedeclWithPredicates1.ts, 0, 20))
+
+    screen_name?: string;
+>screen_name : Symbol(UsersShow.screen_name, Decl(interfacedeclWithPredicates1.ts, 1, 21))
+
+    text: string;
+>text : Symbol(UsersShow.text, Decl(interfacedeclWithPredicates1.ts, 2, 25))
+
+} with {
+    or(and(present(user_id), not(present(screen_name))),
+       and(present(screen_name), not(present(user_id))));
+}

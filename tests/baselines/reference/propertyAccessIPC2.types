@@ -1,0 +1,66 @@
+=== tests/cases/compiler/propertyAccessIPC2.ts ===
+interface PrivateMessage {
+>PrivateMessage : PrivateMessage
+
+    text?: any;
+>text : any
+
+    user_id?: any;
+>user_id : any
+
+    screen_name?: any;
+>screen_name : any
+
+} with {
+    type(user_id) == number;
+>type : any
+>user_id : any
+>number : any
+
+    type(text) == string;
+>type : any
+>text : any
+>string : any
+
+    type(screen_name) == string;
+>type : any
+>screen_name : any
+>string : any
+
+    present(text);
+>present : any
+>text : any
+
+    or(and(present(user_id), not(present(screen_name))),
+>or : any
+>and : any
+>present : any
+>user_id : any
+>not : any
+>present : any
+>screen_name : any
+
+        and(not(present(user_id)), present(screen_name)));
+>and : any
+>not : any
+>present : any
+>user_id : any
+>present : any
+>screen_name : any
+}
+
+let msg: PrivateMessage = {text: "Hello", user_id: 123};
+>msg : PrivateMessage
+>PrivateMessage : PrivateMessage
+>{text: "Hello", user_id: 123} : { text: string; user_id: number; }
+>text : string
+>"Hello" : "Hello"
+>user_id : number
+>123 : 123
+
+msg.text; //OK
+>msg.text : String
+>msg : PrivateMessage
+>text : String
+
+

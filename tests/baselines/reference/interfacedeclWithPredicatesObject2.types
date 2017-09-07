@@ -1,0 +1,60 @@
+=== tests/cases/compiler/interfacedeclWithPredicatesObject2.ts ===
+interface UsersShow{
+>UsersShow : UsersShow
+
+    user_id?: any;
+>user_id : any
+
+    screen_name?: any;
+>screen_name : any
+
+    text: any;
+>text : any
+
+} with {
+    or(and(present(user_id), not(present(screen_name))),
+>or : any
+>and : any
+>present : any
+>user_id : any
+>not : any
+>present : any
+>screen_name : any
+
+    and(present(screen_name), not(present(user_id))));
+>and : any
+>present : any
+>screen_name : any
+>not : any
+>present : any
+>user_id : any
+
+    type(user_id) == number;
+>type : any
+>user_id : any
+>number : any
+
+    type(screen_name) == string;
+>type : any
+>screen_name : any
+>string : any
+
+    type(text) == string;
+>type : any
+>text : any
+>string : any
+
+    present(text);
+>present : any
+>text : any
+}
+
+let object: UsersShow = {screen_name: "screen name", text: "text"}
+>object : UsersShow
+>UsersShow : UsersShow
+>{screen_name: "screen name", text: "text"} : { screen_name: string; text: string; }
+>screen_name : string
+>"screen name" : "screen name"
+>text : string
+>"text" : "text"
+

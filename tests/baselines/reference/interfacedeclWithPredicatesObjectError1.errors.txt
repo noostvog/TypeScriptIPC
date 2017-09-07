@@ -1,0 +1,24 @@
+tests/cases/compiler/interfacedeclWithPredicatesObjectError1.ts(14,5): error TS2322: Type '{ text: string; }' is not assignable to type 'UsersShow'.
+  Predicates of interface UsersShow are not satisfied
+    Predicate or(and(present(user_id),not(present(screen_name))),and(present(screen_name),not(present(user_id)))) was not satisfied in type { text: string; }
+
+
+==== tests/cases/compiler/interfacedeclWithPredicatesObjectError1.ts (1 errors) ====
+    interface UsersShow{
+        user_id?: any;
+        screen_name?: any;
+        text: any;
+    } with {
+        or(and(present(user_id), not(present(screen_name))),
+        and(present(screen_name), not(present(user_id))));
+        type(user_id) == number;
+        type(screen_name) == string;
+        type(text) == string;
+        present(text);
+    }
+    
+    let object: UsersShow = {text: "text"}
+        ~~~~~~
+!!! error TS2322: Type '{ text: string; }' is not assignable to type 'UsersShow'.
+!!! error TS2322:   Predicates of interface UsersShow are not satisfied
+!!! error TS2322:     Predicate or(and(present(user_id),not(present(screen_name))),and(present(screen_name),not(present(user_id)))) was not satisfied in type { text: string; }

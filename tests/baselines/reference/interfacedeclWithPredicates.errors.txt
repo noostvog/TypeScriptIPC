@@ -1,0 +1,16 @@
+tests/cases/compiler/interfacedeclWithPredicates.ts(1,11): error TS95007: xor is an unknown predicate operation, expected the following predicate(s): or, and, not, implic, iff
+
+
+==== tests/cases/compiler/interfacedeclWithPredicates.ts (1 errors) ====
+    interface UsersShow{
+              ~~~~~~~~~
+!!! error TS95007: xor is an unknown predicate operation, expected the following predicate(s): or, and, not, implic, iff
+        user_id?: number;
+        screen_name?: string;
+        text: string;
+    } with {
+        xor(present(user_id), present(screen_name));
+        type(user_id) == number; // obsolete but to test syntax
+        type(screen_name) == string; // obsolete but to test syntax
+        type(text) == string; // obsolete but to test syntax
+    }

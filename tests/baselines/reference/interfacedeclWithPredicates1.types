@@ -1,0 +1,31 @@
+=== tests/cases/compiler/interfacedeclWithPredicates1.ts ===
+interface UsersShow{
+>UsersShow : UsersShow
+
+    user_id?: number;
+>user_id : number
+
+    screen_name?: string;
+>screen_name : string
+
+    text: string;
+>text : string
+
+} with {
+    or(and(present(user_id), not(present(screen_name))),
+>or : any
+>and : any
+>present : any
+>user_id : any
+>not : any
+>present : any
+>screen_name : any
+
+       and(present(screen_name), not(present(user_id))));
+>and : any
+>present : any
+>screen_name : any
+>not : any
+>present : any
+>user_id : any
+}
