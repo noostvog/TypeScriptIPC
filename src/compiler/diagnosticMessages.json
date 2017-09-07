@@ -3278,5 +3278,9 @@
     "The type predicate can only be used wiht an equality operator": {
         "category": "Error",
         "code": 95008
+    },
+    "Cannot access {0} from the object because its interface does not contain the predicate present({0}). Use a non-undefined type guard.": {
+        "category": "Error",
+        "code": 95009
     }
 }

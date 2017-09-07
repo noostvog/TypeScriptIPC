@@ -10174,7 +10174,7 @@ namespace ts {
                         value.kind === SyntaxKind.NullKeyword ?
                             assumeTrue ? TypeFacts.EQNull : TypeFacts.NENull :
                             assumeTrue ? TypeFacts.EQUndefined : TypeFacts.NEUndefined;
-                    return getTypeWithFacts(type, facts);
+                    return getTypeOrPropertyAccessTypeWithFacts(type, facts);
                 }
                 if (type.flags & TypeFlags.NotUnionOrUnit) {
                     return type;
@@ -10216,7 +10216,7 @@ namespace ts {
                 const facts = assumeTrue ?
                     typeofEQFacts[literal.text] || TypeFacts.TypeofEQHostObject :
                     typeofNEFacts[literal.text] || TypeFacts.TypeofNEHostObject;
-                return getTypeWithFacts(type, facts);
+                return getTypeOrPropertyAccessTypeWithFacts(type, facts);
             }
 
             function narrowTypeBySwitchOnDiscriminant(type: Type, switchStatement: SwitchStatement, clauseStart: number, clauseEnd: number) {
@@ -10378,6 +10378,160 @@ namespace ts {
                         break;
                 }
                 return type;
+            }
+
+           // function getTypeFactsFromPredicates(predicates: any) {
+             //   predicates;
+                /* function getTypeFacts(type: Type): TypeFacts {
+            const flags = type.flags;
+            if (flags & TypeFlags.String) {
+                return strictNullChecks ? TypeFacts.StringStrictFacts : TypeFacts.StringFacts;
+            }
+            if (flags & TypeFlags.StringLiteral) {
+                return strictNullChecks ?
+                    (<LiteralType>type).text === "" ? TypeFacts.EmptyStringStrictFacts : TypeFacts.NonEmptyStringStrictFacts :
+                    (<LiteralType>type).text === "" ? TypeFacts.EmptyStringFacts : TypeFacts.NonEmptyStringFacts;
+            }
+            if (flags & (TypeFlags.Number | TypeFlags.Enum)) {
+                return strictNullChecks ? TypeFacts.NumberStrictFacts : TypeFacts.NumberFacts;
+            }
+            if (flags & (TypeFlags.NumberLiteral | TypeFlags.EnumLiteral)) {
+                const isZero = (<LiteralType>type).text === "0";
+                return strictNullChecks ?
+                    isZero ? TypeFacts.ZeroStrictFacts : TypeFacts.NonZeroStrictFacts :
+                    isZero ? TypeFacts.ZeroFacts : TypeFacts.NonZeroFacts;
+            }
+            if (flags & TypeFlags.Boolean) {
+                return strictNullChecks ? TypeFacts.BooleanStrictFacts : TypeFacts.BooleanFacts;
+            }
+            if (flags & TypeFlags.BooleanLike) {
+                return strictNullChecks ?
+                    type === falseType ? TypeFacts.FalseStrictFacts : TypeFacts.TrueStrictFacts :
+                    type === falseType ? TypeFacts.FalseFacts : TypeFacts.TrueFacts;
+            }
+            if (flags & TypeFlags.Object) {
+                return isFunctionObjectType(<ObjectType>type) ?
+                    strictNullChecks ? TypeFacts.FunctionStrictFacts : TypeFacts.FunctionFacts :
+                    strictNullChecks ? TypeFacts.ObjectStrictFacts : TypeFacts.ObjectFacts;
+            }
+            if (flags & (TypeFlags.Void | TypeFlags.Undefined)) {
+                return TypeFacts.UndefinedFacts;
+            }
+            if (flags & TypeFlags.Null) {
+                return TypeFacts.NullFacts;
+            }
+            if (flags & TypeFlags.ESSymbol) {
+                return strictNullChecks ? TypeFacts.SymbolStrictFacts : TypeFacts.SymbolFacts;
+            }
+            if (flags & TypeFlags.TypeParameter) {
+                const constraint = getConstraintOfTypeParameter(<TypeParameter>type);
+                return getTypeFacts(constraint || emptyObjectType);
+            }
+            if (flags & TypeFlags.UnionOrIntersection) {
+                return getTypeFactsOfTypes((<UnionOrIntersectionType>type).types);
+            }
+            return TypeFacts.All;
+        }*/
+           // }
+            function addPredicateAndSimplify(field: Identifier, predicates: NodeArray<PredicateExpression>, include: TypeFacts): NodeArray<PredicateExpression> {
+                //predicates.push(convertFactToPredicate(include));
+                convertFactToPredicate(include);
+                include;
+                field;
+                return predicates;
+
+                function convertFactToPredicate(include: TypeFacts): PredicateExpression {
+                    if (TypeFacts.NEUndefined & include) { //werkt dit zo?
+                        //add PresentPredicateExpression;
+                    }
+                    if (TypeFacts.TypeofEQString & include) {
+                        //add TypePredicateExpression
+                    }
+                    //ook voor andere types
+                    if (TypeFacts.EQUndefined & include) {
+                        //add not(presentpredicateexpression)
+                    }
+                    return;
+                }
+            }
+            function getTypeWithFactsAndPredicates(field: Identifier, include: TypeFacts, predicates: NodeArray<PredicateExpression>): Type {
+                const simplPredicates = addPredicateAndSimplify(field, predicates, include);
+                //1. present(field) must be in simplPredicates
+                //2. is type(field) === ??? present? if so: return that type, otherwise: return any;
+                return getTypeOfPresentFieldInPredicates(simplPredicates, field);
+            }
+            function getTypeOrPropertyAccessTypeWithFacts(type: Type, include: TypeFacts) {
+                // <nathalie>
+                if(reference.kind === SyntaxKind.PropertyAccessExpression) {
+                    //TODO not performant (already checked in "checkPropertyAccessExpression" as well.
+                    const objtype = checkExpression((<PropertyAccessExpression> reference).expression);
+                    //const type = checkNonNullExpression(expr.left);
+                    //if (isTypeAny(type) || type === silentNeverType) {
+                    //    return type;
+                    //}
+
+                    const apparentType = getApparentType(getWidenedType(objtype));
+                    if (getObjectFlags(apparentType) & ObjectFlags.Interface) {
+                        //negeer types
+                        const predicates = (<InterfaceTypeWithDeclaredMembers> apparentType).declaredPredicates;
+                        if (predicates.length > 0) { //Only do this for interfaces that have predicates (to be compatible with existing interfaces)
+                            return getTypeWithFactsAndPredicates((<PropertyAccessExpression> reference).name, include, predicates);
+                        }
+                    }
+                }
+                return getTypeWithFacts(type, include);
+            }
+        }
+
+        function getTypeOfPresentFieldInPredicates(predicates: NodeArray<PredicateExpression>, field: Identifier): Type {
+            //TODO in the ideal world the predicate would also use type flags for all the constraints.
+
+            //1. present(field) must be in simplPredicates
+            //2. is type(field) === ??? present? if so: return that type, otherwise: return any;
+            // returns undefined als field niet present is
+            let presentbool = false;
+            //let notpresentbool = false;
+            let resulttype: Type = anyType;
+            // TODO alleen als er predikaten zijn om de originele werking van interfaces ook te behouden => flow ding terug aanpassen
+            for (const predicate of predicates) {
+                switch (predicate.kind) {
+                    case SyntaxKind.PredicateTypeExpression:
+                        const predtype = <PredicateTypeExpression>predicate;
+                        if (predtype.left_arg.text === field.text) {
+                            const desiredtype_str = predtype.right.text;
+                            const capitalized = desiredtype_str.charAt(0).toUpperCase() + desiredtype_str.slice(1);
+                            resulttype = getGlobalType(capitalized); //identifier omzetten naar type
+                        }
+                        break;
+                    case SyntaxKind.PredicatePresentExpression:
+                        const present = <PredicatePresentExpression>predicate;
+                        for (const fieldname of present.arguments) {
+                            if (fieldname.text === field.text) {
+                                presentbool = true;
+                            }
+                        }
+                        break;
+                    case SyntaxKind.PredicateLogicalExpression:
+                        const logical = <PredicateLogicalExpression>predicate;
+                        if (logical.expression.text === "not") {
+                            if (logical.arguments[0].kind === SyntaxKind.PredicatePresentExpression) {
+                                const predtype = <PredicatePresentExpression>logical.arguments[0];
+                                for (const fieldname of predtype.arguments) {
+                                    if (fieldname.text === field.text) {
+                                        //notpresentbool = true;
+                                        return neverType;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                }
+            }
+            if (presentbool) {
+                return resulttype;
+            } else {
+                error(field, Diagnostics.Cannot_access_0_from_the_object_because_its_interface_does_not_contain_the_predicate_present_0_Use_a_non_undefined_type_guard, field.text);
+                return unknownType;
             }
         }
 
@@ -12580,13 +12734,34 @@ namespace ts {
                 checkClassPropertyAccess(node, left, apparentType, prop);
             }
 
-            const propType = getTypeOfSymbol(prop);
+            let propType = getTypeOfSymbol(prop);
             const assignmentKind = getAssignmentTargetKind(node);
 
             if (assignmentKind) {
                 if (isReferenceToReadonlyEntity(<Expression>node, prop) || isReferenceThroughNamespaceImport(<Expression>node)) {
                     error(right, Diagnostics.Cannot_assign_to_0_because_it_is_a_constant_or_a_read_only_property, right.text);
                     return unknownType;
+                }
+            }
+
+            //<nathalie>
+            // If the left side has an interface type: take predicates into account for checking presence and type
+            if (node.kind == SyntaxKind.PropertyAccessExpression) {
+                if (getObjectFlags(apparentType) & ObjectFlags.Interface) {
+                    // ignore type inferred from this field before if there are predicates
+                    const predicates = (<InterfaceTypeWithDeclaredMembers> apparentType).declaredPredicates;
+                    if (predicates.length > 0) {
+                        /* TODO BUG let's take the following predicates:
+                        - present(a);
+                        - implic(present(a), present(b));
+                        then: present(b) must be present as well in every case,
+                        thus it should actually be present(a) + present(b)
+                        this is not yet supported
+                        => future work (possibly with simplifyPredicates)
+                         */
+                        const newtype = getTypeOfPresentFieldInPredicates(predicates, right);
+                        propType = newtype;
+                    }
                 }
             }
 
@@ -12598,6 +12773,9 @@ namespace ts {
                 !(prop.flags & SymbolFlags.Method && propType.flags & TypeFlags.Union)) {
                 return propType;
             }
+
+
+
             const flowType = getFlowTypeOfReference(node, propType, /*assumeInitialized*/ true, /*flowContainer*/ undefined);
             return assignmentKind ? getBaseTypeOfLiteralType(flowType) : flowType;
         }
