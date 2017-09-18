@@ -9802,7 +9802,7 @@ namespace ts {
             return false;
         }
 
-        function getFlowTypeOfReference(reference: Node, declaredType: Type, assumeInitialized: boolean, flowContainer: Node) {
+        function getFlowTypeOfReference(reference: Node, declaredType: Type, assumeInitialized: boolean, flowContainer: Node, predicatePresent: boolean) {
             let key: string;
             if (!reference.flowNode || assumeInitialized && !(declaredType.flags & TypeFlags.Narrowable)) {
                 return declaredType;
@@ -9820,6 +9820,20 @@ namespace ts {
             const resultType = getObjectFlags(evolvedType) & ObjectFlags.EvolvingArray && isEvolvingArrayOperationTarget(reference) ? anyArrayType : finalizeEvolvingArrayType(evolvedType);
             if (reference.parent.kind === SyntaxKind.NonNullExpression && getTypeWithFacts(resultType, TypeFacts.NEUndefinedOrNull).flags & TypeFlags.Never) {
                 return declaredType;
+            }
+            if (predicatePresent === false) {
+                //TODO ERROR
+                // if null then not relevant
+                // if false then not present
+                // is possibly set to true due to flow condition
+                // if not: give error
+                let text = "<a property of an object>";
+                if (reference.kind === SyntaxKind.PropertyAccessExpression) {
+                    if((<PropertyAccessExpression> reference).name.kind === SyntaxKind.Identifier) {
+                        text = (<Identifier> (<PropertyAccessExpression> reference).name).text;
+                    }
+                }
+                error(reference, Diagnostics.Cannot_access_0_from_the_object_because_its_interface_does_not_contain_the_predicate_present_0_Use_a_non_undefined_type_guard, text);
             }
             return resultType;
 
@@ -10434,22 +10448,35 @@ namespace ts {
         }*/
            // }
             function addPredicateAndSimplify(field: Identifier, predicates: NodeArray<PredicateExpression>, include: TypeFacts): NodeArray<PredicateExpression> {
-                //predicates.push(convertFactToPredicate(include));
-                convertFactToPredicate(include);
-                include;
-                field;
-                return predicates;
+                const simplPredicates: NodeArray<PredicateExpression> = createNodeArray<PredicateExpression>();
+                predicates.forEach((p:PredicateExpression) => simplPredicates.push(p));
+                //simplPredicates.push(predicates);
+                const pred = convertFactToPredicate(include);
+                if (pred) {
+                    simplPredicates.push(pred);
+                }
+                //convertFactToPredicate(include);
+                return simplPredicates;
 
                 function convertFactToPredicate(include: TypeFacts): PredicateExpression {
+                    //TODO not pretty to construct predicates here
                     if (TypeFacts.NEUndefined & include) { //werkt dit zo?
                         //add PresentPredicateExpression;
+                        const ppe_kind = SyntaxKind.PredicatePresentExpression;
+                        let ppe_expr = <Identifier>createNode(SyntaxKind.Identifier);
+                        ppe_expr.text = "present"; // = { kind: SyntaxKind.Identifier, text: "present"};
+                        const ppe_args: NodeArray<Identifier> = createNodeArray<Identifier>();
+                        ppe_args.push(field);
+                        return <PredicatePresentExpression>{ kind: ppe_kind, expression: ppe_expr, arguments: ppe_args };
                     }
                     if (TypeFacts.TypeofEQString & include) {
                         //add TypePredicateExpression
+                        return;
                     }
                     //ook voor andere types
                     if (TypeFacts.EQUndefined & include) {
                         //add not(presentpredicateexpression)
+                        return;
                     }
                     return;
                 }
@@ -10458,7 +10485,15 @@ namespace ts {
                 const simplPredicates = addPredicateAndSimplify(field, predicates, include);
                 //1. present(field) must be in simplPredicates
                 //2. is type(field) === ??? present? if so: return that type, otherwise: return any;
-                return getTypeOfPresentFieldInPredicates(simplPredicates, field);
+                //TODO hier ook een error field meegeven en supporten
+                const present = getPresenceOfFieldInPredicates(simplPredicates, field);
+                const type = getTypeOfFieldInPredicates(simplPredicates, field);
+                predicatePresent = present;
+                //niet meer nodig want wordt later in flow functie gehandled
+                //if (!present) {
+                //    error(field, Diagnostics.Cannot_access_0_from_the_object_because_its_interface_does_not_contain_the_predicate_present_0_Use_a_non_undefined_type_guard, field.text);
+                //}
+                return type;
             }
             function getTypeOrPropertyAccessTypeWithFacts(type: Type, include: TypeFacts) {
                 // <nathalie>
@@ -10483,31 +10518,23 @@ namespace ts {
             }
         }
 
-        function getTypeOfPresentFieldInPredicates(predicates: NodeArray<PredicateExpression>, field: Identifier): Type {
+        function getPresenceOfFieldInPredicates(predicates: NodeArray<PredicateExpression>, field: Identifier): boolean{
             //TODO in the ideal world the predicate would also use type flags for all the constraints.
 
             //1. present(field) must be in simplPredicates
             //2. is type(field) === ??? present? if so: return that type, otherwise: return any;
             // returns undefined als field niet present is
-            let presentbool = false;
+            //let presentbool = false;
             //let notpresentbool = false;
-            let resulttype: Type = anyType;
+            //let resulttype: Type = anyType;
             // TODO alleen als er predikaten zijn om de originele werking van interfaces ook te behouden => flow ding terug aanpassen
             for (const predicate of predicates) {
                 switch (predicate.kind) {
-                    case SyntaxKind.PredicateTypeExpression:
-                        const predtype = <PredicateTypeExpression>predicate;
-                        if (predtype.left_arg.text === field.text) {
-                            const desiredtype_str = predtype.right.text;
-                            const capitalized = desiredtype_str.charAt(0).toUpperCase() + desiredtype_str.slice(1);
-                            resulttype = getGlobalType(capitalized); //identifier omzetten naar type
-                        }
-                        break;
                     case SyntaxKind.PredicatePresentExpression:
                         const present = <PredicatePresentExpression>predicate;
                         for (const fieldname of present.arguments) {
                             if (fieldname.text === field.text) {
-                                presentbool = true;
+                                return true; //presentbool = true;
                             }
                         }
                         break;
@@ -10519,7 +10546,8 @@ namespace ts {
                                 for (const fieldname of predtype.arguments) {
                                     if (fieldname.text === field.text) {
                                         //notpresentbool = true;
-                                        return neverType;
+                                        //return {type: neverType, errorInfo: errorInfo};
+                                        return false;
                                     }
                                 }
                             }
@@ -10527,12 +10555,50 @@ namespace ts {
                         break;
                 }
             }
-            if (presentbool) {
-                return resulttype;
-            } else {
-                error(field, Diagnostics.Cannot_access_0_from_the_object_because_its_interface_does_not_contain_the_predicate_present_0_Use_a_non_undefined_type_guard, field.text);
-                return unknownType;
+            return false;
+            /*
+            if (!presentbool) {
+                errorInfo = chainDiagnosticMessages(errorInfo, Diagnostics.Cannot_access_0_from_the_object_because_its_interface_does_not_contain_the_predicate_present_0_Use_a_non_undefined_type_guard, field.text);
             }
+            //    error(field, Diagnostics.Cannot_access_0_from_the_object_because_its_interface_does_not_contain_the_predicate_present_0_Use_a_non_undefined_type_guard, field.text);
+            //}
+            //return presentbool ? resulttype : null;
+            return {type: resulttype, errorInfo: errorInfo};
+            */
+        }
+        function getTypeOfFieldInPredicates(predicates: NodeArray<PredicateExpression>, field: Identifier): Type {
+            //TODO in the ideal world the predicate would also use type flags for all the constraints.
+
+            //1. present(field) must be in simplPredicates
+            //2. is type(field) === ??? present? if so: return that type, otherwise: return any;
+            // returns undefined als field niet present is
+            //let presentbool = false;
+            //let notpresentbool = false;
+            //let resulttype: Type = anyType;
+            // TODO alleen als er predikaten zijn om de originele werking van interfaces ook te behouden => flow ding terug aanpassen
+            for (const predicate of predicates) {
+                switch (predicate.kind) {
+                    case SyntaxKind.PredicateTypeExpression:
+                        const predtype = <PredicateTypeExpression>predicate;
+                        if (predtype.left_arg.text === field.text) {
+                            const desiredtype_str = predtype.right.text;
+                            const capitalized = desiredtype_str.charAt(0).toUpperCase() + desiredtype_str.slice(1);
+                            const type = getGlobalType(capitalized);
+                            return type; //identifier omzetten naar type
+                        }
+                        break;
+                }
+            }
+            return anyType;
+
+            /*if (!presentbool) {
+                errorInfo = chainDiagnosticMessages(errorInfo, Diagnostics.Cannot_access_0_from_the_object_because_its_interface_does_not_contain_the_predicate_present_0_Use_a_non_undefined_type_guard, field.text);
+            }
+            //    error(field, Diagnostics.Cannot_access_0_from_the_object_because_its_interface_does_not_contain_the_predicate_present_0_Use_a_non_undefined_type_guard, field.text);
+            //}
+            //return presentbool ? resulttype : null;
+            return {type: resulttype, errorInfo: errorInfo};
+            */
         }
 
         function getTypeOfSymbolAtLocation(symbol: Symbol, location: Node) {
@@ -10731,7 +10797,7 @@ namespace ts {
             const assumeInitialized = isParameter || isOuterVariable ||
                 type !== autoType && type !== autoArrayType && (!strictNullChecks || (type.flags & TypeFlags.Any) !== 0) ||
                 isInAmbientContext(declaration);
-            const flowType = getFlowTypeOfReference(node, type, assumeInitialized, flowContainer);
+            const flowType = getFlowTypeOfReference(node, type, assumeInitialized, flowContainer, /*predicatePresent*/ null);
             // A variable is considered uninitialized when it is possible to analyze the entire control flow graph
             // from declaration to use, and when the variable's declared type doesn't include undefined but the
             // control flow based type does include undefined.
@@ -10997,7 +11063,7 @@ namespace ts {
             if (isClassLike(container.parent)) {
                 const symbol = getSymbolOfNode(container.parent);
                 const type = hasModifier(container, ModifierFlags.Static) ? getTypeOfSymbol(symbol) : (<InterfaceType>getDeclaredTypeOfSymbol(symbol)).thisType;
-                return getFlowTypeOfReference(node, type, /*assumeInitialized*/ true, /*flowContainer*/ undefined);
+                return getFlowTypeOfReference(node, type, /*assumeInitialized*/ true, /*flowContainer*/ undefined, /*predicatePresent*/ null);
             }
 
             if (isInJavaScriptFile(node)) {
@@ -12746,6 +12812,10 @@ namespace ts {
 
             //<nathalie>
             // If the left side has an interface type: take predicates into account for checking presence and type
+            //let errorMessage = null;
+            //let errorInfo: DiagnosticMessageChain;
+            let predicateType: Type;
+            let predicatePresent: boolean;
             if (node.kind == SyntaxKind.PropertyAccessExpression) {
                 if (getObjectFlags(apparentType) & ObjectFlags.Interface) {
                     // ignore type inferred from this field before if there are predicates
@@ -12759,8 +12829,17 @@ namespace ts {
                         this is not yet supported
                         => future work (possibly with simplifyPredicates)
                          */
-                        const newtype = getTypeOfPresentFieldInPredicates(predicates, right);
-                        propType = newtype;
+                        predicateType = getTypeOfFieldInPredicates(predicates, right);
+                        predicatePresent = getPresenceOfFieldInPredicates(predicates, right);
+                        propType = predicateType;
+
+                        //if (newtype) {
+                            //propType = type;
+                            //errorInfo = error;
+                        //} else {
+                            //field is not found: maybe still be found after flowtype
+                          //  errorInfo = chainDiagnosticMessages(errorInfo, Diagnostics.Cannot_access_0_from_the_object_because_its_interface_does_not_contain_the_predicate_present_0_Use_a_non_undefined_type_guard, right.text);
+                        //}
                     }
                 }
             }
@@ -12774,9 +12853,14 @@ namespace ts {
                 return propType;
             }
 
+            const flowType = getFlowTypeOfReference(node, propType, /*assumeInitialized*/ true, /*flowContainer*/ undefined, /*predatePresent*/ predicatePresent);
 
+            //TODO NATHALIE: dit werkt nog niet want beide keren komt "String" terug, want het type is in beide gevallen geweten
+            // in de flow typing is de present ook aanwezig, maar dat is hier niet geweten natuurlijk
+            //if (errorInfo && flowType === propType) {
+             //   diagnostics.add(createDiagnosticForNodeFromMessageChain(node, errorInfo));
+           // }
 
-            const flowType = getFlowTypeOfReference(node, propType, /*assumeInitialized*/ true, /*flowContainer*/ undefined);
             return assignmentKind ? getBaseTypeOfLiteralType(flowType) : flowType;
         }
 
