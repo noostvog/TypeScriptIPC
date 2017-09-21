@@ -10171,9 +10171,9 @@ namespace ts {
             }
 
             function narrowTypeByEquality(type: Type, operator: SyntaxKind, value: Expression, assumeTrue: boolean): Type {
-                if (type.flags & TypeFlags.Any) {
+                /*if (type.flags & TypeFlags.Any) {
                     return type;
-                }
+                }*/
                 if (operator === SyntaxKind.ExclamationEqualsToken || operator === SyntaxKind.ExclamationEqualsEqualsToken) {
                     assumeTrue = !assumeTrue;
                 }
@@ -10189,6 +10189,16 @@ namespace ts {
                             assumeTrue ? TypeFacts.EQNull : TypeFacts.NENull :
                             assumeTrue ? TypeFacts.EQUndefined : TypeFacts.NEUndefined;
                     return getTypeOrPropertyAccessTypeWithFacts(type, facts);
+                }
+
+                //<nathalie>
+                // Big change: previously this test was on top of the narrowTypeByEquality function
+                // But it had to be moved to after the if test above
+                // Because with the addition of constraints there are also constraint on the presence of the field
+                // (previously it was only on type (optional fields just got type union undefined)
+                // This means that even if the type is any, there can still be a presence constraint that can be narrowed.
+                if (type.flags & TypeFlags.Any) {
+                    return type;
                 }
                 if (type.flags & TypeFlags.NotUnionOrUnit) {
                     return type;
@@ -10471,16 +10481,43 @@ namespace ts {
                     }
                     if (TypeFacts.TypeofEQString & include) {
                         //add TypePredicateExpression
-                        return;
+                        return createTypePredicate("string");
+                    }
+                    if (TypeFacts.TypeofEQNumber & include) {
+                        //add TypePredicateExpression
+                        return createTypePredicate("number");
+                    }
+                    if (TypeFacts.TypeofEQBoolean & include) {
+                        //add TypePredicateExpression
+                        return createTypePredicate("boolean");
                     }
                     //ook voor andere types
                     if (TypeFacts.EQUndefined & include) {
                         //add not(presentpredicateexpression)
+                        const ppe_kind = SyntaxKind.PredicatePresentExpression;
+                        let ppe_expr = <Identifier>createNode(SyntaxKind.Identifier);
+                        ppe_expr.text = "present"; // = { kind: SyntaxKind.Identifier, text: "present"};
+                        const ppe_args: NodeArray<Identifier> = createNodeArray<Identifier>();
+                        ppe_args.push(field);
+                        const predexpr = <PredicatePresentExpression>{ kind: ppe_kind, expression: ppe_expr, arguments: ppe_args };
+                        predexpr;
+                        //TODO nog logical expression maken
                         return;
                     }
                     return;
                 }
+
+                function createTypePredicate(type: string): PredicateTypeExpression {
+                    const pte_kind = SyntaxKind.PredicateTypeExpression;
+                    let right = <Identifier> createNode(SyntaxKind.Identifier);
+                    right.text = type;
+                    let left_get = <Identifier> createNode(SyntaxKind.Identifier);
+                    left_get.text = "type";
+                    const operatorToken: BinaryOperatorToken = null;
+                    return <PredicateTypeExpression>{ right: right, left_arg: field, left_get: left_get, kind: pte_kind, operatorToken: operatorToken };
+                }
             }
+
             function getTypeWithFactsAndPredicates(field: Identifier, include: TypeFacts, predicates: NodeArray<PredicateExpression>): Type {
                 const simplPredicates = addPredicateAndSimplify(field, predicates, include);
                 //1. present(field) must be in simplPredicates
@@ -10581,10 +10618,11 @@ namespace ts {
                     case SyntaxKind.PredicateTypeExpression:
                         const predtype = <PredicateTypeExpression>predicate;
                         if (predtype.left_arg.text === field.text) {
-                            const desiredtype_str = predtype.right.text;
-                            const capitalized = desiredtype_str.charAt(0).toUpperCase() + desiredtype_str.slice(1);
-                            const type = getGlobalType(capitalized);
-                            return type; //identifier omzetten naar type
+                            switch (predtype.right.text) {
+                                case "string": return stringType;
+                                case "number": return numberType;
+                                case "boolean": return booleanType;
+                            }
                         }
                         break;
                 }
@@ -12854,12 +12892,6 @@ namespace ts {
             }
 
             const flowType = getFlowTypeOfReference(node, propType, /*assumeInitialized*/ true, /*flowContainer*/ undefined, /*predatePresent*/ predicatePresent);
-
-            //TODO NATHALIE: dit werkt nog niet want beide keren komt "String" terug, want het type is in beide gevallen geweten
-            // in de flow typing is de present ook aanwezig, maar dat is hier niet geweten natuurlijk
-            //if (errorInfo && flowType === propType) {
-             //   diagnostics.add(createDiagnosticForNodeFromMessageChain(node, errorInfo));
-           // }
 
             return assignmentKind ? getBaseTypeOfLiteralType(flowType) : flowType;
         }
