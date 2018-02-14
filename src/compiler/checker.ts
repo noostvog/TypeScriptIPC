@@ -1,5 +1,6 @@
 ﻿/// <reference path="moduleNameResolver.ts"/>
 /// <reference path="binder.ts"/>
+/// <reference path="../../scripts/propositional-sequent-calculus-prover.ts"/>
 
 /* @internal */
 namespace ts {
@@ -7736,11 +7737,15 @@ namespace ts {
                                 result &= indexTypesRelatedTo(source, originalSource, target, IndexKind.String, reportErrors);
                                 if (result) {
                                     result &= indexTypesRelatedTo(source, originalSource, target, IndexKind.Number, reportErrors);
+                                    if (result) {
+                                        result &= predicatesRelatedTo(source, target, reportErrors);
+                                    }
                                 }
                             }
                         }
                     }
                 }
+
                 expandingFlags = saveExpandingFlags;
                 depth--;
                 if (result) {
@@ -7755,7 +7760,250 @@ namespace ts {
                     relation[id] = reportErrors ? RelationComparisonResult.FailedAndReported : RelationComparisonResult.Failed;
                 }
                 return result;
-            }
+
+                //<Nathalie>
+                function predicatesRelatedTo(source: Type, target: Type, reportErrors: boolean): Ternary {
+                    source;
+                    target;
+                    reportErrors;
+                    predicatesRelatedToIntfIntf;
+                    predicatesRelatedToObjIntf;
+
+                    if (getObjectFlags(target) & ObjectFlags.Interface) {
+                        if (getObjectFlags(source) & ObjectFlags.Anonymous) {
+                            //CASE: let x: Interface = { ..., ... }
+                            //TODO CAST: gek genoeg is  bij "<Interface>{ ..., ...}" de source en target omgekeerd...
+                            const predicates = (<InterfaceTypeWithDeclaredMembers>target).declaredPredicates;
+                            if (predicates == undefined || predicates.length == 0) {
+                                return Ternary.True;
+                            }
+                            if (!predicatesRelatedToObjIntf(source, predicates, true, reportErrors)) {
+                                return Ternary.False;
+                            }
+                        }
+                    }
+                    return Ternary.True;
+                }
+                function predicatesRelatedToIntfIntf(source: Type, targetProp: string, reportErrors: boolean): Ternary {
+                    //TODO If interface has constraints, then we need to check whether these constraints/predicates are satisfied
+                    //using external library
+                    targetProp;
+                    if (getObjectFlags(source) & ObjectFlags.Interface) {
+                        // TODO the cast to _with declared members_ is not tested by an if test
+                        const predicates = (<InterfaceTypeWithDeclaredMembers>source).declaredPredicates;
+                        if (predicates == undefined || predicates.length == 0) {
+                            return Ternary.True;
+                        }
+                        //TODO voor elke property van target
+                        //TODO niet correct nu
+                        const predicateStr = translatePredicates(predicates);
+                        const proveresult = prove(predicateStr + " > " + targetProp);
+                        if (!proveresult) {
+                            if (reportErrors) {
+                                //reportError(Diagnostics.Predicates_of_interface_0_are_not_satisfied, typeToString(target));
+                                reportError(Diagnostics.Predicate_0_was_not_satisfied_in_type_1, predicateStr, typeToString(source));
+                            }
+                            return Ternary.False;
+                        }
+
+                        return Ternary.True
+                    }
+                    return Ternary.True;
+
+                    //LOGICAL CONSEQUENCE
+                    function prove(str: string): boolean {
+                        var proof: boolean = Prover.proveString(str);
+                        str;
+                        proof;
+                        return proof;
+                    }
+
+                    function translateLogicalOperator(operator: string): string {
+                        switch (operator) {
+                            case "or":
+                                return "|";
+                            case "and":
+                                return "&";
+                        }
+                        return "unknown logical operator";
+                    }
+
+                    function translatePredicates(predicates: NodeArray<PredicateExpression>): string {
+                        let resultaat: string = "";
+                        for (const predicate of predicates) {
+                            resultaat += " " + translatePredicate(predicate) + " & ";
+                        }
+                        resultaat = resultaat.substring(0, resultaat.length - 3);
+                        return resultaat;
+                    }
+
+                    function translatePredicate(predicate: PredicateExpression): string {
+                        switch (predicate.kind) {
+                            case SyntaxKind.PredicatePresentExpression:
+                                const present = <PredicatePresentExpression>predicate;
+                                return present.expression.text + "(" + present.arguments.map(txt => txt.text) + ")"
+                            case SyntaxKind.PredicateLogicalExpression:
+                                const logical = <PredicateLogicalExpression>predicate;
+                                if (logical.expression.text == "not") {
+                                    return "!(" + translatePredicate(logical.arguments[0]) + ")";
+                                } else {
+                                    return "(" + translatePredicate(logical.arguments[0]) + " " + translateLogicalOperator(logical.expression.text) + " " + translatePredicate(logical.arguments[1]) + ")";
+                                }
+                        }
+                        return "unknown predicate";
+                    }
+                }
+
+                    //VALUATION
+
+                    function predicatesRelatedToObjIntf(source: Type, predicates: NodeArray<PredicateExpression>, mainLevel: boolean, reportErrors: boolean): Ternary {
+
+                       for (const predicate of predicates) {
+                                // assume top level is callexpression => checken while type checking interface?
+                                if (!isPredicateSatisfied(source, predicate, reportErrors)) {
+                                    if (mainLevel && reportErrors) {
+                                        reportError(Diagnostics.Predicate_0_was_not_satisfied_in_type_1, predicateToString(predicate), typeToString(source));
+                                    }
+                                    return Ternary.False;
+                                }
+                            }
+                            return Ternary.True;
+                        function predicateToString(predicate: PredicateExpression): string {
+                            switch (predicate.kind) {
+                                case SyntaxKind.PredicateTypeExpression:
+                                    const type = <PredicateTypeExpression>predicate;
+                                    return type.left_get.text + "(" + type.left_arg.text + ") == " + type.right.text;
+                                case SyntaxKind.PredicatePresentExpression:
+                                    const present = <PredicatePresentExpression>predicate;
+                                    return present.expression.text + "(" + present.arguments.map(txt => txt.text) + ")"
+                                case SyntaxKind.PredicateLogicalExpression:
+                                    const logical = <PredicateLogicalExpression>predicate;
+                                    return logical.expression.text + "(" + logical.arguments.map(predicateToString) + ")";
+                            }
+                            return "unknown predicate";
+                        }
+
+                        function isCallPredicateSatisfied(source: Type, callexpr: PredicateLogicalExpression, reportErrors: boolean): Ternary {
+                            switch (callexpr.expression.text) {
+                                case "and":
+                                    if (!predicatesRelatedToObjIntf(source, callexpr.arguments, /*mainLevel*/ false, true && reportErrors)) { //TODO: nu nog correct?
+                                        return Ternary.False;
+                                    }
+                                    break;
+                                case "or":
+                                    if (!anyPredicatesSatisfied(source, callexpr.arguments, /*reportErrors*/ false)) {
+                                        return Ternary.False;
+                                    }
+                                    break;
+                                case "not":
+                                    if (anyPredicatesSatisfied(source, callexpr.arguments, /*reportErrors*/ false)) {
+                                        return Ternary.False;
+                                    }
+                                    break;
+                                case "implic":
+                                    if (!implicPredicatesSatisfied(source, callexpr.arguments, /*reportErrors*/ false)) {
+                                        return Ternary.False;
+                                    }
+                                    break;
+                                case "iff":
+                                    if (!iffPredicatesSatisfied(source, callexpr.arguments, /*reportErrors*/ false)) {
+                                        return Ternary.False;
+                                    }
+                                    break;
+                                default:
+                                    return Ternary.False;
+                            }
+                            return Ternary.True;
+                        }
+
+                        function isBinaryPredicateSatisfied(source: Type, expr: PredicateTypeExpression, reportErrors: boolean): Ternary {
+                            switch (expr.left_get.text) {
+                                case "type":
+                                    const argname = expr.left_arg.text;
+                                    const argtype = getTypeOfPropertyOfType(source, argname);
+                                    const desiredtype_str = (expr.right).text;
+                                    const capitalized = desiredtype_str.charAt(0).toUpperCase() + desiredtype_str.slice(1);
+                                    // TODO better parse a "type" symbol in the parser, this is hacky
+                                    const desiredtype = getGlobalType(capitalized);
+                                    if (argtype) {
+                                        // TODO isRelatedTo overkill? Better to have an === relationship? We only use simple type anyway, that's basically what is done in isRelatedTo
+                                        const related = isRelatedTo(argtype, desiredtype);
+                                        if (!related && reportErrors) {
+                                            reportError(Diagnostics.Types_of_property_0_are_incompatible, argname);
+                                        }
+                                        return related;
+                                    }
+                                    return Ternary.True;
+                                default:
+                                    return Ternary.False;
+                            }
+                        }
+
+                        function isPresentPredicateSatisfied(source: Type, expr: PredicatePresentExpression, reportErrors: boolean): Ternary {
+                            if (!arePresent(source, expr.arguments.map(arg => arg.text), reportErrors)) {
+                                return Ternary.False;
+                            }
+                            return Ternary.True;
+                        }
+
+                        function isPredicateSatisfied(source: Type, expr: PredicateExpression, reportErrors: boolean): Ternary {
+                            switch (expr.kind) {
+                                case SyntaxKind.PredicateTypeExpression:
+                                    return isBinaryPredicateSatisfied(source, <PredicateTypeExpression>expr, reportErrors);
+                                case SyntaxKind.PredicateLogicalExpression:
+                                    return isCallPredicateSatisfied(source, <PredicateLogicalExpression>expr, reportErrors);
+                                case SyntaxKind.PredicatePresentExpression:
+                                    return isPresentPredicateSatisfied(source, <PredicatePresentExpression>expr, reportErrors);
+                                default:
+                                    return Ternary.False;
+                            }
+                        }
+
+                        function implicPredicatesSatisfied(source: Type, predicates: NodeArray<PredicateExpression>, reportErrors: boolean): Ternary {
+                            const arg1 = isPredicateSatisfied(source, predicates[0], reportErrors);
+                            const arg2 = isPredicateSatisfied(source, predicates[1], reportErrors);
+                            if (arg1 && !arg2) {
+                                return Ternary.False;
+                            }
+                            return Ternary.True;
+                        }
+
+                        function iffPredicatesSatisfied(source: Type, predicates: NodeArray<PredicateExpression>, reportErrors: boolean): Ternary {
+                            const reversed = createNodeArray<PredicateExpression>();
+                            reversed.push(predicates[0]);
+                            reversed.push(predicates[1]);
+                            return implicPredicatesSatisfied(source, predicates, reportErrors)
+                                && implicPredicatesSatisfied(source, reversed, reportErrors);
+                        }
+
+                        function anyPredicatesSatisfied(source: Type, predicates: NodeArray<PredicateExpression>, reportErrors: boolean): Ternary {
+                            for (const predicate of predicates) {
+                                if (isPredicateSatisfied(source, predicate, reportErrors)) {
+                                    return Ternary.True;
+                                }
+                            }
+                            return Ternary.False;
+
+                        }
+                        function arePresent(source: Type, args: string[], reportErrors: boolean): Ternary {
+                            source = getApparentType(source);
+                            if (source.flags & TypeFlags.Object) {
+                                for (const name of args) {
+                                    const resolved = resolveStructuredTypeMembers(<ObjectType>source);
+                                    const symbol = resolved.members[name];
+                                    if (!(symbol && symbolIsValue(symbol))) {
+                                        if (reportErrors) {
+                                            reportError(Diagnostics.Property_0_is_missing_in_type_1, name, typeToString(source))
+                                        }
+                                        return Ternary.False;
+                                    }
+                                }
+                            }
+                            return Ternary.True;
+                        }
+                }
+}
+
 
             // A type [P in S]: X is related to a type [P in T]: Y if T is related to S and X is related to Y.
             function mappedTypeRelatedTo(source: Type, target: Type, reportErrors: boolean): Ternary {
@@ -7789,6 +8037,9 @@ namespace ts {
                 return Ternary.False;
             }
 
+
+            //}
+
             function propertiesRelatedTo(source: Type, target: Type, reportErrors: boolean): Ternary {
                 if (relation === identityRelation) {
                     return propertiesIdenticalTo(source, target);
@@ -7812,11 +8063,13 @@ namespace ts {
                                 return Ternary.False;
                             }
                             else {
-                                const predicatesOK = arePredicatesSatisfied(source, target, reportErrors);
+                                /*
+                                //<Nathalie>
+                                const predicatesOK = predicatesRelatedTo(source, targetProp.name, reportErrors);
                                 if (!predicatesOK && reportErrors) {
                                     reportError(Diagnostics.Predicates_of_interface_0_are_not_satisfied, typeToString(target));
                                     return Ternary.False;
-                                }
+                                }*/
                             }
                         }
                         else if (!(targetProp.flags & SymbolFlags.Prototype)) {
@@ -7864,12 +8117,13 @@ namespace ts {
                                 return Ternary.False;
                             }
                             result &= related;
-                            const predicatesOK = arePredicatesSatisfied(source, target, reportErrors);
+                            //<Nathalie>
+                            /*const predicatesOK = predicatesRelatedTo(source, targetProp.name, reportErrors);
                             if (!predicatesOK && reportErrors) {
                                 reportError(Diagnostics.Predicates_of_interface_0_are_not_satisfied, typeToString(target));
                                 return Ternary.False;
                             }
-                            result &= predicatesOK;
+                            result &= predicatesOK;*/
                             // When checking for comparability, be more lenient with optional properties.
                             if (relation !== comparableRelation && sourceProp.flags & SymbolFlags.Optional && !(targetProp.flags & SymbolFlags.Optional)) {
                                 // TypeScript 1.0 spec (April 2014): 3.8.3
@@ -7890,169 +8144,6 @@ namespace ts {
                 }
                 return result;
             }
-
-            function arePredicatesSatisfied(source: Type, target: Type, reportErrors: boolean): Ternary {
-
-                if (getObjectFlags(target) & ObjectFlags.Interface) {
-                    // TODO the cast to _with declared members_ is not tested by an if test
-                    const predicates = (<InterfaceTypeWithDeclaredMembers>target).declaredPredicates;
-                    if (predicates == undefined) { // } || predicates.length == 0) {
-                        return Ternary.True;
-                    }
-                    if (!allPredicatesSatisfied(source, predicates, /*mainLevel*/ true, reportErrors)) {
-                        return Ternary.False;
-                    }
-                }
-                return Ternary.True;
-
-                function allPredicatesSatisfied(source: Type, predicates: NodeArray<PredicateExpression>, mainLevel: boolean, reportErrors: boolean): Ternary {
-                    for (const predicate of predicates) {
-                        // assume top level is callexpression => checken while type checking interface?
-                        if (!isPredicateSatisfied(source, predicate, reportErrors)) {
-                            if (mainLevel && reportErrors) {
-                                reportError(Diagnostics.Predicate_0_was_not_satisfied_in_type_1, predicateToString(predicate), typeToString(source));
-                            }
-                            return Ternary.False;
-                        }
-                    }
-                    return Ternary.True;
-                }
-
-                function predicateToString(predicate: PredicateExpression): string {
-                    switch (predicate.kind) {
-                        case SyntaxKind.PredicateTypeExpression:
-                            const type = <PredicateTypeExpression>predicate;
-                            return type.left_get.text + "(" + type.left_arg.text + ") == " + type.right.text;
-                        case SyntaxKind.PredicatePresentExpression:
-                            const present = <PredicatePresentExpression>predicate;
-                            return present.expression.text + "(" + present.arguments.map(txt => txt.text) + ")"
-                        case SyntaxKind.PredicateLogicalExpression:
-                            const logical = <PredicateLogicalExpression>predicate;
-                            return logical.expression.text + "(" + logical.arguments.map(predicateToString) + ")";
-                    }
-                    return "unknown predicate";
-                }
-
-                function isCallPredicateSatisfied(source: Type, callexpr: PredicateLogicalExpression, reportErrors: boolean): Ternary {
-                    switch (callexpr.expression.text) {
-                        case "and":
-                            if (!allPredicatesSatisfied(source, callexpr.arguments, /*mainLevel*/ false, true && reportErrors)) {
-                                return Ternary.False;
-                            }
-                            break;
-                        case "or":
-                            if (!anyPredicatesSatisfied(source, callexpr.arguments, /*reportErrors*/ false)) {
-                                return Ternary.False;
-                            }
-                            break;
-                        case "not":
-                            if (anyPredicatesSatisfied(source, callexpr.arguments, /*reportErrors*/ false)) {
-                                return Ternary.False;
-                            }
-                            break;
-                        case "implic":
-                            if (!implicPredicatesSatisfied(source, callexpr.arguments, /*reportErrors*/ false)) {
-                                return Ternary.False;
-                            }
-                            break;
-                        case "iff":
-                            if (!iffPredicatesSatisfied(source, callexpr.arguments, /*reportErrors*/ false)) {
-                                return Ternary.False;
-                            }
-                            break;
-                        default:
-                            return Ternary.False;
-                    }
-                    return Ternary.True;
-                }
-
-                function isBinaryPredicateSatisfied(source: Type, expr: PredicateTypeExpression, reportErrors: boolean): Ternary {
-                    switch (expr.left_get.text) {
-                        case "type":
-                            const argname = expr.left_arg.text;
-                            const argtype = getTypeOfPropertyOfType(source, argname);
-                            const desiredtype_str = (expr.right).text;
-                            const capitalized = desiredtype_str.charAt(0).toUpperCase() + desiredtype_str.slice(1);
-                            // TODO better parse a "type" symbol in the parser, this is hacky
-                            const desiredtype = getGlobalType(capitalized);
-                            if (argtype) {
-                                // TODO isRelatedTo overkill? Better to have an === relationship? We only use simple type anyway, that's basically what is done in isRelatedTo
-                                const related = isRelatedTo(argtype, desiredtype);
-                                if (!related && reportErrors) {
-                                    reportError(Diagnostics.Types_of_property_0_are_incompatible, argname);
-                                }
-                                return related;
-                            }
-                            return Ternary.True;
-                        default:
-                            return Ternary.False;
-                    }
-                }
-
-                function isPresentPredicateSatisfied(source: Type, expr: PredicatePresentExpression, reportErrors: boolean): Ternary {
-                    if (!arePresent(source, expr.arguments.map(arg => arg.text), reportErrors)) {
-                        return Ternary.False;
-                    }
-                    return Ternary.True;
-                }
-
-                function isPredicateSatisfied(source: Type, expr: PredicateExpression, reportErrors: boolean): Ternary {
-                    switch (expr.kind) {
-                        case SyntaxKind.PredicateTypeExpression:
-                            return isBinaryPredicateSatisfied(source, <PredicateTypeExpression>expr, reportErrors);
-                        case SyntaxKind.PredicateLogicalExpression:
-                            return isCallPredicateSatisfied(source, <PredicateLogicalExpression>expr, reportErrors);
-                        case SyntaxKind.PredicatePresentExpression:
-                            return isPresentPredicateSatisfied(source, <PredicatePresentExpression>expr, reportErrors);
-                        default:
-                            return Ternary.False;
-                    }
-                }
-
-                function implicPredicatesSatisfied(source: Type, predicates: NodeArray<PredicateExpression>, reportErrors: boolean): Ternary {
-                    const arg1 = isPredicateSatisfied(source, predicates[0], reportErrors);
-                    const arg2 = isPredicateSatisfied(source, predicates[1], reportErrors);
-                    if (arg1 && !arg2) {
-                        return Ternary.False;
-                    }
-                    return Ternary.True;
-                }
-
-                function iffPredicatesSatisfied(source: Type, predicates: NodeArray<PredicateExpression>, reportErrors: boolean): Ternary {
-                    const reversed = createNodeArray<PredicateExpression>();
-                    reversed.push(predicates[0]);
-                    reversed.push(predicates[1]);
-                    return implicPredicatesSatisfied(source, predicates, reportErrors)
-                        && implicPredicatesSatisfied(source, reversed, reportErrors);
-                }
-
-                function anyPredicatesSatisfied(source: Type, predicates: NodeArray<PredicateExpression>, reportErrors: boolean): Ternary {
-                    for (const predicate of predicates) {
-                        if (isPredicateSatisfied(source, predicate, reportErrors)) {
-                            return Ternary.True;
-                        }
-                    }
-                    return Ternary.False;
-
-                }
-                function arePresent(source: Type, args: string[], reportErrors: boolean): Ternary {
-                    source = getApparentType(source);
-                    if (source.flags & TypeFlags.Object) {
-                        for (const name of args) {
-                            const resolved = resolveStructuredTypeMembers(<ObjectType>source);
-                            const symbol = resolved.members[name];
-                            if (!(symbol && symbolIsValue(symbol))) {
-                                if (reportErrors) {
-                                    reportError(Diagnostics.Property_0_is_missing_in_type_1, name, typeToString(source))
-                                }
-                                return Ternary.False;
-                            }
-                        }
-                    }
-                    return Ternary.True;
-                }
-            }
-
 
             function propertiesIdenticalTo(source: Type, target: Type): Ternary {
                 if (!(source.flags & TypeFlags.Object && target.flags & TypeFlags.Object)) {
@@ -10457,6 +10548,7 @@ namespace ts {
             return TypeFacts.All;
         }*/
            // }
+            //<nathalie>
             function addPredicateAndSimplify(field: Identifier, predicates: NodeArray<PredicateExpression>, include: TypeFacts): NodeArray<PredicateExpression> {
                 const simplPredicates: NodeArray<PredicateExpression> = createNodeArray<PredicateExpression>();
                 predicates.forEach((p:PredicateExpression) => simplPredicates.push(p));
@@ -10500,9 +10592,12 @@ namespace ts {
                         const ppe_args: NodeArray<Identifier> = createNodeArray<Identifier>();
                         ppe_args.push(field);
                         const predexpr = <PredicatePresentExpression>{ kind: ppe_kind, expression: ppe_expr, arguments: ppe_args };
-                        predexpr;
-                        //TODO nog logical expression maken
-                        return;
+                        const ple_kind = SyntaxKind.PredicateLogicalExpression;
+                        let ple_expr = <Identifier> createNode(SyntaxKind.Identifier);
+                        ple_expr.text = "not";
+                        const ple_args: NodeArray<PredicateExpression> = createNodeArray<PredicateExpression>();
+                        ple_args.push(predexpr);
+                        return <PredicateLogicalExpression> {kind: ple_kind, expression: ple_expr, arguments: ple_args};
                     }
                     return;
                 }
