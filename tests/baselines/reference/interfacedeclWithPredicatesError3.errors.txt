@@ -5,7 +5,7 @@ tests/cases/compiler/interfacedeclWithPredicatesError3.ts(5,9): error TS1005: 'i
     interface UsersShow{
         user_id?: number;
         screen_name?: string;
-        text: string;
+        text?: string;
     } with {
             
         type(5) == string;

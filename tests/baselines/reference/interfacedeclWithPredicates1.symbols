@@ -8,7 +8,7 @@ interface UsersShow{
     screen_name?: string;
 >screen_name : Symbol(UsersShow.screen_name, Decl(interfacedeclWithPredicates1.ts, 1, 21))
 
-    text: string;
+    text?: string;
 >text : Symbol(UsersShow.text, Decl(interfacedeclWithPredicates1.ts, 2, 25))
 
 } with {

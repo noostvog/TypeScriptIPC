@@ -1,22 +1,20 @@
 //// [propertyAccessIPC2.ts]
 interface PrivateMessage {
-    text?: any;
-    user_id?: any;
-    screen_name?: any;
+    text?: string;
+    userid?: number;
+    screenname?: string;
 } with {
-    type(user_id) == number;
-    type(text) == string;
-    type(screen_name) == string;
     present(text);
-    or(and(present(user_id), not(present(screen_name))),
-        and(not(present(user_id)), present(screen_name)));
+    or(and(present(userid), not(present(screenname))),
+        and(not(present(userid)), present(screenname)));
 }
 
-let msg: PrivateMessage = {text: "Hello", user_id: 123};
+
+let msg: PrivateMessage = {text: "Hello", userid: 123};
 msg.text; //OK
 
 
 
 //// [propertyAccessIPC2.js]
-var msg = { text: "Hello", user_id: 123 };
+var msg = { text: "Hello", userid: 123 };
 msg.text; //OK

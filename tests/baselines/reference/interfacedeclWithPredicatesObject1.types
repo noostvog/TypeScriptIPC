@@ -1,59 +1,44 @@
 === tests/cases/compiler/interfacedeclWithPredicatesObject1.ts ===
-interface UsersShow{
->UsersShow : UsersShow
+interface PrivateMessage{
+>PrivateMessage : PrivateMessage
 
-    user_id?: any;
->user_id : any
+    userid?: any;
+>userid : any
 
-    screen_name?: any;
->screen_name : any
+    screenname?: any;
+>screenname : any
 
     text: any;
 >text : any
 
 } with {
-    or(and(present(user_id), not(present(screen_name))),
+    or(and(present(userid), not(present(screenname))),
 >or : any
 >and : any
 >present : any
->user_id : any
+>userid : any
 >not : any
 >present : any
->screen_name : any
+>screenname : any
 
-    and(present(screen_name), not(present(user_id))));
+    and(present(screenname), not(present(userid))));
 >and : any
 >present : any
->screen_name : any
+>screenname : any
 >not : any
 >present : any
->user_id : any
-
-    type(user_id) == number;
->type : any
->user_id : any
->number : any
-
-    type(screen_name) == string;
->type : any
->screen_name : any
->string : any
-
-    type(text) == string;
->type : any
->text : any
->string : any
+>userid : any
 
     present(text);
 >present : any
 >text : any
 }
 
-let object: UsersShow = {user_id: 25, text: "text"}
->object : UsersShow
->UsersShow : UsersShow
->{user_id: 25, text: "text"} : { user_id: number; text: string; }
->user_id : number
+let object: PrivateMessage = {userid: 25, text: "text"};
+>object : PrivateMessage
+>PrivateMessage : PrivateMessage
+>{userid: 25, text: "text"} : { userid: number; text: string; }
+>userid : number
 >25 : 25
 >text : string
 >"text" : "text"

@@ -1,27 +1,24 @@
-tests/cases/compiler/propertyAccessIPC1.ts(16,5): error TS95009: Cannot access user_id from the object because its interface does not contain the predicate present(user_id). Use a non-undefined type guard.
-tests/cases/compiler/propertyAccessIPC1.ts(17,5): error TS95009: Cannot access screen_name from the object because its interface does not contain the predicate present(screen_name). Use a non-undefined type guard.
+tests/cases/compiler/propertyAccessIPC1.ts(13,1): error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
+tests/cases/compiler/propertyAccessIPC1.ts(14,1): error TS95009: Cannot access screenname from the object because its interface does not contain the predicate present(screenname). Use a non-undefined type guard.
 
 
 ==== tests/cases/compiler/propertyAccessIPC1.ts (2 errors) ====
     interface PrivateMessage {
-        text?: any;
-        user_id?: any;
-        screen_name?: any;
+        text?: string;
+        userid?: number;
+        screenname?: string;
     } with {
-        type(user_id) == number;
-        type(text) == string;
-        type(screen_name) == string;
         present(text);
-        or(and(present(user_id), not(present(screen_name))),
-            and(not(present(user_id)), present(screen_name)));
+        or(and(present(userid), not(present(screenname))),
+            and(not(present(userid)), present(screenname)));
     }
     
-    let msg: PrivateMessage = {text: "Hello", user_id: 123};
+    let msg: PrivateMessage = {text: "Hi!", userid: 42};
     msg.text; //OK
-    msg.user_id; //NOT OK: fields that are not always required may only be accessed inside a non-undefined typeguard
-        ~~~~~~~
-!!! error TS95009: Cannot access user_id from the object because its interface does not contain the predicate present(user_id). Use a non-undefined type guard.
-    msg.screen_name; //NOT OK
-        ~~~~~~~~~~~
-!!! error TS95009: Cannot access screen_name from the object because its interface does not contain the predicate present(screen_name). Use a non-undefined type guard.
+    msg.userid; //NOT OK: fields that are not always required may only be accessed inside a non-undefined typeguard
+    ~~~~~~~~~~
+!!! error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
+    msg.screenname; //NOT OK
+    ~~~~~~~~~~~~~~
+!!! error TS95009: Cannot access screenname from the object because its interface does not contain the predicate present(screenname). Use a non-undefined type guard.
     

@@ -1,28 +1,25 @@
 === tests/cases/compiler/interfacedeclWithPredicatesObject1.ts ===
-interface UsersShow{
->UsersShow : Symbol(UsersShow, Decl(interfacedeclWithPredicatesObject1.ts, 0, 0))
+interface PrivateMessage{
+>PrivateMessage : Symbol(PrivateMessage, Decl(interfacedeclWithPredicatesObject1.ts, 0, 0))
 
-    user_id?: any;
->user_id : Symbol(UsersShow.user_id, Decl(interfacedeclWithPredicatesObject1.ts, 0, 20))
+    userid?: any;
+>userid : Symbol(PrivateMessage.userid, Decl(interfacedeclWithPredicatesObject1.ts, 0, 25))
 
-    screen_name?: any;
->screen_name : Symbol(UsersShow.screen_name, Decl(interfacedeclWithPredicatesObject1.ts, 1, 18))
+    screenname?: any;
+>screenname : Symbol(PrivateMessage.screenname, Decl(interfacedeclWithPredicatesObject1.ts, 1, 17))
 
     text: any;
->text : Symbol(UsersShow.text, Decl(interfacedeclWithPredicatesObject1.ts, 2, 22))
+>text : Symbol(PrivateMessage.text, Decl(interfacedeclWithPredicatesObject1.ts, 2, 21))
 
 } with {
-    or(and(present(user_id), not(present(screen_name))),
-    and(present(screen_name), not(present(user_id))));
-    type(user_id) == number;
-    type(screen_name) == string;
-    type(text) == string;
+    or(and(present(userid), not(present(screenname))),
+    and(present(screenname), not(present(userid))));
     present(text);
 }
 
-let object: UsersShow = {user_id: 25, text: "text"}
->object : Symbol(object, Decl(interfacedeclWithPredicatesObject1.ts, 13, 3))
->UsersShow : Symbol(UsersShow, Decl(interfacedeclWithPredicatesObject1.ts, 0, 0))
->user_id : Symbol(user_id, Decl(interfacedeclWithPredicatesObject1.ts, 13, 25))
->text : Symbol(text, Decl(interfacedeclWithPredicatesObject1.ts, 13, 37))
+let object: PrivateMessage = {userid: 25, text: "text"};
+>object : Symbol(object, Decl(interfacedeclWithPredicatesObject1.ts, 10, 3))
+>PrivateMessage : Symbol(PrivateMessage, Decl(interfacedeclWithPredicatesObject1.ts, 0, 0))
+>userid : Symbol(userid, Decl(interfacedeclWithPredicatesObject1.ts, 10, 30))
+>text : Symbol(text, Decl(interfacedeclWithPredicatesObject1.ts, 10, 41))
 

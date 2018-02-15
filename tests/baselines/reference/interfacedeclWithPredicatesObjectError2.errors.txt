@@ -1,26 +1,19 @@
-tests/cases/compiler/interfacedeclWithPredicatesObjectError2.ts(14,5): error TS2322: Type '{ user_id: number; }' is not assignable to type 'UsersShow'.
-  Predicates of interface UsersShow are not satisfied
-    Predicate present(text) was not satisfied in type { user_id: number; }
-      Property 'text' is missing in type '{ user_id: number; }'.
+tests/cases/compiler/interfacedeclWithPredicatesObjectError2.ts(11,5): error TS2322: Type '{ userid: number; }' is not assignable to type 'PrivateMessage'.
+  Property 'text' is missing in type '{ userid: number; }'.
 
 
 ==== tests/cases/compiler/interfacedeclWithPredicatesObjectError2.ts (1 errors) ====
-    interface UsersShow{
-        user_id?: any;
-        screen_name?: any;
+    interface PrivateMessage{
+        userid?: any;
+        screenname?: any;
         text: any;
     } with {
-        or(and(present(user_id), not(present(screen_name))),
-        and(present(screen_name), not(present(user_id))));
-        type(user_id) == number;
-        type(screen_name) == string;
-        type(text) == string;
-        present(text);
+        or(and(present(userid), not(present(screenname))),
+        and(present(screenname), not(present(userid))));
+    present(text);
     }
     
-    let object: UsersShow = {user_id: 25}
+    let object: PrivateMessage = {userid: 25};
         ~~~~~~
-!!! error TS2322: Type '{ user_id: number; }' is not assignable to type 'UsersShow'.
-!!! error TS2322:   Predicates of interface UsersShow are not satisfied
-!!! error TS2322:     Predicate present(text) was not satisfied in type { user_id: number; }
-!!! error TS2322:       Property 'text' is missing in type '{ user_id: number; }'.
+!!! error TS2322: Type '{ userid: number; }' is not assignable to type 'PrivateMessage'.
+!!! error TS2322:   Property 'text' is missing in type '{ userid: number; }'.

@@ -1,24 +1,19 @@
-tests/cases/compiler/interfacedeclWithPredicatesObjectError3.ts(14,5): error TS2322: Type '{ user_id: number; screen_name: string; text: string; }' is not assignable to type 'UsersShow'.
-  Predicates of interface UsersShow are not satisfied
-    Predicate or(and(present(user_id),not(present(screen_name))),and(present(screen_name),not(present(user_id)))) was not satisfied in type { user_id: number; screen_name: string; text: string; }
+tests/cases/compiler/interfacedeclWithPredicatesObjectError3.ts(11,5): error TS2322: Type '{ userid: number; text: string; screenname: string; }' is not assignable to type 'PrivateMessage'.
+  Predicate or(and(present(userid),not(present(screenname))),and(present(screenname),not(present(userid)))) was not satisfied in type { userid: number; text: string; screenname: string; }
 
 
 ==== tests/cases/compiler/interfacedeclWithPredicatesObjectError3.ts (1 errors) ====
-    interface UsersShow{
-        user_id?: any;
-        screen_name?: any;
+    interface PrivateMessage{
+        userid?: any;
+        screenname?: any;
         text: any;
     } with {
-        or(and(present(user_id), not(present(screen_name))),
-        and(present(screen_name), not(present(user_id))));
-        type(user_id) == number;
-        type(screen_name) == string;
-        type(text) == string;
-        present(text);
+        or(and(present(userid), not(present(screenname))),
+        and(present(screenname), not(present(userid))));
+    present(text);
     }
     
-    let object: UsersShow = {user_id: 25, screen_name: "screen name", text: "text"}
+    let object: PrivateMessage = {userid: 25, text: "text", screenname: "Alice"};
         ~~~~~~
-!!! error TS2322: Type '{ user_id: number; screen_name: string; text: string; }' is not assignable to type 'UsersShow'.
-!!! error TS2322:   Predicates of interface UsersShow are not satisfied
-!!! error TS2322:     Predicate or(and(present(user_id),not(present(screen_name))),and(present(screen_name),not(present(user_id)))) was not satisfied in type { user_id: number; screen_name: string; text: string; }
+!!! error TS2322: Type '{ userid: number; text: string; screenname: string; }' is not assignable to type 'PrivateMessage'.
+!!! error TS2322:   Predicate or(and(present(userid),not(present(screenname))),and(present(screenname),not(present(userid)))) was not satisfied in type { userid: number; text: string; screenname: string; }

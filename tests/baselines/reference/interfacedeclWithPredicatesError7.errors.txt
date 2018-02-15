@@ -7,7 +7,7 @@ tests/cases/compiler/interfacedeclWithPredicatesError7.ts(1,11): error TS95003: 
 !!! error TS95003: The field unknown is used in a predicate but not described in the interface
         user_id?: number;
         screen_name?: string;
-        text: string;
+        text?: string;
     } with {
         present(unknown);
     }

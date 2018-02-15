@@ -1,25 +1,22 @@
 //// [propertyAccessIPC1.ts]
 interface PrivateMessage {
-    text?: any;
-    user_id?: any;
-    screen_name?: any;
+    text?: string;
+    userid?: number;
+    screenname?: string;
 } with {
-    type(user_id) == number;
-    type(text) == string;
-    type(screen_name) == string;
     present(text);
-    or(and(present(user_id), not(present(screen_name))),
-        and(not(present(user_id)), present(screen_name)));
+    or(and(present(userid), not(present(screenname))),
+        and(not(present(userid)), present(screenname)));
 }
 
-let msg: PrivateMessage = {text: "Hello", user_id: 123};
+let msg: PrivateMessage = {text: "Hi!", userid: 42};
 msg.text; //OK
-msg.user_id; //NOT OK: fields that are not always required may only be accessed inside a non-undefined typeguard
-msg.screen_name; //NOT OK
+msg.userid; //NOT OK: fields that are not always required may only be accessed inside a non-undefined typeguard
+msg.screenname; //NOT OK
 
 
 //// [propertyAccessIPC1.js]
-var msg = { text: "Hello", user_id: 123 };
+var msg = { text: "Hi!", userid: 42 };
 msg.text; //OK
-msg.user_id; //NOT OK: fields that are not always required may only be accessed inside a non-undefined typeguard
-msg.screen_name; //NOT OK
+msg.userid; //NOT OK: fields that are not always required may only be accessed inside a non-undefined typeguard
+msg.screenname; //NOT OK

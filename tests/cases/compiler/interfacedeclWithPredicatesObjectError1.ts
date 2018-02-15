@@ -1,14 +1,11 @@
-interface UsersShow{
-    user_id?: any;
-    screen_name?: any;
+interface PrivateMessage{
+    userid?: any;
+    screenname?: any;
     text: any;
 } with {
-    or(and(present(user_id), not(present(screen_name))),
-    and(present(screen_name), not(present(user_id))));
-    type(user_id) == number;
-    type(screen_name) == string;
-    type(text) == string;
-    present(text);
+    or(and(present(userid), not(present(screenname))),
+    and(present(screenname), not(present(userid))));
+present(text);
 }
 
-let object: UsersShow = {text: "text"}
+let object: PrivateMessage = {text: "text"};

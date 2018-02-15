@@ -2,65 +2,51 @@
 interface PrivateMessage {
 >PrivateMessage : PrivateMessage
 
-    text?: any;
->text : any
+    text?: string;
+>text : string
 
-    user_id?: any;
->user_id : any
+    userid?: number;
+>userid : number
 
-    screen_name?: any;
->screen_name : any
+    screenname?: string;
+>screenname : string
 
 } with {
-    type(user_id) == number;
->type : any
->user_id : any
->number : any
-
-    type(text) == string;
->type : any
->text : any
->string : any
-
-    type(screen_name) == string;
->type : any
->screen_name : any
->string : any
-
     present(text);
 >present : any
 >text : any
 
-    or(and(present(user_id), not(present(screen_name))),
+    or(and(present(userid), not(present(screenname))),
 >or : any
 >and : any
 >present : any
->user_id : any
+>userid : any
 >not : any
 >present : any
->screen_name : any
+>screenname : any
 
-        and(not(present(user_id)), present(screen_name)));
+        and(not(present(userid)), present(screenname)));
 >and : any
 >not : any
 >present : any
->user_id : any
+>userid : any
 >present : any
->screen_name : any
+>screenname : any
 }
 
-let msg: PrivateMessage = {text: "Hello", user_id: 123};
+
+let msg: PrivateMessage = {text: "Hello", userid: 123};
 >msg : PrivateMessage
 >PrivateMessage : PrivateMessage
->{text: "Hello", user_id: 123} : { text: string; user_id: number; }
+>{text: "Hello", userid: 123} : { text: string; userid: number; }
 >text : string
 >"Hello" : "Hello"
->user_id : number
+>userid : number
 >123 : 123
 
 msg.text; //OK
->msg.text : String
+>msg.text : string
 >msg : PrivateMessage
->text : String
+>text : string
 
 

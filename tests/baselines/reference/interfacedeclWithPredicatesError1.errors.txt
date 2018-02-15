@@ -5,7 +5,7 @@ tests/cases/compiler/interfacedeclWithPredicatesError1.ts(5,9): error TS1005: 'C
     interface UsersShow{
         user_id?: number;
         screen_name?: string;
-        text: string;
+        text?: string;
     } with {
             
         5;

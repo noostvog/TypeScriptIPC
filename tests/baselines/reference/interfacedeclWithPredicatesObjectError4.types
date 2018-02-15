@@ -1,4 +1,4 @@
-=== tests/cases/compiler/interfacedeclWithPredicatesObject2.ts ===
+=== tests/cases/compiler/interfacedeclWithPredicatesObjectError4.ts ===
 interface PrivateMessage{
 >PrivateMessage : PrivateMessage
 
@@ -34,12 +34,12 @@ present(text);
 >text : any
 }
 
-let object: PrivateMessage = {screenname: "Alice", text: "text"};
+let object: PrivateMessage = {userid: "25", text: "text"};
 >object : PrivateMessage
 >PrivateMessage : PrivateMessage
->{screenname: "Alice", text: "text"} : { screenname: string; text: string; }
->screenname : string
->"Alice" : "Alice"
+>{userid: "25", text: "text"} : { userid: string; text: string; }
+>userid : string
+>"25" : "25"
 >text : string
 >"text" : "text"
 

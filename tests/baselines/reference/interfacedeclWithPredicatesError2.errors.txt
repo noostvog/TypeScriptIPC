@@ -10,7 +10,7 @@ tests/cases/compiler/interfacedeclWithPredicatesError2.ts(1,11): error TS95007: 
 !!! error TS95007: types is an unknown predicate operation, expected the following predicate(s): type
         user_id?: number;
         screen_name?: string;
-        text: string;
+        text?: string;
     } with {
         types(test) == string;
     }

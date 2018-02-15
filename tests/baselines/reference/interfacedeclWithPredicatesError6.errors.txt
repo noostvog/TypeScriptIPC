@@ -7,7 +7,7 @@ tests/cases/compiler/interfacedeclWithPredicatesError6.ts(1,11): error TS95004: 
 !!! error TS95004: The type predicate expects one of the following types: string, number, boolean, any, object, symbol, void
         user_id?: number;
         screen_name?: string;
-        text: string;
+        text?: string;
     } with {
         type(user_id) == shtring;
     }

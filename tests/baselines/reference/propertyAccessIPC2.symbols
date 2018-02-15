@@ -2,33 +2,31 @@
 interface PrivateMessage {
 >PrivateMessage : Symbol(PrivateMessage, Decl(propertyAccessIPC2.ts, 0, 0))
 
-    text?: any;
+    text?: string;
 >text : Symbol(PrivateMessage.text, Decl(propertyAccessIPC2.ts, 0, 26))
 
-    user_id?: any;
->user_id : Symbol(PrivateMessage.user_id, Decl(propertyAccessIPC2.ts, 1, 15))
+    userid?: number;
+>userid : Symbol(PrivateMessage.userid, Decl(propertyAccessIPC2.ts, 1, 18))
 
-    screen_name?: any;
->screen_name : Symbol(PrivateMessage.screen_name, Decl(propertyAccessIPC2.ts, 2, 18))
+    screenname?: string;
+>screenname : Symbol(PrivateMessage.screenname, Decl(propertyAccessIPC2.ts, 2, 20))
 
 } with {
-    type(user_id) == number;
-    type(text) == string;
-    type(screen_name) == string;
     present(text);
-    or(and(present(user_id), not(present(screen_name))),
-        and(not(present(user_id)), present(screen_name)));
+    or(and(present(userid), not(present(screenname))),
+        and(not(present(userid)), present(screenname)));
 }
 
-let msg: PrivateMessage = {text: "Hello", user_id: 123};
->msg : Symbol(msg, Decl(propertyAccessIPC2.ts, 13, 3))
+
+let msg: PrivateMessage = {text: "Hello", userid: 123};
+>msg : Symbol(msg, Decl(propertyAccessIPC2.ts, 11, 3))
 >PrivateMessage : Symbol(PrivateMessage, Decl(propertyAccessIPC2.ts, 0, 0))
->text : Symbol(text, Decl(propertyAccessIPC2.ts, 13, 27))
->user_id : Symbol(user_id, Decl(propertyAccessIPC2.ts, 13, 41))
+>text : Symbol(text, Decl(propertyAccessIPC2.ts, 11, 27))
+>userid : Symbol(userid, Decl(propertyAccessIPC2.ts, 11, 41))
 
 msg.text; //OK
 >msg.text : Symbol(PrivateMessage.text, Decl(propertyAccessIPC2.ts, 0, 26))
->msg : Symbol(msg, Decl(propertyAccessIPC2.ts, 13, 3))
+>msg : Symbol(msg, Decl(propertyAccessIPC2.ts, 11, 3))
 >text : Symbol(PrivateMessage.text, Decl(propertyAccessIPC2.ts, 0, 26))
 
 
