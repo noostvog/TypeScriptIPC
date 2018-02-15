@@ -7195,6 +7195,51 @@ namespace ts {
             return false;
         }
 
+
+        function prove(str: string): boolean {
+            var proof: boolean = Prover.proveString(str);
+            str;
+            proof;
+            return proof;
+        }
+
+        function translateLogicalOperator(operator: string): string {
+            switch (operator) {
+                case "or":
+                    return "|";
+                case "and":
+                    return "&";
+            }
+            return "unknown logical operator";
+        }
+
+        function translatePredicates(predicates: NodeArray<PredicateExpression>): string {
+            let resultaat: string = "";
+            for (const predicate of predicates) {
+                resultaat += " " + translatePredicate(predicate) + " & ";
+            }
+            resultaat = resultaat.substring(0, resultaat.length - 3);
+            return resultaat;
+        }
+
+        function translatePredicate(predicate: PredicateExpression): string {
+            switch (predicate.kind) {
+                case SyntaxKind.PredicatePresentExpression:
+                    const present = <PredicatePresentExpression>predicate;
+                    //TODO werkt alleen als maar 1 argument voor present.
+                    return present.arguments[0].text
+                    //return present.expression.text + "(" + present.arguments.map(txt => txt.text) + ")"
+                case SyntaxKind.PredicateLogicalExpression:
+                    const logical = <PredicateLogicalExpression>predicate;
+                    if (logical.expression.text == "not") {
+                        return "!(" + translatePredicate(logical.arguments[0]) + ")";
+                    } else {
+                        return "(" + translatePredicate(logical.arguments[0]) + " " + translateLogicalOperator(logical.expression.text) + " " + translatePredicate(logical.arguments[1]) + ")";
+                    }
+            }
+            return "unknown predicate";
+        }
+
         /**
          * Checks if 'source' is related to 'target' (e.g.: is a assignable to).
          * @param source The left-hand-side of the relation.
@@ -7678,6 +7723,8 @@ namespace ts {
             // Third, check if both types are part of deeply nested chains of generic type instantiations and if so assume the types are
             // equal and infinitely expanding. Fourth, if we have reached a depth of 100 nested comparisons, assume we have runaway recursion
             // and issue an error. Otherwise, actually compare the structure of the two types.
+            //LOGICAL CONSEQUENCE
+
             function objectTypeRelatedTo(source: Type, originalSource: Type, target: Type, reportErrors: boolean): Ternary {
                 if (overflow) {
                     return Ternary.False;
@@ -7810,48 +7857,7 @@ namespace ts {
                     }
                     return Ternary.True;
 
-                    //LOGICAL CONSEQUENCE
-                    function prove(str: string): boolean {
-                        var proof: boolean = Prover.proveString(str);
-                        str;
-                        proof;
-                        return proof;
-                    }
 
-                    function translateLogicalOperator(operator: string): string {
-                        switch (operator) {
-                            case "or":
-                                return "|";
-                            case "and":
-                                return "&";
-                        }
-                        return "unknown logical operator";
-                    }
-
-                    function translatePredicates(predicates: NodeArray<PredicateExpression>): string {
-                        let resultaat: string = "";
-                        for (const predicate of predicates) {
-                            resultaat += " " + translatePredicate(predicate) + " & ";
-                        }
-                        resultaat = resultaat.substring(0, resultaat.length - 3);
-                        return resultaat;
-                    }
-
-                    function translatePredicate(predicate: PredicateExpression): string {
-                        switch (predicate.kind) {
-                            case SyntaxKind.PredicatePresentExpression:
-                                const present = <PredicatePresentExpression>predicate;
-                                return present.expression.text + "(" + present.arguments.map(txt => txt.text) + ")"
-                            case SyntaxKind.PredicateLogicalExpression:
-                                const logical = <PredicateLogicalExpression>predicate;
-                                if (logical.expression.text == "not") {
-                                    return "!(" + translatePredicate(logical.arguments[0]) + ")";
-                                } else {
-                                    return "(" + translatePredicate(logical.arguments[0]) + " " + translateLogicalOperator(logical.expression.text) + " " + translatePredicate(logical.arguments[1]) + ")";
-                                }
-                        }
-                        return "unknown predicate";
-                    }
                 }
 
                     //VALUATION
@@ -9893,7 +9899,9 @@ namespace ts {
             return false;
         }
 
-        function getFlowTypeOfReference(reference: Node, declaredType: Type, assumeInitialized: boolean, flowContainer: Node, predicatePresent: boolean) {
+        function getFlowTypeOfReference(reference: Node, declaredType: Type, assumeInitialized: boolean, flowContainer: Node) {
+            //TODO predicatePresent verwijderen
+            predicatePresent;
             let key: string;
             if (!reference.flowNode || assumeInitialized && !(declaredType.flags & TypeFlags.Narrowable)) {
                 return declaredType;
@@ -9912,20 +9920,7 @@ namespace ts {
             if (reference.parent.kind === SyntaxKind.NonNullExpression && getTypeWithFacts(resultType, TypeFacts.NEUndefinedOrNull).flags & TypeFlags.Never) {
                 return declaredType;
             }
-            if (predicatePresent === false) {
-                //TODO ERROR
-                // if null then not relevant
-                // if false then not present
-                // is possibly set to true due to flow condition
-                // if not: give error
-                let text = "<a property of an object>";
-                if (reference.kind === SyntaxKind.PropertyAccessExpression) {
-                    if((<PropertyAccessExpression> reference).name.kind === SyntaxKind.Identifier) {
-                        text = (<Identifier> (<PropertyAccessExpression> reference).name).text;
-                    }
-                }
-                error(reference, Diagnostics.Cannot_access_0_from_the_object_because_its_interface_does_not_contain_the_predicate_present_0_Use_a_non_undefined_type_guard, text);
-            }
+
             return resultType;
 
             function getTypeAtFlowNode(flow: FlowNode): FlowType {
@@ -10618,9 +10613,9 @@ namespace ts {
                 //1. present(field) must be in simplPredicates
                 //2. is type(field) === ??? present? if so: return that type, otherwise: return any;
                 //TODO hier ook een error field meegeven en supporten
-                const present = getPresenceOfFieldInPredicates(simplPredicates, field);
+                //const present = getPresenceOfFieldInPredicates(simplPredicates, field);
                 const type = getTypeOfFieldInPredicates(simplPredicates, field);
-                predicatePresent = present;
+                //predicatePresent = present;
                 //niet meer nodig want wordt later in flow functie gehandled
                 //if (!present) {
                 //    error(field, Diagnostics.Cannot_access_0_from_the_object_because_its_interface_does_not_contain_the_predicate_present_0_Use_a_non_undefined_type_guard, field.text);
@@ -10650,6 +10645,7 @@ namespace ts {
             }
         }
 
+        /*
         function getPresenceOfFieldInPredicates(predicates: NodeArray<PredicateExpression>, field: Identifier): boolean{
             //TODO in the ideal world the predicate would also use type flags for all the constraints.
 
@@ -10696,8 +10692,8 @@ namespace ts {
             //}
             //return presentbool ? resulttype : null;
             return {type: resulttype, errorInfo: errorInfo};
-            */
-        }
+            *//*
+        }*/
         function getTypeOfFieldInPredicates(predicates: NodeArray<PredicateExpression>, field: Identifier): Type {
             //TODO in the ideal world the predicate would also use type flags for all the constraints.
 
@@ -10930,7 +10926,7 @@ namespace ts {
             const assumeInitialized = isParameter || isOuterVariable ||
                 type !== autoType && type !== autoArrayType && (!strictNullChecks || (type.flags & TypeFlags.Any) !== 0) ||
                 isInAmbientContext(declaration);
-            const flowType = getFlowTypeOfReference(node, type, assumeInitialized, flowContainer, /*predicatePresent*/ null);
+            const flowType = getFlowTypeOfReference(node, type, assumeInitialized, flowContainer);
             // A variable is considered uninitialized when it is possible to analyze the entire control flow graph
             // from declaration to use, and when the variable's declared type doesn't include undefined but the
             // control flow based type does include undefined.
@@ -11196,7 +11192,7 @@ namespace ts {
             if (isClassLike(container.parent)) {
                 const symbol = getSymbolOfNode(container.parent);
                 const type = hasModifier(container, ModifierFlags.Static) ? getTypeOfSymbol(symbol) : (<InterfaceType>getDeclaredTypeOfSymbol(symbol)).thisType;
-                return getFlowTypeOfReference(node, type, /*assumeInitialized*/ true, /*flowContainer*/ undefined, /*predicatePresent*/ null);
+                return getFlowTypeOfReference(node, type, /*assumeInitialized*/ true, /*flowContainer*/ undefined);
             }
 
             if (isInJavaScriptFile(node)) {
@@ -12947,6 +12943,7 @@ namespace ts {
             // If the left side has an interface type: take predicates into account for checking presence and type
             //let errorMessage = null;
             //let errorInfo: DiagnosticMessageChain;
+            /*
             let predicateType: Type;
             let predicatePresent: boolean;
             if (node.kind == SyntaxKind.PropertyAccessExpression) {
@@ -12961,10 +12958,11 @@ namespace ts {
                         thus it should actually be present(a) + present(b)
                         this is not yet supported
                         => future work (possibly with simplifyPredicates)
-                         */
-                        predicateType = getTypeOfFieldInPredicates(predicates, right);
+                         *//*
+                        // TODO the type gets ignored for now: we only concern ourselves with presence constraints...
+                        //predicateType = getTypeOfFieldInPredicates(predicates, right);
                         predicatePresent = getPresenceOfFieldInPredicates(predicates, right);
-                        propType = predicateType;
+                        //propType = predicateType;
 
                         //if (newtype) {
                             //propType = type;
@@ -12973,6 +12971,35 @@ namespace ts {
                             //field is not found: maybe still be found after flowtype
                           //  errorInfo = chainDiagnosticMessages(errorInfo, Diagnostics.Cannot_access_0_from_the_object_because_its_interface_does_not_contain_the_predicate_present_0_Use_a_non_undefined_type_guard, right.text);
                         //}
+                }
+                    }
+            }*/
+
+            if (node.kind == SyntaxKind.PropertyAccessExpression) {
+                if (getObjectFlags(apparentType) & ObjectFlags.Interface) {
+                    // ignore type inferred from this field before if there are predicates
+                    const predicates = (<InterfaceTypeWithDeclaredMembers> apparentType).declaredPredicates;
+                    if (predicates.length > 0) {
+                        //predicatePresent = getPresenceOfFieldInPredicates(predicates, right);
+                        const predicateStr = translatePredicates(predicates);
+                        const provePresent = prove(predicateStr + " > " + node.name.text);
+                        const proveAbsent  = prove(predicateStr + " > !" + node.name.text);
+                        if (!provePresent && !proveAbsent){
+                            let text: string = "<a property of an object>";
+                            if (node.kind === SyntaxKind.PropertyAccessExpression) {
+                                if((<PropertyAccessExpression> node).name.kind === SyntaxKind.Identifier) {
+                                    text = (<Identifier> (<PropertyAccessExpression> node).name).text;
+                                }
+                            }
+                            error(node, Diagnostics.Cannot_access_0_from_the_object_because_its_interface_does_not_contain_the_predicate_present_0_Use_a_non_undefined_type_guard, text);
+                            return unknownType;
+                        } else if (provePresent) {
+                            //predicatePresent = Ternary.True;
+                            //TODO remove "undefined" because everything is
+                        } else if (proveAbsent) {
+                            //predicatePresent = Ternary.False;
+                            propType = undefinedType;
+                        }
                     }
                 }
             }
@@ -12986,7 +13013,7 @@ namespace ts {
                 return propType;
             }
 
-            const flowType = getFlowTypeOfReference(node, propType, /*assumeInitialized*/ true, /*flowContainer*/ undefined, /*predatePresent*/ predicatePresent);
+            const flowType = getFlowTypeOfReference(node, propType, /*assumeInitialized*/ true, /*flowContainer*/ undefined);
 
             return assignmentKind ? getBaseTypeOfLiteralType(flowType) : flowType;
         }
