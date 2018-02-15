@@ -9900,8 +9900,6 @@ namespace ts {
         }
 
         function getFlowTypeOfReference(reference: Node, declaredType: Type, assumeInitialized: boolean, flowContainer: Node) {
-            //TODO predicatePresent verwijderen
-            predicatePresent;
             let key: string;
             if (!reference.flowNode || assumeInitialized && !(declaredType.flags & TypeFlags.Narrowable)) {
                 return declaredType;
@@ -12996,6 +12994,13 @@ namespace ts {
                         } else if (provePresent) {
                             //predicatePresent = Ternary.True;
                             //TODO remove "undefined" because everything is
+                            if (propType.flags & TypeFlags.Union) {
+                                if (contains((<UnionType> propType).types, undefinedType)) {
+                                    let filtered = (<UnionType> propType).types.filter(t => t !== undefinedType);
+                                    //assert.isTrue(parsed.errors.filter(e => e.code === expectedDiagnosticCode).length > 0, `Expected error code ${expectedDiagnosticCode} to be in ${JSON.stringify(parsed.errors)}`);
+                                    (<UnionType> propType).types = filtered;
+                                }
+                            }
                         } else if (proveAbsent) {
                             //predicatePresent = Ternary.False;
                             propType = undefinedType;
