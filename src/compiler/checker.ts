@@ -7775,17 +7775,29 @@ namespace ts {
                     result = mappedTypeRelatedTo(source, target, reportErrors);
                 }
                 else {
-                    result = propertiesRelatedTo(source, target, reportErrors);
-                    if (result) {
-                        result &= signaturesRelatedTo(source, target, SignatureKind.Call, reportErrors);
+                    const result2 = predicatesRelatedTo(source, target, reportErrors);
+                    if (result2 == Ternary.True) {
+                        //DONE: types moeten dan in predictesRelatedTo gecheckt worden.
+                        return result2;
+                    }
+                    if (result2 == Ternary.False) {
+                        //DONE: einde
+                        return result2;
+                    }
+                    if (result2 == Ternary.Maybe) {
+                        //Geen predikaten in het spel: continue;
+                        result = propertiesRelatedTo(source, target, reportErrors);
                         if (result) {
-                            result &= signaturesRelatedTo(source, target, SignatureKind.Construct, reportErrors);
+                            result &= signaturesRelatedTo(source, target, SignatureKind.Call, reportErrors);
                             if (result) {
-                                result &= indexTypesRelatedTo(source, originalSource, target, IndexKind.String, reportErrors);
+                                result &= signaturesRelatedTo(source, target, SignatureKind.Construct, reportErrors);
                                 if (result) {
-                                    result &= indexTypesRelatedTo(source, originalSource, target, IndexKind.Number, reportErrors);
+                                    result &= indexTypesRelatedTo(source, originalSource, target, IndexKind.String, reportErrors);
                                     if (result) {
-                                        result &= predicatesRelatedTo(source, target, reportErrors);
+                                        result &= indexTypesRelatedTo(source, originalSource, target, IndexKind.Number, reportErrors);
+                                        //if (result) {
+                                        //    result &= predicatesRelatedTo(source, target, reportErrors);
+                                        //}
                                     }
                                 }
                             }
@@ -7810,26 +7822,73 @@ namespace ts {
 
                 //<Nathalie>
                 function predicatesRelatedTo(source: Type, target: Type, reportErrors: boolean): Ternary {
-                    source;
-                    target;
-                    reportErrors;
                     predicatesRelatedToIntfIntf;
-                    predicatesRelatedToObjIntf;
-
                     if (getObjectFlags(target) & ObjectFlags.Interface) {
                         if (getObjectFlags(source) & ObjectFlags.Anonymous) {
                             //CASE: let x: Interface = { ..., ... }
                             //TODO CAST: gek genoeg is  bij "<Interface>{ ..., ...}" de source en target omgekeerd...
                             const predicates = (<InterfaceTypeWithDeclaredMembers>target).declaredPredicates;
                             if (predicates == undefined || predicates.length == 0) {
-                                return Ternary.True;
+                                return Ternary.Maybe;
                             }
-                            if (!predicatesRelatedToObjIntf(source, predicates, true, reportErrors)) {
+                            if (predicatesRelatedToObjIntf(source, predicates, true, reportErrors)) {
+                                //TODO TYPES GAAN NOG MOETEN WORDEN VERGELEKEN
+                                return Ternary.True;
+                            } else {
+                                return Ternary.False;
+                            }
+                        }
+                    } else if (getObjectFlags(target) & ObjectFlags.Anonymous) {
+                        if (getObjectFlags(source) & ObjectFlags.Interface) {
+                            const predicates = (<InterfaceTypeWithDeclaredMembers> source).declaredPredicates;
+                            if(predicates == undefined || predicates.length == 0) {
+                                return Ternary.Maybe;
+                            }
+                            if (predicatesRelatedToIntfObj(source, predicates, target, reportErrors)) {
+                                //TODO TYPES GAAN NOG MOETEN VERGELEKEN WORDEN
+                                return Ternary.True;
+                            } else {
+                                return Ternary.False;
+                            }
+                        }
+                    }
+                    return Ternary.Maybe;
+                }
+                function predicatesRelatedToIntfObj(source: Type, predicates: NodeArray<PredicateExpression>, target: Type, reportErrors: boolean): Ternary {
+                    //TODO ook nog types checken
+                    const sourceprops = getPropertiesOfType(source);
+                    const targetprops = getPropertiesOfType(target);
+                    for (const prop of targetprops) {
+                        if (prop.flags & SymbolFlags.Optional) {
+                            //TODO moet in de interface properties lijst zitten
+                            return Ternary.True;
+                        } else {
+                            const predicateStr = translatePredicates(predicates);
+                            if (!prove(predicateStr + " > " + prop.name)) {
+                                if (reportErrors) {
+                                    reportError(Diagnostics.Property_0_is_not_present_in_type_1, prop.name, typeToString(source));
+                                }
+                               return Ternary.False;
+                            }
+                            //anders verder doen
+                        }
+                    }
+                    //TODO in de huidige typeregels mogen er overbodige veldjes zijn... Clasht wat met huidige TypeScript...
+                    for (const prop of sourceprops) {
+                        const names = targetprops.map(x => x.name);
+                        if (names.indexOf(prop.name) == -1) { //alleen naam van prop moet matchen: type niet... => eigen member schrijven...
+                            const predicateStr = translatePredicates(predicates);
+                            if (!prove(predicateStr + " > !" + prop.name)) {
+                                if (reportErrors) {
+                                    reportError(Diagnostics.Predicates_of_0_do_not_guarantee_the_absence_of_property_1_which_is_not_a_member_of_2, typeToString(source), prop.name, typeToString(target));
+                                }
                                 return Ternary.False;
                             }
                         }
                     }
                     return Ternary.True;
+
+                    //function member(prop)
                 }
                 function predicatesRelatedToIntfIntf(source: Type, targetProp: string, reportErrors: boolean): Ternary {
                     //TODO If interface has constraints, then we need to check whether these constraints/predicates are satisfied

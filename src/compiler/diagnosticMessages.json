@@ -3282,5 +3282,13 @@
     "Cannot access {0} from the object because its interface does not contain the predicate present({0}). Use a non-undefined type guard.": {
         "category": "Error",
         "code": 95009
+    },
+    "Property '{0}' is not present in type '{1}'.": {
+        "category": "Error",
+        "code": 95010
+    },
+    "Predicates of '{0}' do not guarantee the absence of property '{1}', which is not a member of '{2}'":{
+        "category": "Error",
+        "code": 95011
     }
 }
