@@ -7892,11 +7892,9 @@ namespace ts {
                     }
                 }
                 function predicatesRelatedToIntfObj(source: Type, predicatessource: NodeArray<PredicateExpression>, target: Type, reportErrors: boolean): Ternary {
-                    //TODO ook nog types checken
                     const sourceprops = getPropertiesOfType(source);
                     const targetprops = getPropertiesOfType(target);
                     for (const prop of targetprops) {
-                        //TODO property types vergelijken.
                         if (prop.flags & SymbolFlags.Optional) {
                             // If the property is optional, then the property should be part of property list of the interface.
                             // There are no other requirements on the presence of the property.
@@ -7936,7 +7934,6 @@ namespace ts {
 
                 }
                 function predicatesRelatedToIntfIntf(source: Type, predicatesS: NodeArray<PredicateExpression>, target: Type, predicatesT: NodeArray<PredicateExpression>, reportErrors: boolean): Ternary {
-                    //TODO check types;
                     let predicateSourceStr = translatePredicates(predicatesS);
                     let predicateTargetStr = translatePredicates(predicatesT);
                     const sourceprops = getPropertiesOfType(source);
@@ -7967,7 +7964,6 @@ namespace ts {
                 }
 
                 function predicatesRelatedToObjIntf(source: Type, predicates: NodeArray<PredicateExpression>, mainLevel: boolean, reportErrors: boolean): Ternary {
-
                     for (const predicate of predicates) {
                         // assume top level is callexpression => checken while type checking interface?
                         if (!isPredicateSatisfied(source, predicate, reportErrors)) {
