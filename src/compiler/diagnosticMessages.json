@@ -3295,12 +3295,16 @@
         "category": "Error",
         "code": 95012
     },
-    "Invalid assignment of type {0} tot type {1}. Check if predicates are correct.": {
+    "Invalid assignment of type {0} tot type {1}. Check if predicates are correct": {
         "category": "Error",
         "code": 95013
     },
-    "Either both sides have to use predicates, or not use predicates.": {
+    "Either both sides have to use predicates, or not use predicates": {
         "category": "Error",
         "code": 95014
+    },
+    "Only fresh object literals may be assigned to an interface with predicates (type '{0}')": {
+        "category": "Error",
+        "code": 95015
     }
 }

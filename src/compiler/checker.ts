@@ -7822,11 +7822,18 @@ namespace ts {
                             if (predicatesT == undefined || predicatesT.length == 0) {
                                 return Ternary.Maybe;
                             }
-                            //CASE: let x: Interface = { ..., ... }
-                            //TODO CAST: gek genoeg is  bij "<Interface>{ ..., ...}" de source en target omgekeerd... Up vs Downcast?
-                            if (predicatesRelatedToObjIntf(source, predicatesT, true, reportErrors)) {
-                                return tempOwnPropertyTypeCheck(source, target, reportErrors);
+                            if (source.flags & TypeFlags.FreshLiteral) {
+                                //CASE: let x: Interface = { ..., ... }
+                                //TODO CAST: gek genoeg is  bij "<Interface>{ ..., ...}" de source en target omgekeerd... Up vs Downcast?
+                                if (predicatesRelatedToObjIntf(source, predicatesT, true, reportErrors)) {
+                                    return tempOwnPropertyTypeCheck(source, target, reportErrors);
+                                } else {
+                                    return Ternary.False;
+                                }
                             } else {
+                                if (reportErrors) {
+                                    reportError(Diagnostics.Only_fresh_object_literals_may_be_assigned_to_an_interface_with_predicates_type_0, typeToString(target));
+                                }
                                 return Ternary.False;
                             }
                         } else if (getObjectFlags(source) & ObjectFlags.Interface) {
@@ -7913,7 +7920,7 @@ namespace ts {
                         }
                     }
                     // This is a limitation such that "hidden" fields are not part of the target object.
-                    for (const prop of sourceprops) {
+                    /*for (const prop of sourceprops) {
                         const names = targetprops.map(x => x.name);
                         if (names.indexOf(prop.name) == -1) {
                             const predicateStr = translatePredicates(predicatessource);
@@ -7924,7 +7931,7 @@ namespace ts {
                                 return Ternary.False;
                             }
                         }
-                    }
+                    }*/
                     return Ternary.True;
 
                 }
