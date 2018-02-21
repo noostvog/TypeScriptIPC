@@ -3290,5 +3290,17 @@
     "Predicates of '{0}' do not guarantee the absence of property '{1}', which is not a member of '{2}'":{
         "category": "Error",
         "code": 95011
+    },
+    "Property '{0}' of type '{1}' is unknown in type '{2}'": {
+        "category": "Error",
+        "code": 95012
+    },
+    "Invalid assignment of type {0} tot type {1}. Check if predicates are correct.": {
+        "category": "Error",
+        "code": 95013
+    },
+    "Either both sides have to use predicates, or not use predicates.": {
+        "category": "Error",
+        "code": 95014
     }
 }

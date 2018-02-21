@@ -174,7 +174,7 @@ namespace ts {
          * List of every ambient module with a "*" wildcard.
          * Unlike other ambient modules, these can't be stored in `globals` because symbol tables only deal with exact matches.
          * This is only used if there is no exact match.
-        */
+         */
         let patternAmbientModules: PatternAmbientModule[];
 
         let getGlobalESSymbolConstructorSymbol: () => Symbol;
@@ -1458,7 +1458,7 @@ namespace ts {
                 }
             }
 
-             // May be an untyped module. If so, ignore resolutionDiagnostic.
+            // May be an untyped module. If so, ignore resolutionDiagnostic.
             if (!isRelative && resolvedModule && !extensionIsTypeScript(resolvedModule.extension)) {
                 if (isForAugmentation) {
                     const diag = Diagnostics.Invalid_module_name_in_augmentation_Module_0_resolves_to_an_untyped_module_at_1_which_cannot_be_augmented;
@@ -2250,11 +2250,11 @@ namespace ts {
                     }
                     else if (
                         // If this is the last part of outputting the symbol, always output. The cases apply only to parent symbols.
-                        endOfChain ||
-                        // If a parent symbol is an external module, don't write it. (We prefer just `x` vs `"foo/bar".x`.)
-                        !(!parentSymbol && ts.forEach(symbol.declarations, hasExternalModuleSymbol)) &&
-                        // If a parent symbol is an anonymous type, don't write it.
-                        !(symbol.flags & (SymbolFlags.TypeLiteral | SymbolFlags.ObjectLiteral))) {
+                    endOfChain ||
+                    // If a parent symbol is an external module, don't write it. (We prefer just `x` vs `"foo/bar".x`.)
+                    !(!parentSymbol && ts.forEach(symbol.declarations, hasExternalModuleSymbol)) &&
+                    // If a parent symbol is an anonymous type, don't write it.
+                    !(symbol.flags & (SymbolFlags.TypeLiteral | SymbolFlags.ObjectLiteral))) {
 
                         appendParentTypeArgumentsAndSymbolName(symbol);
                     }
@@ -4350,7 +4350,7 @@ namespace ts {
         }
 
         function createSignature(declaration: SignatureDeclaration, typeParameters: TypeParameter[], thisParameter: Symbol | undefined, parameters: Symbol[],
-            resolvedReturnType: Type, typePredicate: TypePredicate, minArgumentCount: number, hasRestParameter: boolean, hasLiteralTypes: boolean): Signature {
+                                 resolvedReturnType: Type, typePredicate: TypePredicate, minArgumentCount: number, hasRestParameter: boolean, hasLiteralTypes: boolean): Signature {
             const sig = new Signature(checker);
             sig.declaration = declaration;
             sig.typeParameters = typeParameters;
@@ -4772,9 +4772,9 @@ namespace ts {
             const t = type.flags & TypeFlags.TypeVariable ? getApparentTypeOfTypeVariable(<TypeVariable>type) : type;
             return t.flags & TypeFlags.StringLike ? globalStringType :
                 t.flags & TypeFlags.NumberLike ? globalNumberType :
-                t.flags & TypeFlags.BooleanLike ? globalBooleanType :
-                t.flags & TypeFlags.ESSymbol ? getGlobalESSymbolType() :
-                t;
+                    t.flags & TypeFlags.BooleanLike ? globalBooleanType :
+                        t.flags & TypeFlags.ESSymbol ? getGlobalESSymbolType() :
+                            t;
         }
 
         function createUnionOrIntersectionProperty(containingType: UnionOrIntersectionType, name: string): Symbol {
@@ -5358,7 +5358,7 @@ namespace ts {
         function getConstraintOfTypeVariable(type: TypeVariable): Type {
             return type.flags & TypeFlags.TypeParameter ? getConstraintOfTypeParameter(<TypeParameter>type) :
                 type.flags & TypeFlags.IndexedAccess ? (<IndexedAccessType>type).constraint :
-                undefined;
+                    undefined;
         }
 
         function getParentSymbolOfTypeParameter(typeParameter: TypeParameter): Symbol {
@@ -5637,8 +5637,8 @@ namespace ts {
         }
 
         /**
-          * Creates a TypeReference for a generic `TypedPropertyDescriptor<T>`.
-          */
+         * Creates a TypeReference for a generic `TypedPropertyDescriptor<T>`.
+         */
         function createTypedPropertyDescriptorType(propertyType: Type): Type {
             const globalTypedPropertyDescriptorType = getGlobalTypedPropertyDescriptorType();
             return globalTypedPropertyDescriptorType !== emptyGenericType
@@ -5781,7 +5781,7 @@ namespace ts {
                 const index = len && type.id > typeSet[len - 1].id ? ~len : binarySearchTypes(typeSet, type);
                 if (index < 0) {
                     if (!(flags & TypeFlags.Object && (<ObjectType>type).objectFlags & ObjectFlags.Anonymous &&
-                        type.symbol && type.symbol.flags & (SymbolFlags.Function | SymbolFlags.Method) && containsIdenticalType(typeSet, type))) {
+                            type.symbol && type.symbol.flags & (SymbolFlags.Function | SymbolFlags.Method) && containsIdenticalType(typeSet, type))) {
                         typeSet.splice(~index, 0, type);
                     }
                 }
@@ -6015,8 +6015,8 @@ namespace ts {
         function getIndexType(type: Type): Type {
             return maybeTypeOfKind(type, TypeFlags.TypeVariable) ? getIndexTypeForGenericType(<TypeVariable | UnionOrIntersectionType>type) :
                 getObjectFlags(type) & ObjectFlags.Mapped ? getConstraintTypeFromMappedType(<MappedType>type) :
-                type.flags & TypeFlags.Any || getIndexInfoOfType(type, IndexKind.String) ? stringType :
-                getLiteralTypeFromPropertyNames(type);
+                    type.flags & TypeFlags.Any || getIndexInfoOfType(type, IndexKind.String) ? stringType :
+                        getLiteralTypeFromPropertyNames(type);
         }
 
         function getIndexTypeOrString(type: Type): Type {
@@ -6786,8 +6786,8 @@ namespace ts {
                     // the given mapper, however we can only do that analysis if the type isn't itself an
                     // instantiation.
                     return type.symbol &&
-                        type.symbol.flags & (SymbolFlags.Function | SymbolFlags.Method | SymbolFlags.Class | SymbolFlags.TypeLiteral | SymbolFlags.ObjectLiteral) &&
-                        ((<ObjectType>type).objectFlags & ObjectFlags.Instantiated || isSymbolInScopeOfMappedTypeParameter(type.symbol, mapper)) ?
+                    type.symbol.flags & (SymbolFlags.Function | SymbolFlags.Method | SymbolFlags.Class | SymbolFlags.TypeLiteral | SymbolFlags.ObjectLiteral) &&
+                    ((<ObjectType>type).objectFlags & ObjectFlags.Instantiated || isSymbolInScopeOfMappedTypeParameter(type.symbol, mapper)) ?
                         instantiateCached(type, mapper, instantiateAnonymousType) : type;
                 }
                 if ((<ObjectType>type).objectFlags & ObjectFlags.Mapped) {
@@ -6944,8 +6944,8 @@ namespace ts {
         }
 
         function isSignatureAssignableTo(source: Signature,
-            target: Signature,
-            ignoreReturnTypes: boolean): boolean {
+                                         target: Signature,
+                                         ignoreReturnTypes: boolean): boolean {
             return compareSignaturesRelated(source, target, ignoreReturnTypes, /*reportErrors*/ false, /*errorReporter*/ undefined, compareTypesAssignable) !== Ternary.False;
         }
 
@@ -6955,11 +6955,11 @@ namespace ts {
          * See signatureRelatedTo, compareSignaturesIdentical
          */
         function compareSignaturesRelated(source: Signature,
-            target: Signature,
-            ignoreReturnTypes: boolean,
-            reportErrors: boolean,
-            errorReporter: ErrorReporter,
-            compareTypes: (s: Type, t: Type, reportErrors?: boolean) => Ternary): Ternary {
+                                          target: Signature,
+                                          ignoreReturnTypes: boolean,
+                                          reportErrors: boolean,
+                                          errorReporter: ErrorReporter,
+                                          compareTypes: (s: Type, t: Type, reportErrors?: boolean) => Ternary): Ternary {
             // TODO (drosen): De-duplicate code between related functions.
             if (source === target) {
                 return Ternary.True;
@@ -7041,10 +7041,10 @@ namespace ts {
         }
 
         function compareTypePredicateRelatedTo(source: TypePredicate,
-            target: TypePredicate,
-            reportErrors: boolean,
-            errorReporter: ErrorReporter,
-            compareTypes: (s: Type, t: Type, reportErrors?: boolean) => Ternary): Ternary {
+                                               target: TypePredicate,
+                                               reportErrors: boolean,
+                                               errorReporter: ErrorReporter,
+                                               compareTypes: (s: Type, t: Type, reportErrors?: boolean) => Ternary): Ternary {
             if (source.kind !== target.kind) {
                 if (reportErrors) {
                     errorReporter(Diagnostics.A_this_based_type_guard_is_not_compatible_with_a_parameter_based_type_guard);
@@ -7228,7 +7228,7 @@ namespace ts {
                     const present = <PredicatePresentExpression>predicate;
                     //TODO werkt alleen als maar 1 argument voor present.
                     return present.arguments[0].text
-                    //return present.expression.text + "(" + present.arguments.map(txt => txt.text) + ")"
+                //return present.expression.text + "(" + present.arguments.map(txt => txt.text) + ")"
                 case SyntaxKind.PredicateLogicalExpression:
                     const logical = <PredicateLogicalExpression>predicate;
                     if (logical.expression.text == "not") {
@@ -7322,7 +7322,7 @@ namespace ts {
                     (globalNumberType === source && numberType === target) ||
                     (globalBooleanType === source && booleanType === target) ||
                     (getGlobalESSymbolType() === source && esSymbolType === target)) {
-                        reportError(Diagnostics._0_is_a_primitive_but_1_is_a_wrapper_object_Prefer_using_0_when_possible, targetType, sourceType);
+                    reportError(Diagnostics._0_is_a_primitive_but_1_is_a_wrapper_object_Prefer_using_0_when_possible, targetType, sourceType);
                 }
             }
 
@@ -7723,8 +7723,6 @@ namespace ts {
             // Third, check if both types are part of deeply nested chains of generic type instantiations and if so assume the types are
             // equal and infinitely expanding. Fourth, if we have reached a depth of 100 nested comparisons, assume we have runaway recursion
             // and issue an error. Otherwise, actually compare the structure of the two types.
-            //LOGICAL CONSEQUENCE
-
             function objectTypeRelatedTo(source: Type, originalSource: Type, target: Type, reportErrors: boolean): Ternary {
                 if (overflow) {
                     return Ternary.False;
@@ -7822,62 +7820,107 @@ namespace ts {
 
                 //<Nathalie>
                 function predicatesRelatedTo(source: Type, target: Type, reportErrors: boolean): Ternary {
-                    predicatesRelatedToIntfIntf;
                     if (getObjectFlags(target) & ObjectFlags.Interface) {
+                        const predicatesT = (<InterfaceTypeWithDeclaredMembers>target).declaredPredicates;
                         if (getObjectFlags(source) & ObjectFlags.Anonymous) {
-                            //CASE: let x: Interface = { ..., ... }
-                            //TODO CAST: gek genoeg is  bij "<Interface>{ ..., ...}" de source en target omgekeerd...
-                            const predicates = (<InterfaceTypeWithDeclaredMembers>target).declaredPredicates;
-                            if (predicates == undefined || predicates.length == 0) {
+                            if (predicatesT == undefined || predicatesT.length == 0) {
                                 return Ternary.Maybe;
                             }
-                            if (predicatesRelatedToObjIntf(source, predicates, true, reportErrors)) {
-                                //TODO TYPES GAAN NOG MOETEN WORDEN VERGELEKEN
-                                return Ternary.True;
+                            //CASE: let x: Interface = { ..., ... }
+                            //TODO CAST: gek genoeg is  bij "<Interface>{ ..., ...}" de source en target omgekeerd... Up vs Downcast?
+                            if (predicatesRelatedToObjIntf(source, predicatesT, true, reportErrors)) {
+                                return tempOwnPropertyTypeCheck(source, target, reportErrors);
+                            } else {
+                                return Ternary.False;
+                            }
+                        } else if (getObjectFlags(source) & ObjectFlags.Interface) {
+                            const predicatesS = (<InterfaceTypeWithDeclaredMembers> source).declaredPredicates;
+                            if ((predicatesS == undefined || predicatesS.length == 0) && (predicatesT == undefined || predicatesT.length == 0)) {
+                                return Ternary.Maybe;
+                            } else if ((predicatesS == undefined || predicatesS.length == 0 || predicatesT == undefined || predicatesT.length == 0)) {
+                                if (reportErrors) {
+                                    reportError(Diagnostics.Either_both_sides_have_to_use_predicates_or_not_use_predicates);
+                                }
+                                return Ternary.False;
+                            }
+                            if (predicatesRelatedToIntfIntf(source, predicatesS, target, predicatesT, reportErrors)) {
+                                return tempOwnPropertyTypeCheck(source, target, reportErrors);
                             } else {
                                 return Ternary.False;
                             }
                         }
                     } else if (getObjectFlags(target) & ObjectFlags.Anonymous) {
                         if (getObjectFlags(source) & ObjectFlags.Interface) {
-                            const predicates = (<InterfaceTypeWithDeclaredMembers> source).declaredPredicates;
-                            if(predicates == undefined || predicates.length == 0) {
+                            const predicatesS = (<InterfaceTypeWithDeclaredMembers> source).declaredPredicates;
+                            if (predicatesS == undefined || predicatesS.length == 0) {
                                 return Ternary.Maybe;
                             }
-                            if (predicatesRelatedToIntfObj(source, predicates, target, reportErrors)) {
-                                //TODO TYPES GAAN NOG MOETEN VERGELEKEN WORDEN
-                                return Ternary.True;
+                            if (predicatesRelatedToIntfObj(source, predicatesS, target, reportErrors)) {
+                                return tempOwnPropertyTypeCheck(source, target, reportErrors);
                             } else {
                                 return Ternary.False;
                             }
                         }
                     }
                     return Ternary.Maybe;
+
+                    function removeUndefined(type: Type): Type{
+                        if (type.flags & TypeFlags.Union) {
+                            if (contains((<UnionType> type).types, undefinedType)) {
+                                let filtered = (<UnionType> type).types.filter(t => t !== undefinedType);
+                                (<UnionType> type).types = filtered;
+                            }
+                        }
+                        return type;
+                    }
+                    function tempOwnPropertyTypeCheck(source: Type, target: Type, reportErrors: boolean): Ternary {
+                        const sourceProps = getPropertiesOfObjectType(source);
+                        for (const sourceProp of sourceProps) {
+                            const sourcePropType = getTypeOfSymbol(sourceProp);
+                            const targetPropType = getTypeOfPropertyOfType(target, sourceProp.name);
+                            //removeUndefined ensures actual types are compared.
+                            //special interfaces require every object property to be optional, but presence constraints are checked
+                            // elsewhere, so for the types only the actual types should be compared.
+                            if (targetPropType != undefined && !isRelatedTo(removeUndefined(sourcePropType), removeUndefined(targetPropType), reportErrors)) {
+                                return Ternary.False;
+                            }
+                        }
+                        return Ternary.True;
+                    }
                 }
-                function predicatesRelatedToIntfObj(source: Type, predicates: NodeArray<PredicateExpression>, target: Type, reportErrors: boolean): Ternary {
+                function predicatesRelatedToIntfObj(source: Type, predicatessource: NodeArray<PredicateExpression>, target: Type, reportErrors: boolean): Ternary {
                     //TODO ook nog types checken
                     const sourceprops = getPropertiesOfType(source);
                     const targetprops = getPropertiesOfType(target);
                     for (const prop of targetprops) {
+                        //TODO property types vergelijken.
                         if (prop.flags & SymbolFlags.Optional) {
-                            //TODO moet in de interface properties lijst zitten
+                            // If the property is optional, then the property should be part of property list of the interface.
+                            // There are no other requirements on the presence of the property.
+                            const names = sourceprops.map(x => x.name);
+                            if (names.indexOf(prop.name) == -1) {
+                                if (reportErrors) {
+                                    reportError(Diagnostics.Property_0_of_type_1_is_unknown_in_type_2, prop.name, typeToString(source), typeToString(target));
+                                }
+                                return Ternary.False;
+                            }
                             return Ternary.True;
                         } else {
-                            const predicateStr = translatePredicates(predicates);
+                            const predicateStr = translatePredicates(predicatessource);
                             if (!prove(predicateStr + " > " + prop.name)) {
                                 if (reportErrors) {
                                     reportError(Diagnostics.Property_0_is_not_present_in_type_1, prop.name, typeToString(source));
                                 }
-                               return Ternary.False;
+                                return Ternary.False;
                             }
-                            //anders verder doen
+                            // otherwise: continue
                         }
                     }
-                    //TODO in de huidige typeregels mogen er overbodige veldjes zijn... Clasht wat met huidige TypeScript...
+                    // This is a limitation such that "hidden" fields are not part of the target object.
                     for (const prop of sourceprops) {
                         const names = targetprops.map(x => x.name);
-                        if (names.indexOf(prop.name) == -1) { //alleen naam van prop moet matchen: type niet... => eigen member schrijven...
-                            const predicateStr = translatePredicates(predicates);
+                        if (names.indexOf(prop.name) == -1) {
+                            const predicateStr = translatePredicates(predicatessource);
                             if (!prove(predicateStr + " > !" + prop.name)) {
                                 if (reportErrors) {
                                     reportError(Diagnostics.Predicates_of_0_do_not_guarantee_the_absence_of_property_1_which_is_not_a_member_of_2, typeToString(source), prop.name, typeToString(target));
@@ -7888,186 +7931,185 @@ namespace ts {
                     }
                     return Ternary.True;
 
-                    //function member(prop)
                 }
-                function predicatesRelatedToIntfIntf(source: Type, targetProp: string, reportErrors: boolean): Ternary {
-                    //TODO If interface has constraints, then we need to check whether these constraints/predicates are satisfied
-                    //using external library
-                    targetProp;
-                    if (getObjectFlags(source) & ObjectFlags.Interface) {
-                        // TODO the cast to _with declared members_ is not tested by an if test
-                        const predicates = (<InterfaceTypeWithDeclaredMembers>source).declaredPredicates;
-                        if (predicates == undefined || predicates.length == 0) {
-                            return Ternary.True;
-                        }
-                        //TODO voor elke property van target
-                        //TODO niet correct nu
-                        const predicateStr = translatePredicates(predicates);
-                        const proveresult = prove(predicateStr + " > " + targetProp);
-                        if (!proveresult) {
-                            if (reportErrors) {
-                                //reportError(Diagnostics.Predicates_of_interface_0_are_not_satisfied, typeToString(target));
-                                reportError(Diagnostics.Predicate_0_was_not_satisfied_in_type_1, predicateStr, typeToString(source));
-                            }
-                            return Ternary.False;
-                        }
+                function predicatesRelatedToIntfIntf(source: Type, predicatesS: NodeArray<PredicateExpression>, target: Type, predicatesT: NodeArray<PredicateExpression>, reportErrors: boolean): Ternary {
+                    //TODO check types;
+                    let predicateSourceStr = translatePredicates(predicatesS);
+                    let predicateTargetStr = translatePredicates(predicatesT);
+                    const sourceprops = getPropertiesOfType(source);
+                    const targetprops = getPropertiesOfType(target);
+                    const sourcepropNames = sourceprops.map((x:Symbol) => x.name);
+                    const targetpropNames = targetprops.map((x:Symbol) => x.name);
 
-                        return Ternary.True
+                    for (const prop of targetprops) {
+                        if (sourcepropNames.indexOf(prop.name) == -1) {
+                            predicateSourceStr += " & !" + prop.name;
+                        }
+                    }
+
+                    for (const prop of sourceprops) {
+                        if (targetpropNames.indexOf(prop.name) == -1) {
+                            predicateTargetStr += " & !" + prop.name;
+                        }
+                    }
+
+                    if (!prove(predicateSourceStr + " > " + predicateTargetStr)) {
+                        if (reportErrors) {
+                            reportError(Diagnostics.Invalid_assignment_of_type_0_tot_type_1_Check_if_predicates_are_correct, typeToString(source), typeToString(target));
+                        }
+                        return Ternary.False;
                     }
                     return Ternary.True;
 
-
                 }
 
-                    //VALUATION
+                function predicatesRelatedToObjIntf(source: Type, predicates: NodeArray<PredicateExpression>, mainLevel: boolean, reportErrors: boolean): Ternary {
 
-                    function predicatesRelatedToObjIntf(source: Type, predicates: NodeArray<PredicateExpression>, mainLevel: boolean, reportErrors: boolean): Ternary {
-
-                       for (const predicate of predicates) {
-                                // assume top level is callexpression => checken while type checking interface?
-                                if (!isPredicateSatisfied(source, predicate, reportErrors)) {
-                                    if (mainLevel && reportErrors) {
-                                        reportError(Diagnostics.Predicate_0_was_not_satisfied_in_type_1, predicateToString(predicate), typeToString(source));
-                                    }
-                                    return Ternary.False;
-                                }
-                            }
-                            return Ternary.True;
-                        function predicateToString(predicate: PredicateExpression): string {
-                            switch (predicate.kind) {
-                                case SyntaxKind.PredicateTypeExpression:
-                                    const type = <PredicateTypeExpression>predicate;
-                                    return type.left_get.text + "(" + type.left_arg.text + ") == " + type.right.text;
-                                case SyntaxKind.PredicatePresentExpression:
-                                    const present = <PredicatePresentExpression>predicate;
-                                    return present.expression.text + "(" + present.arguments.map(txt => txt.text) + ")"
-                                case SyntaxKind.PredicateLogicalExpression:
-                                    const logical = <PredicateLogicalExpression>predicate;
-                                    return logical.expression.text + "(" + logical.arguments.map(predicateToString) + ")";
-                            }
-                            return "unknown predicate";
-                        }
-
-                        function isCallPredicateSatisfied(source: Type, callexpr: PredicateLogicalExpression, reportErrors: boolean): Ternary {
-                            switch (callexpr.expression.text) {
-                                case "and":
-                                    if (!predicatesRelatedToObjIntf(source, callexpr.arguments, /*mainLevel*/ false, true && reportErrors)) { //TODO: nu nog correct?
-                                        return Ternary.False;
-                                    }
-                                    break;
-                                case "or":
-                                    if (!anyPredicatesSatisfied(source, callexpr.arguments, /*reportErrors*/ false)) {
-                                        return Ternary.False;
-                                    }
-                                    break;
-                                case "not":
-                                    if (anyPredicatesSatisfied(source, callexpr.arguments, /*reportErrors*/ false)) {
-                                        return Ternary.False;
-                                    }
-                                    break;
-                                case "implic":
-                                    if (!implicPredicatesSatisfied(source, callexpr.arguments, /*reportErrors*/ false)) {
-                                        return Ternary.False;
-                                    }
-                                    break;
-                                case "iff":
-                                    if (!iffPredicatesSatisfied(source, callexpr.arguments, /*reportErrors*/ false)) {
-                                        return Ternary.False;
-                                    }
-                                    break;
-                                default:
-                                    return Ternary.False;
-                            }
-                            return Ternary.True;
-                        }
-
-                        function isBinaryPredicateSatisfied(source: Type, expr: PredicateTypeExpression, reportErrors: boolean): Ternary {
-                            switch (expr.left_get.text) {
-                                case "type":
-                                    const argname = expr.left_arg.text;
-                                    const argtype = getTypeOfPropertyOfType(source, argname);
-                                    const desiredtype_str = (expr.right).text;
-                                    const capitalized = desiredtype_str.charAt(0).toUpperCase() + desiredtype_str.slice(1);
-                                    // TODO better parse a "type" symbol in the parser, this is hacky
-                                    const desiredtype = getGlobalType(capitalized);
-                                    if (argtype) {
-                                        // TODO isRelatedTo overkill? Better to have an === relationship? We only use simple type anyway, that's basically what is done in isRelatedTo
-                                        const related = isRelatedTo(argtype, desiredtype);
-                                        if (!related && reportErrors) {
-                                            reportError(Diagnostics.Types_of_property_0_are_incompatible, argname);
-                                        }
-                                        return related;
-                                    }
-                                    return Ternary.True;
-                                default:
-                                    return Ternary.False;
-                            }
-                        }
-
-                        function isPresentPredicateSatisfied(source: Type, expr: PredicatePresentExpression, reportErrors: boolean): Ternary {
-                            if (!arePresent(source, expr.arguments.map(arg => arg.text), reportErrors)) {
-                                return Ternary.False;
-                            }
-                            return Ternary.True;
-                        }
-
-                        function isPredicateSatisfied(source: Type, expr: PredicateExpression, reportErrors: boolean): Ternary {
-                            switch (expr.kind) {
-                                case SyntaxKind.PredicateTypeExpression:
-                                    return isBinaryPredicateSatisfied(source, <PredicateTypeExpression>expr, reportErrors);
-                                case SyntaxKind.PredicateLogicalExpression:
-                                    return isCallPredicateSatisfied(source, <PredicateLogicalExpression>expr, reportErrors);
-                                case SyntaxKind.PredicatePresentExpression:
-                                    return isPresentPredicateSatisfied(source, <PredicatePresentExpression>expr, reportErrors);
-                                default:
-                                    return Ternary.False;
-                            }
-                        }
-
-                        function implicPredicatesSatisfied(source: Type, predicates: NodeArray<PredicateExpression>, reportErrors: boolean): Ternary {
-                            const arg1 = isPredicateSatisfied(source, predicates[0], reportErrors);
-                            const arg2 = isPredicateSatisfied(source, predicates[1], reportErrors);
-                            if (arg1 && !arg2) {
-                                return Ternary.False;
-                            }
-                            return Ternary.True;
-                        }
-
-                        function iffPredicatesSatisfied(source: Type, predicates: NodeArray<PredicateExpression>, reportErrors: boolean): Ternary {
-                            const reversed = createNodeArray<PredicateExpression>();
-                            reversed.push(predicates[0]);
-                            reversed.push(predicates[1]);
-                            return implicPredicatesSatisfied(source, predicates, reportErrors)
-                                && implicPredicatesSatisfied(source, reversed, reportErrors);
-                        }
-
-                        function anyPredicatesSatisfied(source: Type, predicates: NodeArray<PredicateExpression>, reportErrors: boolean): Ternary {
-                            for (const predicate of predicates) {
-                                if (isPredicateSatisfied(source, predicate, reportErrors)) {
-                                    return Ternary.True;
-                                }
+                    for (const predicate of predicates) {
+                        // assume top level is callexpression => checken while type checking interface?
+                        if (!isPredicateSatisfied(source, predicate, reportErrors)) {
+                            if (mainLevel && reportErrors) {
+                                reportError(Diagnostics.Predicate_0_was_not_satisfied_in_type_1, predicateToString(predicate), typeToString(source));
                             }
                             return Ternary.False;
-
                         }
-                        function arePresent(source: Type, args: string[], reportErrors: boolean): Ternary {
-                            source = getApparentType(source);
-                            if (source.flags & TypeFlags.Object) {
-                                for (const name of args) {
-                                    const resolved = resolveStructuredTypeMembers(<ObjectType>source);
-                                    const symbol = resolved.members[name];
-                                    if (!(symbol && symbolIsValue(symbol))) {
-                                        if (reportErrors) {
-                                            reportError(Diagnostics.Property_0_is_missing_in_type_1, name, typeToString(source))
-                                        }
-                                        return Ternary.False;
+                    }
+                    return Ternary.True;
+                    function predicateToString(predicate: PredicateExpression): string {
+                        switch (predicate.kind) {
+                            case SyntaxKind.PredicateTypeExpression:
+                                const type = <PredicateTypeExpression>predicate;
+                                return type.left_get.text + "(" + type.left_arg.text + ") == " + type.right.text;
+                            case SyntaxKind.PredicatePresentExpression:
+                                const present = <PredicatePresentExpression>predicate;
+                                return present.expression.text + "(" + present.arguments.map(txt => txt.text) + ")"
+                            case SyntaxKind.PredicateLogicalExpression:
+                                const logical = <PredicateLogicalExpression>predicate;
+                                return logical.expression.text + "(" + logical.arguments.map(predicateToString) + ")";
+                        }
+                        return "unknown predicate";
+                    }
+
+                    function isCallPredicateSatisfied(source: Type, callexpr: PredicateLogicalExpression, reportErrors: boolean): Ternary {
+                        switch (callexpr.expression.text) {
+                            case "and":
+                                if (!predicatesRelatedToObjIntf(source, callexpr.arguments, /*mainLevel*/ false, true && reportErrors)) { //TODO: nu nog correct?
+                                    return Ternary.False;
+                                }
+                                break;
+                            case "or":
+                                if (!anyPredicatesSatisfied(source, callexpr.arguments, /*reportErrors*/ false)) {
+                                    return Ternary.False;
+                                }
+                                break;
+                            case "not":
+                                if (anyPredicatesSatisfied(source, callexpr.arguments, /*reportErrors*/ false)) {
+                                    return Ternary.False;
+                                }
+                                break;
+                            case "implic":
+                                if (!implicPredicatesSatisfied(source, callexpr.arguments, /*reportErrors*/ false)) {
+                                    return Ternary.False;
+                                }
+                                break;
+                            case "iff":
+                                if (!iffPredicatesSatisfied(source, callexpr.arguments, /*reportErrors*/ false)) {
+                                    return Ternary.False;
+                                }
+                                break;
+                            default:
+                                return Ternary.False;
+                        }
+                        return Ternary.True;
+                    }
+
+                    function isBinaryPredicateSatisfied(source: Type, expr: PredicateTypeExpression, reportErrors: boolean): Ternary {
+                        switch (expr.left_get.text) {
+                            case "type":
+                                const argname = expr.left_arg.text;
+                                const argtype = getTypeOfPropertyOfType(source, argname);
+                                const desiredtype_str = (expr.right).text;
+                                const capitalized = desiredtype_str.charAt(0).toUpperCase() + desiredtype_str.slice(1);
+                                // TODO better parse a "type" symbol in the parser, this is hacky
+                                const desiredtype = getGlobalType(capitalized);
+                                if (argtype) {
+                                    // TODO isRelatedTo overkill? Better to have an === relationship? We only use simple type anyway, that's basically what is done in isRelatedTo
+                                    const related = isRelatedTo(argtype, desiredtype);
+                                    if (!related && reportErrors) {
+                                        reportError(Diagnostics.Types_of_property_0_are_incompatible, argname);
                                     }
+                                    return related;
+                                }
+                                return Ternary.True;
+                            default:
+                                return Ternary.False;
+                        }
+                    }
+
+                    function isPresentPredicateSatisfied(source: Type, expr: PredicatePresentExpression, reportErrors: boolean): Ternary {
+                        if (!arePresent(source, expr.arguments.map(arg => arg.text), reportErrors)) {
+                            return Ternary.False;
+                        }
+                        return Ternary.True;
+                    }
+
+                    function isPredicateSatisfied(source: Type, expr: PredicateExpression, reportErrors: boolean): Ternary {
+                        switch (expr.kind) {
+                            case SyntaxKind.PredicateTypeExpression:
+                                return isBinaryPredicateSatisfied(source, <PredicateTypeExpression>expr, reportErrors);
+                            case SyntaxKind.PredicateLogicalExpression:
+                                return isCallPredicateSatisfied(source, <PredicateLogicalExpression>expr, reportErrors);
+                            case SyntaxKind.PredicatePresentExpression:
+                                return isPresentPredicateSatisfied(source, <PredicatePresentExpression>expr, reportErrors);
+                            default:
+                                return Ternary.False;
+                        }
+                    }
+
+                    function implicPredicatesSatisfied(source: Type, predicates: NodeArray<PredicateExpression>, reportErrors: boolean): Ternary {
+                        const arg1 = isPredicateSatisfied(source, predicates[0], reportErrors);
+                        const arg2 = isPredicateSatisfied(source, predicates[1], reportErrors);
+                        if (arg1 && !arg2) {
+                            return Ternary.False;
+                        }
+                        return Ternary.True;
+                    }
+
+                    function iffPredicatesSatisfied(source: Type, predicates: NodeArray<PredicateExpression>, reportErrors: boolean): Ternary {
+                        const reversed = createNodeArray<PredicateExpression>();
+                        reversed.push(predicates[0]);
+                        reversed.push(predicates[1]);
+                        return implicPredicatesSatisfied(source, predicates, reportErrors)
+                            && implicPredicatesSatisfied(source, reversed, reportErrors);
+                    }
+
+                    function anyPredicatesSatisfied(source: Type, predicates: NodeArray<PredicateExpression>, reportErrors: boolean): Ternary {
+                        for (const predicate of predicates) {
+                            if (isPredicateSatisfied(source, predicate, reportErrors)) {
+                                return Ternary.True;
+                            }
+                        }
+                        return Ternary.False;
+
+                    }
+                    function arePresent(source: Type, args: string[], reportErrors: boolean): Ternary {
+                        source = getApparentType(source);
+                        if (source.flags & TypeFlags.Object) {
+                            for (const name of args) {
+                                const resolved = resolveStructuredTypeMembers(<ObjectType>source);
+                                const symbol = resolved.members[name];
+                                if (!(symbol && symbolIsValue(symbol))) {
+                                    if (reportErrors) {
+                                        reportError(Diagnostics.Property_0_is_missing_in_type_1, name, typeToString(source))
+                                    }
+                                    return Ternary.False;
                                 }
                             }
-                            return Ternary.True;
                         }
+                        return Ternary.True;
+                    }
                 }
-}
+            }
 
 
             // A type [P in S]: X is related to a type [P in T]: Y if T is related to S and X is related to Y.
@@ -8492,8 +8534,8 @@ namespace ts {
             const sourceRestCount = source.hasRestParameter ? 1 : 0;
             const targetRestCount = target.hasRestParameter ? 1 : 0;
             if (partialMatch && source.minArgumentCount <= target.minArgumentCount && (
-                sourceRestCount > targetRestCount ||
-                sourceRestCount === targetRestCount && source.parameters.length >= target.parameters.length)) {
+                    sourceRestCount > targetRestCount ||
+                    sourceRestCount === targetRestCount && source.parameters.length >= target.parameters.length)) {
                 return true;
             }
             return false;
@@ -8661,25 +8703,25 @@ namespace ts {
         function isLiteralType(type: Type): boolean {
             return type.flags & TypeFlags.Boolean ? true :
                 type.flags & TypeFlags.Union ? type.flags & TypeFlags.Enum ? true : !forEach((<UnionType>type).types, t => !isUnitType(t)) :
-                isUnitType(type);
+                    isUnitType(type);
         }
 
         function getBaseTypeOfLiteralType(type: Type): Type {
             return type.flags & TypeFlags.StringLiteral ? stringType :
                 type.flags & TypeFlags.NumberLiteral ? numberType :
-                type.flags & TypeFlags.BooleanLiteral ? booleanType :
-                type.flags & TypeFlags.EnumLiteral ? (<EnumLiteralType>type).baseType :
-                type.flags & TypeFlags.Union && !(type.flags & TypeFlags.Enum) ? getUnionType(sameMap((<UnionType>type).types, getBaseTypeOfLiteralType)) :
-                type;
+                    type.flags & TypeFlags.BooleanLiteral ? booleanType :
+                        type.flags & TypeFlags.EnumLiteral ? (<EnumLiteralType>type).baseType :
+                            type.flags & TypeFlags.Union && !(type.flags & TypeFlags.Enum) ? getUnionType(sameMap((<UnionType>type).types, getBaseTypeOfLiteralType)) :
+                                type;
         }
 
         function getWidenedLiteralType(type: Type): Type {
             return type.flags & TypeFlags.StringLiteral && type.flags & TypeFlags.FreshLiteral ? stringType :
                 type.flags & TypeFlags.NumberLiteral && type.flags & TypeFlags.FreshLiteral ? numberType :
-                type.flags & TypeFlags.BooleanLiteral ? booleanType :
-                type.flags & TypeFlags.EnumLiteral ? (<EnumLiteralType>type).baseType :
-                type.flags & TypeFlags.Union && !(type.flags & TypeFlags.Enum) ? getUnionType(sameMap((<UnionType>type).types, getWidenedLiteralType)) :
-                type;
+                    type.flags & TypeFlags.BooleanLiteral ? booleanType :
+                        type.flags & TypeFlags.EnumLiteral ? (<EnumLiteralType>type).baseType :
+                            type.flags & TypeFlags.Union && !(type.flags & TypeFlags.Enum) ? getUnionType(sameMap((<UnionType>type).types, getWidenedLiteralType)) :
+                                type;
         }
 
         /**
@@ -8704,9 +8746,9 @@ namespace ts {
         function getFalsyFlags(type: Type): TypeFlags {
             return type.flags & TypeFlags.Union ? getFalsyFlagsOfTypes((<UnionType>type).types) :
                 type.flags & TypeFlags.StringLiteral ? (<LiteralType>type).text === "" ? TypeFlags.StringLiteral : 0 :
-                type.flags & TypeFlags.NumberLiteral ? (<LiteralType>type).text === "0" ? TypeFlags.NumberLiteral : 0 :
-                type.flags & TypeFlags.BooleanLiteral ? type === falseType ? TypeFlags.BooleanLiteral : 0 :
-                type.flags & TypeFlags.PossiblyFalsy;
+                    type.flags & TypeFlags.NumberLiteral ? (<LiteralType>type).text === "0" ? TypeFlags.NumberLiteral : 0 :
+                        type.flags & TypeFlags.BooleanLiteral ? type === falseType ? TypeFlags.BooleanLiteral : 0 :
+                            type.flags & TypeFlags.PossiblyFalsy;
         }
 
         function includeFalsyTypes(type: Type, flags: TypeFlags) {
@@ -9759,8 +9801,8 @@ namespace ts {
         function getReferenceRoot(node: Node): Node {
             const parent = node.parent;
             return parent.kind === SyntaxKind.ParenthesizedExpression ||
-                parent.kind === SyntaxKind.BinaryExpression && (<BinaryExpression>parent).operatorToken.kind === SyntaxKind.EqualsToken && (<BinaryExpression>parent).left === node ||
-                parent.kind === SyntaxKind.BinaryExpression && (<BinaryExpression>parent).operatorToken.kind === SyntaxKind.CommaToken && (<BinaryExpression>parent).right === node ?
+            parent.kind === SyntaxKind.BinaryExpression && (<BinaryExpression>parent).operatorToken.kind === SyntaxKind.EqualsToken && (<BinaryExpression>parent).left === node ||
+            parent.kind === SyntaxKind.BinaryExpression && (<BinaryExpression>parent).operatorToken.kind === SyntaxKind.CommaToken && (<BinaryExpression>parent).right === node ?
                 getReferenceRoot(parent) : node;
         }
 
@@ -9835,8 +9877,8 @@ namespace ts {
                 isTypeSubsetOf(numberType, typeWithPrimitives) && maybeTypeOfKind(typeWithLiterals, TypeFlags.NumberLiteral)) {
                 return mapType(typeWithPrimitives, t =>
                     t.flags & TypeFlags.String ? extractTypesOfKind(typeWithLiterals, TypeFlags.String | TypeFlags.StringLiteral) :
-                    t.flags & TypeFlags.Number ? extractTypesOfKind(typeWithLiterals, TypeFlags.Number | TypeFlags.NumberLiteral) :
-                    t);
+                        t.flags & TypeFlags.Number ? extractTypesOfKind(typeWithLiterals, TypeFlags.Number | TypeFlags.NumberLiteral) :
+                            t);
             }
             return typeWithPrimitives;
         }
@@ -9965,7 +10007,7 @@ namespace ts {
             }
             const initialType = assumeInitialized ? declaredType :
                 declaredType === autoType || declaredType === autoArrayType ? undefinedType :
-                includeFalsyTypes(declaredType, TypeFlags.Undefined);
+                    includeFalsyTypes(declaredType, TypeFlags.Undefined);
             const visitedFlowStart = visitedFlowCount;
             const evolvedType = getTypeFromFlowType(getTypeAtFlowNode(reference.flowNode));
             visitedFlowCount = visitedFlowStart;
@@ -10397,7 +10439,7 @@ namespace ts {
                 const discriminantType = getUnionType(clauseTypes);
                 const caseType =
                     discriminantType.flags & TypeFlags.Never ? neverType :
-                    replacePrimitivesWithLiterals(filterType(type, t => isTypeComparableTo(discriminantType, t)), discriminantType);
+                        replacePrimitivesWithLiterals(filterType(type, t => isTypeComparableTo(discriminantType, t)), discriminantType);
                 if (!hasDefaultClause) {
                     return caseType;
                 }
@@ -10478,8 +10520,8 @@ namespace ts {
                 const targetType = type.flags & TypeFlags.TypeParameter ? getApparentType(type) : type;
                 return isTypeSubtypeOf(candidate, type) ? candidate :
                     isTypeAssignableTo(type, candidate) ? type :
-                    isTypeAssignableTo(candidate, targetType) ? candidate :
-                    getIntersectionType([type, candidate]);
+                        isTypeAssignableTo(candidate, targetType) ? candidate :
+                            getIntersectionType([type, candidate]);
             }
 
             function narrowTypeByTypePredicate(type: Type, callExpression: CallExpression, assumeTrue: boolean): Type {
@@ -10547,59 +10589,59 @@ namespace ts {
                 return type;
             }
 
-           // function getTypeFactsFromPredicates(predicates: any) {
-             //   predicates;
-                /* function getTypeFacts(type: Type): TypeFacts {
-            const flags = type.flags;
-            if (flags & TypeFlags.String) {
-                return strictNullChecks ? TypeFacts.StringStrictFacts : TypeFacts.StringFacts;
-            }
-            if (flags & TypeFlags.StringLiteral) {
-                return strictNullChecks ?
-                    (<LiteralType>type).text === "" ? TypeFacts.EmptyStringStrictFacts : TypeFacts.NonEmptyStringStrictFacts :
-                    (<LiteralType>type).text === "" ? TypeFacts.EmptyStringFacts : TypeFacts.NonEmptyStringFacts;
-            }
-            if (flags & (TypeFlags.Number | TypeFlags.Enum)) {
-                return strictNullChecks ? TypeFacts.NumberStrictFacts : TypeFacts.NumberFacts;
-            }
-            if (flags & (TypeFlags.NumberLiteral | TypeFlags.EnumLiteral)) {
-                const isZero = (<LiteralType>type).text === "0";
-                return strictNullChecks ?
-                    isZero ? TypeFacts.ZeroStrictFacts : TypeFacts.NonZeroStrictFacts :
-                    isZero ? TypeFacts.ZeroFacts : TypeFacts.NonZeroFacts;
-            }
-            if (flags & TypeFlags.Boolean) {
-                return strictNullChecks ? TypeFacts.BooleanStrictFacts : TypeFacts.BooleanFacts;
-            }
-            if (flags & TypeFlags.BooleanLike) {
-                return strictNullChecks ?
-                    type === falseType ? TypeFacts.FalseStrictFacts : TypeFacts.TrueStrictFacts :
-                    type === falseType ? TypeFacts.FalseFacts : TypeFacts.TrueFacts;
-            }
-            if (flags & TypeFlags.Object) {
-                return isFunctionObjectType(<ObjectType>type) ?
-                    strictNullChecks ? TypeFacts.FunctionStrictFacts : TypeFacts.FunctionFacts :
-                    strictNullChecks ? TypeFacts.ObjectStrictFacts : TypeFacts.ObjectFacts;
-            }
-            if (flags & (TypeFlags.Void | TypeFlags.Undefined)) {
-                return TypeFacts.UndefinedFacts;
-            }
-            if (flags & TypeFlags.Null) {
-                return TypeFacts.NullFacts;
-            }
-            if (flags & TypeFlags.ESSymbol) {
-                return strictNullChecks ? TypeFacts.SymbolStrictFacts : TypeFacts.SymbolFacts;
-            }
-            if (flags & TypeFlags.TypeParameter) {
-                const constraint = getConstraintOfTypeParameter(<TypeParameter>type);
-                return getTypeFacts(constraint || emptyObjectType);
-            }
-            if (flags & TypeFlags.UnionOrIntersection) {
-                return getTypeFactsOfTypes((<UnionOrIntersectionType>type).types);
-            }
-            return TypeFacts.All;
-        }*/
-           // }
+            // function getTypeFactsFromPredicates(predicates: any) {
+            //   predicates;
+            /* function getTypeFacts(type: Type): TypeFacts {
+        const flags = type.flags;
+        if (flags & TypeFlags.String) {
+            return strictNullChecks ? TypeFacts.StringStrictFacts : TypeFacts.StringFacts;
+        }
+        if (flags & TypeFlags.StringLiteral) {
+            return strictNullChecks ?
+                (<LiteralType>type).text === "" ? TypeFacts.EmptyStringStrictFacts : TypeFacts.NonEmptyStringStrictFacts :
+                (<LiteralType>type).text === "" ? TypeFacts.EmptyStringFacts : TypeFacts.NonEmptyStringFacts;
+        }
+        if (flags & (TypeFlags.Number | TypeFlags.Enum)) {
+            return strictNullChecks ? TypeFacts.NumberStrictFacts : TypeFacts.NumberFacts;
+        }
+        if (flags & (TypeFlags.NumberLiteral | TypeFlags.EnumLiteral)) {
+            const isZero = (<LiteralType>type).text === "0";
+            return strictNullChecks ?
+                isZero ? TypeFacts.ZeroStrictFacts : TypeFacts.NonZeroStrictFacts :
+                isZero ? TypeFacts.ZeroFacts : TypeFacts.NonZeroFacts;
+        }
+        if (flags & TypeFlags.Boolean) {
+            return strictNullChecks ? TypeFacts.BooleanStrictFacts : TypeFacts.BooleanFacts;
+        }
+        if (flags & TypeFlags.BooleanLike) {
+            return strictNullChecks ?
+                type === falseType ? TypeFacts.FalseStrictFacts : TypeFacts.TrueStrictFacts :
+                type === falseType ? TypeFacts.FalseFacts : TypeFacts.TrueFacts;
+        }
+        if (flags & TypeFlags.Object) {
+            return isFunctionObjectType(<ObjectType>type) ?
+                strictNullChecks ? TypeFacts.FunctionStrictFacts : TypeFacts.FunctionFacts :
+                strictNullChecks ? TypeFacts.ObjectStrictFacts : TypeFacts.ObjectFacts;
+        }
+        if (flags & (TypeFlags.Void | TypeFlags.Undefined)) {
+            return TypeFacts.UndefinedFacts;
+        }
+        if (flags & TypeFlags.Null) {
+            return TypeFacts.NullFacts;
+        }
+        if (flags & TypeFlags.ESSymbol) {
+            return strictNullChecks ? TypeFacts.SymbolStrictFacts : TypeFacts.SymbolFacts;
+        }
+        if (flags & TypeFlags.TypeParameter) {
+            const constraint = getConstraintOfTypeParameter(<TypeParameter>type);
+            return getTypeFacts(constraint || emptyObjectType);
+        }
+        if (flags & TypeFlags.UnionOrIntersection) {
+            return getTypeFactsOfTypes((<UnionOrIntersectionType>type).types);
+        }
+        return TypeFacts.All;
+    }*/
+            // }
             //<nathalie>
             function addPredicateAndSimplify(field: Identifier, predicates: NodeArray<PredicateExpression>, include: TypeFacts): NodeArray<PredicateExpression> {
                 const simplPredicates: NodeArray<PredicateExpression> = createNodeArray<PredicateExpression>();
@@ -10974,7 +11016,7 @@ namespace ts {
             // analysis to include the immediately enclosing function.
             while (flowContainer !== declarationContainer && (flowContainer.kind === SyntaxKind.FunctionExpression ||
                 flowContainer.kind === SyntaxKind.ArrowFunction || isObjectLiteralOrClassExpressionMethod(flowContainer)) &&
-                (isConstVariable(localOrExportSymbol) || isParameter && !isParameterAssigned(localOrExportSymbol))) {
+            (isConstVariable(localOrExportSymbol) || isParameter && !isParameterAssigned(localOrExportSymbol))) {
                 flowContainer = getControlFlowContainer(flowContainer);
             }
             // We only look for uninitialized variables in strict null checking mode, and only when we can analyze
@@ -12314,7 +12356,7 @@ namespace ts {
                 }
                 return result;
             }
-       }
+        }
 
         function isValidSpreadType(type: Type): boolean {
             return !!(type.flags & (TypeFlags.Any | TypeFlags.Null | TypeFlags.Undefined) ||
@@ -12451,11 +12493,11 @@ namespace ts {
         }
 
         /**
-          * Looks up an intrinsic tag name and returns a symbol that either points to an intrinsic
-          * property (in which case nodeLinks.jsxFlags will be IntrinsicNamedElement) or an intrinsic
-          * string index signature (in which case nodeLinks.jsxFlags will be IntrinsicIndexedElement).
-          * May also return unknownSymbol if both of these lookups fail.
-          */
+         * Looks up an intrinsic tag name and returns a symbol that either points to an intrinsic
+         * property (in which case nodeLinks.jsxFlags will be IntrinsicNamedElement) or an intrinsic
+         * string index signature (in which case nodeLinks.jsxFlags will be IntrinsicIndexedElement).
+         * May also return unknownSymbol if both of these lookups fail.
+         */
         function getIntrinsicTagSymbol(node: JsxOpeningLikeElement | JsxClosingElement): Symbol {
             const links = getNodeLinks(node);
             if (!links.resolvedSymbol) {
@@ -13600,18 +13642,18 @@ namespace ts {
 
 
         /**
-          * Returns the effective argument count for a node that works like a function invocation.
-          * If 'node' is a Decorator, the number of arguments is derived from the decoration
-          *    target and the signature:
-          *    If 'node.target' is a class declaration or class expression, the effective argument
-          *       count is 1.
-          *    If 'node.target' is a parameter declaration, the effective argument count is 3.
-          *    If 'node.target' is a property declaration, the effective argument count is 2.
-          *    If 'node.target' is a method or accessor declaration, the effective argument count
-          *       is 3, although it can be 2 if the signature only accepts two arguments, allowing
-          *       us to match a property decorator.
-          * Otherwise, the argument count is the length of the 'args' array.
-          */
+         * Returns the effective argument count for a node that works like a function invocation.
+         * If 'node' is a Decorator, the number of arguments is derived from the decoration
+         *    target and the signature:
+         *    If 'node.target' is a class declaration or class expression, the effective argument
+         *       count is 1.
+         *    If 'node.target' is a parameter declaration, the effective argument count is 3.
+         *    If 'node.target' is a property declaration, the effective argument count is 2.
+         *    If 'node.target' is a method or accessor declaration, the effective argument count
+         *       is 3, although it can be 2 if the signature only accepts two arguments, allowing
+         *       us to match a property decorator.
+         * Otherwise, the argument count is the length of the 'args' array.
+         */
         function getEffectiveArgumentCount(node: CallLikeExpression, args: Expression[], signature: Signature) {
             if (node.kind === SyntaxKind.Decorator) {
                 switch (node.parent.kind) {
@@ -13653,17 +13695,17 @@ namespace ts {
         }
 
         /**
-          * Returns the effective type of the first argument to a decorator.
-          * If 'node' is a class declaration or class expression, the effective argument type
-          *    is the type of the static side of the class.
-          * If 'node' is a parameter declaration, the effective argument type is either the type
-          *    of the static or instance side of the class for the parameter's parent method,
-          *    depending on whether the method is declared static.
-          *    For a constructor, the type is always the type of the static side of the class.
-          * If 'node' is a property, method, or accessor declaration, the effective argument
-          *    type is the type of the static or instance side of the parent class for class
-          *    element, depending on whether the element is declared static.
-          */
+         * Returns the effective type of the first argument to a decorator.
+         * If 'node' is a class declaration or class expression, the effective argument type
+         *    is the type of the static side of the class.
+         * If 'node' is a parameter declaration, the effective argument type is either the type
+         *    of the static or instance side of the class for the parameter's parent method,
+         *    depending on whether the method is declared static.
+         *    For a constructor, the type is always the type of the static side of the class.
+         * If 'node' is a property, method, or accessor declaration, the effective argument
+         *    type is the type of the static or instance side of the parent class for class
+         *    element, depending on whether the element is declared static.
+         */
         function getEffectiveDecoratorFirstArgumentType(node: Node): Type {
             // The first argument to a decorator is its `target`.
             if (node.kind === SyntaxKind.ClassDeclaration) {
@@ -13699,20 +13741,20 @@ namespace ts {
         }
 
         /**
-          * Returns the effective type for the second argument to a decorator.
-          * If 'node' is a parameter, its effective argument type is one of the following:
-          *    If 'node.parent' is a constructor, the effective argument type is 'any', as we
-          *       will emit `undefined`.
-          *    If 'node.parent' is a member with an identifier, numeric, or string literal name,
-          *       the effective argument type will be a string literal type for the member name.
-          *    If 'node.parent' is a computed property name, the effective argument type will
-          *       either be a symbol type or the string type.
-          * If 'node' is a member with an identifier, numeric, or string literal name, the
-          *    effective argument type will be a string literal type for the member name.
-          * If 'node' is a computed property name, the effective argument type will either
-          *    be a symbol type or the string type.
-          * A class decorator does not have a second argument type.
-          */
+         * Returns the effective type for the second argument to a decorator.
+         * If 'node' is a parameter, its effective argument type is one of the following:
+         *    If 'node.parent' is a constructor, the effective argument type is 'any', as we
+         *       will emit `undefined`.
+         *    If 'node.parent' is a member with an identifier, numeric, or string literal name,
+         *       the effective argument type will be a string literal type for the member name.
+         *    If 'node.parent' is a computed property name, the effective argument type will
+         *       either be a symbol type or the string type.
+         * If 'node' is a member with an identifier, numeric, or string literal name, the
+         *    effective argument type will be a string literal type for the member name.
+         * If 'node' is a computed property name, the effective argument type will either
+         *    be a symbol type or the string type.
+         * A class decorator does not have a second argument type.
+         */
         function getEffectiveDecoratorSecondArgumentType(node: Node) {
             // The second argument to a decorator is its `propertyKey`
             if (node.kind === SyntaxKind.ClassDeclaration) {
@@ -13766,12 +13808,12 @@ namespace ts {
         }
 
         /**
-          * Returns the effective argument type for the third argument to a decorator.
-          * If 'node' is a parameter, the effective argument type is the number type.
-          * If 'node' is a method or accessor, the effective argument type is a
-          *    `TypedPropertyDescriptor<T>` instantiated with the type of the member.
-          * Class and property decorators do not have a third effective argument.
-          */
+         * Returns the effective argument type for the third argument to a decorator.
+         * If 'node' is a parameter, the effective argument type is the number type.
+         * If 'node' is a method or accessor, the effective argument type is a
+         *    `TypedPropertyDescriptor<T>` instantiated with the type of the member.
+         * Class and property decorators do not have a third effective argument.
+         */
         function getEffectiveDecoratorThirdArgumentType(node: Node) {
             // The third argument to a decorator is either its `descriptor` for a method decorator
             // or its `parameterIndex` for a parameter decorator
@@ -13804,8 +13846,8 @@ namespace ts {
         }
 
         /**
-          * Returns the effective argument type for the provided argument to a decorator.
-          */
+         * Returns the effective argument type for the provided argument to a decorator.
+         */
         function getEffectiveDecoratorArgumentType(node: Decorator, argIndex: number): Type {
             if (argIndex === 0) {
                 return getEffectiveDecoratorFirstArgumentType(node.parent);
@@ -13822,8 +13864,8 @@ namespace ts {
         }
 
         /**
-          * Gets the effective argument type for an argument in a call expression.
-          */
+         * Gets the effective argument type for an argument in a call expression.
+         */
         function getEffectiveArgumentType(node: CallLikeExpression, argIndex: number): Type {
             // Decorators provide special arguments, a tagged template expression provides
             // a special first argument, and string literals get string literal types
@@ -13841,8 +13883,8 @@ namespace ts {
         }
 
         /**
-          * Gets the effective argument expression for an argument in a call expression.
-          */
+         * Gets the effective argument expression for an argument in a call expression.
+         */
         function getEffectiveArgument(node: CallLikeExpression, args: Expression[], argIndex: number) {
             // For a decorator or the first argument of a tagged template expression we return undefined.
             if (node.kind === SyntaxKind.Decorator ||
@@ -13854,8 +13896,8 @@ namespace ts {
         }
 
         /**
-          * Gets the error node to use when reporting errors for an effective argument.
-          */
+         * Gets the error node to use when reporting errors for an effective argument.
+         */
         function getEffectiveArgumentErrorNode(node: CallLikeExpression, argIndex: number, arg: Expression) {
             if (node.kind === SyntaxKind.Decorator) {
                 // For a decorator, we use the expression of the decorator for error reporting.
@@ -14337,8 +14379,8 @@ namespace ts {
         }
 
         /**
-          * Gets the localized diagnostic head message to use for errors when resolving a decorator as a call expression.
-          */
+         * Gets the localized diagnostic head message to use for errors when resolving a decorator as a call expression.
+         */
         function getDiagnosticHeadMessageForDecoratorResolution(node: Decorator) {
             switch (node.parent.kind) {
                 case SyntaxKind.ClassDeclaration:
@@ -14359,8 +14401,8 @@ namespace ts {
         }
 
         /**
-          * Resolves a decorator as if it were a call expression.
-          */
+         * Resolves a decorator as if it were a call expression.
+         */
         function resolveDecorator(node: Decorator, candidatesOutArray: Signature[]): Signature {
             const funcType = checkExpression(node.expression);
             const apparentType = getApparentType(funcType);
@@ -14489,7 +14531,7 @@ namespace ts {
             if (!isRequireCall(node, /*checkArgumentIsStringLiteral*/true)) {
                 return false;
             }
-                // Make sure require is not a local function
+            // Make sure require is not a local function
             const resolvedRequire = resolveName(node.expression, (<Identifier>node.expression).text, SymbolFlags.Value, /*nameNotFoundMessage*/ undefined, /*nameArg*/ undefined);
             if (!resolvedRequire) {
                 // project does not contain symbol named 'require' - assume commonjs require
@@ -14823,7 +14865,7 @@ namespace ts {
                 }
             });
             if (aggregatedTypes.length === 0 && !hasReturnWithNoExpression && (hasReturnOfTypeNever ||
-                func.kind === SyntaxKind.FunctionExpression || func.kind === SyntaxKind.ArrowFunction)) {
+                    func.kind === SyntaxKind.FunctionExpression || func.kind === SyntaxKind.ArrowFunction)) {
                 return undefined;
             }
             if (strictNullChecks && aggregatedTypes.length && hasReturnWithNoExpression) {
@@ -15110,7 +15152,7 @@ namespace ts {
                     const facts = getTypeFacts(operandType) & (TypeFacts.Truthy | TypeFacts.Falsy);
                     return facts === TypeFacts.Truthy ? falseType :
                         facts === TypeFacts.Falsy ? trueType :
-                        booleanType;
+                            booleanType;
                 case SyntaxKind.PlusPlusToken:
                 case SyntaxKind.MinusMinusToken:
                     const ok = checkArithmeticOperandType(node.operand, getNonNullableType(operandType),
@@ -15295,7 +15337,7 @@ namespace ts {
         }
 
         function checkArrayLiteralDestructuringElementAssignment(node: ArrayLiteralExpression, sourceType: Type,
-            elementIndex: number, elementType: Type, contextualMapper?: TypeMapper) {
+                                                                 elementIndex: number, elementType: Type, contextualMapper?: TypeMapper) {
             const elements = node.elements;
             const element = elements[elementIndex];
             if (element.kind !== SyntaxKind.OmittedExpression) {
@@ -15424,7 +15466,7 @@ namespace ts {
                         return false;
                     }
                     return isSideEffectFree((node as BinaryExpression).left) &&
-                            isSideEffectFree((node as BinaryExpression).right);
+                        isSideEffectFree((node as BinaryExpression).right);
 
                 case SyntaxKind.PrefixUnaryExpression:
                 case SyntaxKind.PostfixUnaryExpression:
@@ -15457,7 +15499,7 @@ namespace ts {
             const secondAssignableToFirst = isTypeAssignableTo(type2, type1);
             return secondAssignableToFirst && !firstAssignableToSecond ? type1 :
                 firstAssignableToSecond && !secondAssignableToFirst ? type2 :
-                getUnionType([type1, type2], /*subtypeReduction*/ true);
+                    getUnionType([type1, type2], /*subtypeReduction*/ true);
         }
 
         function checkBinaryExpression(node: BinaryExpression, contextualMapper?: TypeMapper) {
@@ -15799,8 +15841,8 @@ namespace ts {
         function checkDeclarationInitializer(declaration: VariableLikeDeclaration) {
             const type = checkExpressionCached(declaration.initializer);
             return getCombinedNodeFlags(declaration) & NodeFlags.Const ||
-                getCombinedModifierFlags(declaration) & ModifierFlags.Readonly && !isParameterPropertyDeclaration(declaration) ||
-                isTypeAssertion(declaration.initializer) ? type : getWidenedLiteralType(type);
+            getCombinedModifierFlags(declaration) & ModifierFlags.Readonly && !isParameterPropertyDeclaration(declaration) ||
+            isTypeAssertion(declaration.initializer) ? type : getWidenedLiteralType(type);
         }
 
         function isLiteralContextualType(contextualType: Type) {
@@ -16111,7 +16153,7 @@ namespace ts {
                     let hasReportedError = false;
                     for (const { name } of parent.parameters) {
                         if (isBindingPattern(name) &&
-                                checkIfTypePredicateVariableIsDeclaredInBindingPattern(name, parameterName, typePredicate.parameterName)) {
+                            checkIfTypePredicateVariableIsDeclaredInBindingPattern(name, parameterName, typePredicate.parameterName)) {
                             hasReportedError = true;
                             break;
                         }
@@ -16159,9 +16201,9 @@ namespace ts {
                 else if (name.kind === SyntaxKind.ArrayBindingPattern ||
                     name.kind === SyntaxKind.ObjectBindingPattern) {
                     if (checkIfTypePredicateVariableIsDeclaredInBindingPattern(
-                        <BindingPattern>name,
-                        predicateVariableNode,
-                        predicateVariableName)) {
+                            <BindingPattern>name,
+                            predicateVariableNode,
+                            predicateVariableName)) {
                         return true;
                     }
                 }
@@ -16982,10 +17024,10 @@ namespace ts {
         }
 
         /**
-          * Gets the "promised type" of a promise.
-          * @param type The type of the promise.
-          * @remarks The "promised type" of a type is the type of the "value" parameter of the "onfulfilled" callback.
-          */
+         * Gets the "promised type" of a promise.
+         * @param type The type of the promise.
+         * @remarks The "promised type" of a type is the type of the "value" parameter of the "onfulfilled" callback.
+         */
         function getPromisedType(promise: Type): Type {
             //
             //  { // promise
@@ -17041,12 +17083,12 @@ namespace ts {
         }
 
         /**
-          * Gets the "awaited type" of a type.
-          * @param type The type to await.
-          * @remarks The "awaited type" of an expression is its "promised type" if the expression is a
-          * Promise-like type; otherwise, it is the type of the expression. This is used to reflect
-          * The runtime behavior of the `await` keyword.
-          */
+         * Gets the "awaited type" of a type.
+         * @param type The type to await.
+         * @remarks The "awaited type" of an expression is its "promised type" if the expression is a
+         * Promise-like type; otherwise, it is the type of the expression. This is used to reflect
+         * The runtime behavior of the `await` keyword.
+         */
         function getAwaitedType(type: Type) {
             return checkAwaitedType(type, /*location*/ undefined, /*message*/ undefined);
         }
@@ -17221,7 +17263,7 @@ namespace ts {
                 }
 
                 if (!checkTypeAssignableTo(promiseConstructorType, globalPromiseConstructorLikeType, node.type,
-                    Diagnostics.Type_0_is_not_a_valid_async_function_return_type_in_ES5_SlashES3_because_it_does_not_refer_to_a_Promise_compatible_constructor_value)) {
+                        Diagnostics.Type_0_is_not_a_valid_async_function_return_type_in_ES5_SlashES3_because_it_does_not_refer_to_a_Promise_compatible_constructor_value)) {
                     return unknownType;
                 }
 
@@ -17536,7 +17578,7 @@ namespace ts {
                 const declaration = getRootDeclaration(node.parent);
                 if (declaration.kind === SyntaxKind.VariableDeclaration &&
                     (declaration.parent.parent.kind === SyntaxKind.ForInStatement ||
-                    declaration.parent.parent.kind === SyntaxKind.ForOfStatement)) {
+                        declaration.parent.parent.kind === SyntaxKind.ForOfStatement)) {
                     return;
                 }
             }
@@ -17860,7 +17902,7 @@ namespace ts {
                     const enclosingContainer = getEnclosingBlockScopeContainer(symbol.valueDeclaration);
                     if (enclosingContainer === func) {
                         if (symbol.valueDeclaration.kind === SyntaxKind.Parameter ||
-                           symbol.valueDeclaration.kind === SyntaxKind.BindingElement) {
+                            symbol.valueDeclaration.kind === SyntaxKind.BindingElement) {
                             // it is ok to reference parameter in initializer if either
                             // - parameter is located strictly on the left of current parameter declaration
                             if (symbol.valueDeclaration.pos < node.pos) {
@@ -19487,7 +19529,7 @@ namespace ts {
             const declarations = symbol.declarations;
             for (const declaration of declarations) {
                 if ((declaration.kind === SyntaxKind.ClassDeclaration ||
-                    (declaration.kind === SyntaxKind.FunctionDeclaration && nodeIsPresent((<FunctionLikeDeclaration>declaration).body))) &&
+                        (declaration.kind === SyntaxKind.FunctionDeclaration && nodeIsPresent((<FunctionLikeDeclaration>declaration).body))) &&
                     !isInAmbientContext(declaration)) {
                     return declaration;
                 }
@@ -19636,7 +19678,7 @@ namespace ts {
                         }
                         break;
                     }
-                    // fallthrough
+                // fallthrough
                 case SyntaxKind.ClassDeclaration:
                 case SyntaxKind.EnumDeclaration:
                 case SyntaxKind.FunctionDeclaration:
@@ -19941,7 +19983,7 @@ namespace ts {
 
             function isNotOverload(declaration: Declaration): boolean {
                 return (declaration.kind !== SyntaxKind.FunctionDeclaration && declaration.kind !== SyntaxKind.MethodDeclaration) ||
-                        !!(declaration as FunctionDeclaration).body;
+                    !!(declaration as FunctionDeclaration).body;
             }
         }
 
@@ -20421,7 +20463,7 @@ namespace ts {
                     case SpecialPropertyAssignmentKind.ModuleExports:
                         return getSymbolOfNode(entityName.parent.parent);
                     default:
-                        // Fall through if it is not a special property assignment
+                    // Fall through if it is not a special property assignment
                 }
             }
 
@@ -20551,7 +20593,7 @@ namespace ts {
                             return sig.thisParameter;
                         }
                     }
-                    // fallthrough
+                // fallthrough
 
                 case SyntaxKind.SuperKeyword:
                     const type = isPartOfExpression(node) ? getTypeOfExpression(<Expression>node) : getTypeFromTypeNode(<TypeNode>node);
@@ -20571,7 +20613,7 @@ namespace ts {
                 case SyntaxKind.StringLiteral:
                     // External module name in an import declaration
                     if ((isExternalModuleImportEqualsDeclaration(node.parent.parent) &&
-                        getExternalModuleImportEqualsDeclarationExpression(node.parent.parent) === node) ||
+                            getExternalModuleImportEqualsDeclarationExpression(node.parent.parent) === node) ||
                         ((node.parent.kind === SyntaxKind.ImportDeclaration || node.parent.kind === SyntaxKind.ExportDeclaration) &&
                             (<ImportDeclaration>node.parent).moduleSpecifier === node)) {
                         return resolveExternalModuleName(node, <LiteralExpression>node);
@@ -20723,9 +20765,9 @@ namespace ts {
         }
 
         /**
-          * Gets either the static or instance type of a class element, based on
-          * whether the element is declared as "static".
-          */
+         * Gets either the static or instance type of a class element, based on
+         * whether the element is declared as "static".
+         */
         function getParentTypeOfClassElement(node: ClassElement) {
             const classSymbol = getSymbolOfNode(node.parent);
             return getModifierFlags(node) & ModifierFlags.Static
@@ -20768,7 +20810,7 @@ namespace ts {
                 let target: Symbol;
                 let next = symbol;
                 while (next = getSymbolLinks(next).target) {
-                   target = next;
+                    target = next;
                 }
                 if (target) {
                     return [target];
@@ -20971,9 +21013,9 @@ namespace ts {
                     return exportClause && forEach(exportClause.elements, isValueAliasDeclaration);
                 case SyntaxKind.ExportAssignment:
                     return (<ExportAssignment>node).expression
-                        && (<ExportAssignment>node).expression.kind === SyntaxKind.Identifier
-                            ? isAliasResolvedToValue(getSymbolOfNode(node) || unknownSymbol)
-                            : true;
+                    && (<ExportAssignment>node).expression.kind === SyntaxKind.Identifier
+                        ? isAliasResolvedToValue(getSymbolOfNode(node) || unknownSymbol)
+                        : true;
             }
             return false;
         }
@@ -22234,9 +22276,9 @@ namespace ts {
             }
             else if (!doesAccessorHaveCorrectParameterCount(accessor)) {
                 return grammarErrorOnNode(accessor.name,
-                                          kind === SyntaxKind.GetAccessor ?
-                                          Diagnostics.A_get_accessor_cannot_have_parameters :
-                                          Diagnostics.A_set_accessor_must_have_exactly_one_parameter);
+                    kind === SyntaxKind.GetAccessor ?
+                        Diagnostics.A_get_accessor_cannot_have_parameters :
+                        Diagnostics.A_set_accessor_must_have_exactly_one_parameter);
             }
             else if (kind === SyntaxKind.SetAccessor) {
                 if (accessor.type) {
@@ -22259,8 +22301,8 @@ namespace ts {
 
         /** Does the accessor have the right number of parameters?
 
-            A get accessor has no parameters or a single `this` parameter.
-            A set accessor has one parameter or a `this` parameter and one more parameter */
+         A get accessor has no parameters or a single `this` parameter.
+         A set accessor has one parameter or a `this` parameter and one more parameter */
         function doesAccessorHaveCorrectParameterCount(accessor: AccessorDeclaration) {
             return getAccessorThisParameter(accessor) || accessor.parameters.length === (accessor.kind === SyntaxKind.GetAccessor ? 0 : 1);
         }
@@ -22581,7 +22623,7 @@ namespace ts {
                 node.kind === SyntaxKind.ExportAssignment ||
                 node.kind === SyntaxKind.NamespaceExportDeclaration ||
                 getModifierFlags(node) & (ModifierFlags.Ambient | ModifierFlags.Export | ModifierFlags.Default)) {
-                    return false;
+                return false;
             }
 
             return grammarErrorOnFirstToken(node, Diagnostics.A_declare_modifier_is_required_for_a_top_level_declaration_in_a_d_ts_file);
