@@ -7775,32 +7775,28 @@ namespace ts {
                 else {
                     const result2 = predicatesRelatedTo(source, target, reportErrors);
                     if (result2 == Ternary.True) {
-                        //DONE: types moeten dan in predictesRelatedTo gecheckt worden.
-                        return result2;
+                        result = result2;
                     }
                     if (result2 == Ternary.False) {
-                        //DONE: einde
-                        return result2;
+                        result = result2;
                     }
                     if (result2 == Ternary.Maybe) {
                         //Geen predikaten in het spel: continue;
                         result = propertiesRelatedTo(source, target, reportErrors);
+                    }
+                    if (result) {
+                        result &= signaturesRelatedTo(source, target, SignatureKind.Call, reportErrors);
                         if (result) {
-                            result &= signaturesRelatedTo(source, target, SignatureKind.Call, reportErrors);
+                            result &= signaturesRelatedTo(source, target, SignatureKind.Construct, reportErrors);
                             if (result) {
-                                result &= signaturesRelatedTo(source, target, SignatureKind.Construct, reportErrors);
+                                result &= indexTypesRelatedTo(source, originalSource, target, IndexKind.String, reportErrors);
                                 if (result) {
-                                    result &= indexTypesRelatedTo(source, originalSource, target, IndexKind.String, reportErrors);
-                                    if (result) {
-                                        result &= indexTypesRelatedTo(source, originalSource, target, IndexKind.Number, reportErrors);
-                                        //if (result) {
-                                        //    result &= predicatesRelatedTo(source, target, reportErrors);
-                                        //}
-                                    }
+                                    result &= indexTypesRelatedTo(source, originalSource, target, IndexKind.Number, reportErrors);
                                 }
                             }
                         }
                     }
+
                 }
 
                 expandingFlags = saveExpandingFlags;
