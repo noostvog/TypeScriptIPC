@@ -456,6 +456,11 @@ namespace ts {
                     return emitDoStatement(<DoStatement>node);
                 case SyntaxKind.WhileStatement:
                     return emitWhileStatement(<WhileStatement>node);
+
+                //<Nathalie>
+                case SyntaxKind.ObjectUpdateStatement:
+                    return emitObjectUpdateStatement(<ObjectUpdateStatement>node);
+
                 case SyntaxKind.ForStatement:
                     return emitForStatement(<ForStatement>node);
                 case SyntaxKind.ForInStatement:
@@ -567,6 +572,7 @@ namespace ts {
 
                 // JSDoc nodes (ignored)
                 // Transformation nodes (ignored)
+
             }
 
             // If the node is an expression, try to emit it as an expression with
@@ -1337,6 +1343,13 @@ namespace ts {
             emitExpression(node.expression);
             write(")");
             emitEmbeddedStatement(node, node.statement);
+        }
+
+        //<Nathalie>
+        function emitObjectUpdateStatement(node: ObjectUpdateStatement) {
+            node;
+            write("42");
+            write(";");
         }
 
         function emitForStatement(node: ForStatement) {

@@ -230,6 +230,11 @@ namespace ts {
             case SyntaxKind.WhileStatement:
                 return visitNode(cbNode, (<WhileStatement>node).expression) ||
                     visitNode(cbNode, (<WhileStatement>node).statement);
+
+            //<nathalie>
+            case SyntaxKind.ObjectUpdateStatement:
+                return visitNodes(cbNodes, (<ObjectUpdateStatement>node).arguments);
+
             case SyntaxKind.ForStatement:
                 return visitNode(cbNode, (<ForStatement>node).initializer) ||
                     visitNode(cbNode, (<ForStatement>node).condition) ||
@@ -1729,6 +1734,9 @@ namespace ts {
                     case SyntaxKind.ForInStatement:
                     case SyntaxKind.ForOfStatement:
                     case SyntaxKind.ForStatement:
+                        //<nathalie>
+                    case SyntaxKind.ObjectUpdateStatement:
+
                     case SyntaxKind.WhileStatement:
                     case SyntaxKind.WithStatement:
                     case SyntaxKind.EmptyStatement:
@@ -4660,6 +4668,14 @@ namespace ts {
             return finishNode(node);
         }
 
+        //<Nathalie>
+        function parseObjectUpdateStatement(): ObjectUpdateStatement {
+            const node = <ObjectUpdateStatement>createNode(SyntaxKind.ObjectUpdateStatement);
+            parseExpected(SyntaxKind.ObjectUpdateKeyword);
+            node.arguments = parseArgumentList();
+            return finishNode(node);
+        }
+
         function parseForOrForInOrForOfStatement(): Statement {
             const pos = getNodePos();
             parseExpected(SyntaxKind.ForKeyword);
@@ -4963,6 +4979,10 @@ namespace ts {
                 case SyntaxKind.DoKeyword:
                 case SyntaxKind.WhileKeyword:
                 case SyntaxKind.ForKeyword:
+
+                //<Nathalie>
+                case SyntaxKind.ObjectUpdateKeyword:
+
                 case SyntaxKind.ContinueKeyword:
                 case SyntaxKind.BreakKeyword:
                 case SyntaxKind.ReturnKeyword:
@@ -5040,6 +5060,11 @@ namespace ts {
                     return parseDoStatement();
                 case SyntaxKind.WhileKeyword:
                     return parseWhileStatement();
+
+                //<Nathalie>
+                case SyntaxKind.ObjectUpdateKeyword:
+                    return parseObjectUpdateStatement();
+
                 case SyntaxKind.ForKeyword:
                     return parseForOrForInOrForOfStatement();
                 case SyntaxKind.ContinueKeyword:
@@ -5063,6 +5088,8 @@ namespace ts {
                     return parseDebuggerStatement();
                 case SyntaxKind.AtToken:
                     return parseDeclaration();
+
+
                 case SyntaxKind.AsyncKeyword:
                 case SyntaxKind.InterfaceKeyword:
                 case SyntaxKind.TypeKeyword:

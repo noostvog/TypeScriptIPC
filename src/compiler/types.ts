@@ -135,6 +135,10 @@ namespace ts {
         InstanceOfKeyword,
         NewKeyword,
         NullKeyword,
+
+        //<Nathalie>
+        ObjectUpdateKeyword,
+
         ReturnKeyword,
         SuperKeyword,
         SwitchKeyword,
@@ -265,6 +269,10 @@ namespace ts {
         IfStatement,
         DoStatement,
         WhileStatement,
+
+        //<nathalie>
+        ObjectUpdateStatement,
+
         ForStatement,
         ForInStatement,
         ForOfStatement,
@@ -409,6 +417,7 @@ namespace ts {
         LastJSDocNode = JSDocLiteralType,
         FirstJSDocTagNode = JSDocComment,
         LastJSDocTagNode = JSDocNeverKeyword
+
     }
 
     export const enum NodeFlags {
@@ -1622,6 +1631,11 @@ namespace ts {
 
     export type ForInitializer = VariableDeclarationList | Expression;
 
+    //<Nathalie>
+    export interface ObjectUpdateStatement extends Statement {
+        kind: SyntaxKind.ObjectUpdateStatement;
+        arguments: NodeArray<Expression>;
+    }
     export interface ForStatement extends IterationStatement {
         kind: SyntaxKind.ForStatement;
         initializer?: ForInitializer;
@@ -2074,6 +2088,7 @@ namespace ts {
         ArrayMutation  = 1 << 8,  // Potential array mutation
         Referenced     = 1 << 9,  // Referenced as antecedent once
         Shared         = 1 << 10, // Referenced as antecedent more than once
+        TestCondition  = 1 << 11, // <nathalie> poging om een flowflag aan de conditie zelf te geven om die later te kunnen identificeren
         Label = BranchLabel | LoopLabel,
         Condition = TrueCondition | FalseCondition
     }

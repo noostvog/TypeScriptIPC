@@ -80,6 +80,10 @@ namespace ts {
         "false": SyntaxKind.FalseKeyword,
         "finally": SyntaxKind.FinallyKeyword,
         "for": SyntaxKind.ForKeyword,
+
+        //<Nathalie>
+        "objupdate": SyntaxKind.ObjectUpdateKeyword,
+
         "from": SyntaxKind.FromKeyword,
         "function": SyntaxKind.FunctionKeyword,
         "get": SyntaxKind.GetKeyword,
@@ -180,7 +184,7 @@ namespace ts {
         "&=": SyntaxKind.AmpersandEqualsToken,
         "|=": SyntaxKind.BarEqualsToken,
         "^=": SyntaxKind.CaretEqualsToken,
-        "@": SyntaxKind.AtToken,
+        "@": SyntaxKind.AtToken
     });
 
     /*
