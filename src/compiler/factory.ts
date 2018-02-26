@@ -420,6 +420,21 @@ namespace ts {
         return node;
     }
 
+    //<nathalie>
+
+    export function createObjectUpdate(arguments: NodeArray<Expression>, location?: TextRange) {
+        const node = <ObjectUpdateExpression>createNode(SyntaxKind.ObjectUpdateExpression, location);
+        node.arguments = createNodeArray(arguments);
+        return node;
+    }
+
+    export function updateObjectUpdate(node: ObjectUpdateExpression, arguments: NodeArray<Expression>) {
+        if (node.arguments !== arguments) {
+            return updateNode(createObjectUpdate(arguments, node), node);
+        }
+        return node;
+    }
+
     export function createPropertyAccess(expression: Expression, name: string | Identifier, location?: TextRange, flags?: NodeFlags) {
         const node = <PropertyAccessExpression>createNode(SyntaxKind.PropertyAccessExpression, location, flags);
         node.expression = parenthesizeForAccess(expression);
@@ -894,6 +909,7 @@ namespace ts {
     }
 
     //<nathalie>
+    /*
     export function createObjectUpdate(location?: TextRange) {
         const node = <ObjectUpdateStatement>createNode(SyntaxKind.ObjectUpdateStatement, location);
         return node;
@@ -902,9 +918,9 @@ namespace ts {
     export function updateObjectUpdate(node: ObjectUpdateStatement) {
         /*if (node.expression !== expression || node.statement !== statement) {
             return updateNode(createWhile(expression, statement, node), node);
-        }*/
+        }
         return node;
-    }
+    }*/
 
     export function createFor(initializer: ForInitializer, condition: Expression, incrementor: Expression, statement: Statement, location?: TextRange) {
         const node = <ForStatement>createNode(SyntaxKind.ForStatement, location, /*flags*/ undefined);

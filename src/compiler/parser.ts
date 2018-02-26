@@ -155,6 +155,8 @@ namespace ts {
                 return visitNodes(cbNodes, (<ArrayLiteralExpression>node).elements);
             case SyntaxKind.ObjectLiteralExpression:
                 return visitNodes(cbNodes, (<ObjectLiteralExpression>node).properties);
+            /*case SyntaxKind.ObjectUpdateExpression:
+                return visitNodes(cbNodes, (<ObjectUpdateExpression>node).arguments);*/
             case SyntaxKind.PropertyAccessExpression:
                 return visitNode(cbNode, (<PropertyAccessExpression>node).expression) ||
                     visitNode(cbNode, (<PropertyAccessExpression>node).name);
@@ -231,10 +233,11 @@ namespace ts {
                 return visitNode(cbNode, (<WhileStatement>node).expression) ||
                     visitNode(cbNode, (<WhileStatement>node).statement);
 
+                /*
             //<nathalie>
             case SyntaxKind.ObjectUpdateStatement:
                 return visitNodes(cbNodes, (<ObjectUpdateStatement>node).arguments);
-
+*/
             case SyntaxKind.ForStatement:
                 return visitNode(cbNode, (<ForStatement>node).initializer) ||
                     visitNode(cbNode, (<ForStatement>node).condition) ||
@@ -1735,7 +1738,7 @@ namespace ts {
                     case SyntaxKind.ForOfStatement:
                     case SyntaxKind.ForStatement:
                         //<nathalie>
-                    case SyntaxKind.ObjectUpdateStatement:
+                    //case SyntaxKind.ObjectUpdateStatement:
 
                     case SyntaxKind.WhileStatement:
                     case SyntaxKind.WithStatement:
@@ -3023,6 +3026,7 @@ namespace ts {
                 case SyntaxKind.LessThanToken:
                 case SyntaxKind.AwaitKeyword:
                 case SyntaxKind.YieldKeyword:
+                case SyntaxKind.ObjectUpdateKeyword:
                     // Yield/await always starts an expression.  Either it is an identifier (in which case
                     // it is definitely an expression).  Or it's a keyword (either because we're in
                     // a generator or async function, or in strict mode (or both)) and it started a yield or await expression.
@@ -3790,6 +3794,8 @@ namespace ts {
                     return parseTypeOfExpression();
                 case SyntaxKind.VoidKeyword:
                     return parseVoidExpression();
+                case SyntaxKind.ObjectUpdateKeyword:
+                    return parseObjectUpdateExpression();
                 case SyntaxKind.LessThanToken:
                     // This is modified UnaryExpression grammar in TypeScript
                     //  UnaryExpression (modified):
@@ -3826,6 +3832,7 @@ namespace ts {
                 case SyntaxKind.TypeOfKeyword:
                 case SyntaxKind.VoidKeyword:
                 case SyntaxKind.AwaitKeyword:
+                case SyntaxKind.ObjectUpdateKeyword: //<nathalie>
                     return false;
                 case SyntaxKind.LessThanToken:
                     // If we are not in JSX context, we are parsing TypeAssertion which is an UnaryExpression
@@ -4401,6 +4408,12 @@ namespace ts {
                     return parseClassExpression();
                 case SyntaxKind.FunctionKeyword:
                     return parseFunctionExpression();
+
+                //<nathalie>
+                    /*
+                case SyntaxKind.ObjectUpdateKeyword:
+                    return parseObjectUpdateExpression();
+*/
                 case SyntaxKind.NewKeyword:
                     return parseNewExpression();
                 case SyntaxKind.SlashToken:
@@ -4531,6 +4544,9 @@ namespace ts {
             return finishNode(node);
         }
 
+
+
+
         function parseFunctionExpression(): FunctionExpression {
             // GeneratorExpression:
             //      function* BindingIdentifier [Yield][opt](FormalParameters[Yield]){ GeneratorBody }
@@ -4567,6 +4583,16 @@ namespace ts {
 
         function parseOptionalIdentifier() {
             return isIdentifier() ? parseIdentifier() : undefined;
+        }
+        function parseObjectUpdateExpression(): ObjectUpdateExpression {
+            const node = <ObjectUpdateExpression>createNode(SyntaxKind.ObjectUpdateExpression);
+            nextToken();
+            //parseExpected(SyntaxKind.ObjectUpdateKeyword);
+            //parseExpected(SyntaxKind.OpenParenToken);
+            //parseExpected(SyntaxKind.CloseParenToken);
+            //node.arguments = undefined; //
+            node.arguments = parseArgumentList();
+            return finishNode(node);
         }
 
         function parseNewExpression(): NewExpression {
@@ -4669,12 +4695,14 @@ namespace ts {
         }
 
         //<Nathalie>
+        /*
         function parseObjectUpdateStatement(): ObjectUpdateStatement {
             const node = <ObjectUpdateStatement>createNode(SyntaxKind.ObjectUpdateStatement);
             parseExpected(SyntaxKind.ObjectUpdateKeyword);
             node.arguments = parseArgumentList();
             return finishNode(node);
         }
+        */
 
         function parseForOrForInOrForOfStatement(): Statement {
             const pos = getNodePos();
@@ -4980,8 +5008,8 @@ namespace ts {
                 case SyntaxKind.WhileKeyword:
                 case SyntaxKind.ForKeyword:
 
-                //<Nathalie>
-                case SyntaxKind.ObjectUpdateKeyword:
+                //<Nathalie> FOUT DENK IK
+                //case SyntaxKind.ObjectUpdateKeyword:
 
                 case SyntaxKind.ContinueKeyword:
                 case SyntaxKind.BreakKeyword:
@@ -5060,11 +5088,6 @@ namespace ts {
                     return parseDoStatement();
                 case SyntaxKind.WhileKeyword:
                     return parseWhileStatement();
-
-                //<Nathalie>
-                case SyntaxKind.ObjectUpdateKeyword:
-                    return parseObjectUpdateStatement();
-
                 case SyntaxKind.ForKeyword:
                     return parseForOrForInOrForOfStatement();
                 case SyntaxKind.ContinueKeyword:

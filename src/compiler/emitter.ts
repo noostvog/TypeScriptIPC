@@ -458,9 +458,10 @@ namespace ts {
                     return emitWhileStatement(<WhileStatement>node);
 
                 //<Nathalie>
+                    /*
                 case SyntaxKind.ObjectUpdateStatement:
                     return emitObjectUpdateStatement(<ObjectUpdateStatement>node);
-
+*/
                 case SyntaxKind.ForStatement:
                     return emitForStatement(<ForStatement>node);
                 case SyntaxKind.ForInStatement:
@@ -618,6 +619,8 @@ namespace ts {
                     return emitArrayLiteralExpression(<ArrayLiteralExpression>node);
                 case SyntaxKind.ObjectLiteralExpression:
                     return emitObjectLiteralExpression(<ObjectLiteralExpression>node);
+                case SyntaxKind.ObjectUpdateExpression:
+                    return emitObjectUpdateExpression(<ObjectUpdateExpression>node);
                 case SyntaxKind.PropertyAccessExpression:
                     return emitPropertyAccessExpression(<PropertyAccessExpression>node);
                 case SyntaxKind.ElementAccessExpression:
@@ -1346,10 +1349,20 @@ namespace ts {
         }
 
         //<Nathalie>
-        function emitObjectUpdateStatement(node: ObjectUpdateStatement) {
-            node;
-            write("42");
-            write(";");
+        function emitObjectUpdateExpression(node: ObjectUpdateExpression) {
+            //WARNING the spread operator is not recursive, is this is a problem.
+            write("{ ...");
+            emitExpression(node.arguments[0]);
+            write(", ...");
+            emitExpression(node.arguments[1]);
+            write("}");
+            /*var bar = { ...foo, ...{a: 6, z: 5}}
+            > bar
+            {a: 6, b: 6, z: 5}
+            > foo
+            {a: 5, b: 6}*/
+            //            emitExpressionList(node, node.arguments, ListFormat.CallExpressionArguments);
+
         }
 
         function emitForStatement(node: ForStatement) {

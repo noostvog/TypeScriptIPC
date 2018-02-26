@@ -879,11 +879,17 @@ namespace ts {
         }
 
         function bindCondition(node: Expression, trueTarget: FlowLabel, falseTarget: FlowLabel) {
+            //<nathalie> poging om ook een label aan de condition zelf te geven
             const saveTrueTarget = currentTrueTarget;
             const saveFalseTarget = currentFalseTarget;
+            //const condIfLabel = createBranchLabel(); //<nathalie>
+            //const saveCurrentFlow = currentFlow;
             currentTrueTarget = trueTarget;
             currentFalseTarget = falseTarget;
+            //currentFlow = finishFlowLabel(condIfLabel); //<nathalie>
             bind(node);
+            //addAntecedent(condIfLabel, createFlowCondition(FlowFlags.TestCondition, currentFlow, node)); //<nathalie>
+            //currentFlow = saveCurrentFlow; //<nathalie>
             currentTrueTarget = saveTrueTarget;
             currentFalseTarget = saveFalseTarget;
             if (!node || !isLogicalExpression(node)) {
@@ -971,6 +977,7 @@ namespace ts {
             bindCondition(node.expression, thenLabel, elseLabel);
             currentFlow = finishFlowLabel(thenLabel);
             bind(node.thenStatement);
+            //currentFlow = finishFlowLabel(thenLabel);
             addAntecedent(postIfLabel, currentFlow);
             currentFlow = finishFlowLabel(elseLabel);
             bind(node.elseStatement);
@@ -1573,6 +1580,23 @@ namespace ts {
             typeLiteralSymbol.members[symbol.name] = symbol;
         }
 
+        //<Nathalie>
+        function bindObjectUpdateExpression(node: ObjectUpdateExpression) {
+            if (node.arguments == undefined || node.arguments.length != 2){
+                file.bindDiagnostics.push(createDiagnosticForNode(node,
+                    Diagnostics.The_built_in_function_objupdate_expects_exactly_two_arguments));
+            } else {
+                // Check second argument is fresh object literal
+                if (node.arguments[1].kind !== SyntaxKind.ObjectLiteralExpression) {
+                    file.bindDiagnostics.push(createDiagnosticForNode(node,
+                        Diagnostics.The_built_in_function_objupdate_expects_an_object_literal_as_second_arguments));
+                } else {
+                    bindEach(node.arguments);
+                    //TODO the actual binding...
+                }
+            }
+        }
+
         function bindObjectLiteralExpression(node: ObjectLiteralExpression) {
             const enum ElementKind {
                 Property = 1,
@@ -2009,6 +2033,8 @@ namespace ts {
                     return bindAnonymousDeclaration(<Declaration>node, SymbolFlags.TypeLiteral, "__type");
                 case SyntaxKind.ObjectLiteralExpression:
                     return bindObjectLiteralExpression(<ObjectLiteralExpression>node);
+                case SyntaxKind.ObjectUpdateExpression:
+                    return bindObjectUpdateExpression(<ObjectUpdateExpression>node);
                 case SyntaxKind.FunctionExpression:
                 case SyntaxKind.ArrowFunction:
                     return bindFunctionExpression(<FunctionExpression>node);

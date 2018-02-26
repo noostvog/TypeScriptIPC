@@ -232,6 +232,7 @@ namespace ts {
         // Expression
         ArrayLiteralExpression,
         ObjectLiteralExpression,
+        ObjectUpdateExpression, //<nathalie>
         PropertyAccessExpression,
         ElementAccessExpression,
         CallExpression,
@@ -271,7 +272,7 @@ namespace ts {
         WhileStatement,
 
         //<nathalie>
-        ObjectUpdateStatement,
+        //ObjectUpdateStatement,
 
         ForStatement,
         ForInStatement,
@@ -1371,6 +1372,12 @@ namespace ts {
         multiLine?: boolean;
     }
 
+
+    export interface ObjectUpdateExpression extends UnaryExpression {
+        kind: SyntaxKind.ObjectUpdateExpression;
+        arguments: NodeArray<Expression>;
+    }
+
     export type EntityNameExpression = Identifier | PropertyAccessEntityNameExpression;
     export type EntityNameOrEntityNameExpression = EntityName | EntityNameExpression;
 
@@ -1631,11 +1638,13 @@ namespace ts {
 
     export type ForInitializer = VariableDeclarationList | Expression;
 
+    /*
     //<Nathalie>
     export interface ObjectUpdateStatement extends Statement {
         kind: SyntaxKind.ObjectUpdateStatement;
         arguments: NodeArray<Expression>;
     }
+    */
     export interface ForStatement extends IterationStatement {
         kind: SyntaxKind.ForStatement;
         initializer?: ForInitializer;

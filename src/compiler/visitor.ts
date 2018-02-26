@@ -223,6 +223,10 @@ namespace ts {
                 result = reduceNodes((<ObjectLiteralExpression>node).properties, cbNodes, result);
                 break;
 
+            case SyntaxKind.ObjectUpdateExpression:
+                result = reduceNodes((<ObjectUpdateExpression>node).arguments, cbNodes, result);
+                break;
+
             case SyntaxKind.PropertyAccessExpression:
                 result = reduceNode((<PropertyAccessExpression>node).expression, cbNode, result);
                 result = reduceNode((<PropertyAccessExpression>node).name, cbNode, result);
@@ -826,6 +830,10 @@ namespace ts {
             case SyntaxKind.ObjectLiteralExpression:
                 return updateObjectLiteral(<ObjectLiteralExpression>node,
                     visitNodes((<ObjectLiteralExpression>node).properties, visitor, isObjectLiteralElementLike));
+
+            case SyntaxKind.ObjectUpdateExpression:
+                return updateObjectUpdate(<ObjectUpdateExpression>node,
+                    visitNodes((<ObjectUpdateExpression>node).arguments, visitor, isExpression));
 
             case SyntaxKind.PropertyAccessExpression:
                 return updatePropertyAccess(<PropertyAccessExpression>node,
