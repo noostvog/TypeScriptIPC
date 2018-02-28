@@ -734,6 +734,12 @@ namespace ts {
             let grandparent: Node;
             let isInExternalModule = false;
 
+            if (name == "for") {
+                true;
+            }
+            if (name == "objectupdate") {
+                true;
+            }
             loop: while (location) {
                 // Locals of a source file are not in scope (because they get merged into the global symbol table)
                 if (location.locals && !isGlobalSourceFile(location)) {
@@ -7881,10 +7887,11 @@ namespace ts {
                         for (const sourceProp of sourceProps) {
                             const sourcePropType = getTypeOfSymbol(sourceProp);
                             const targetPropType = getTypeOfPropertyOfType(target, sourceProp.name);
+                            //when one of the types is undefinedType then they should not be taken into consideration; only the presence constraints should be okay, and this is taken care of by the other functions
                             //removeUndefined ensures actual types are compared.
                             //special interfaces require every object property to be optional, but presence constraints are checked
                             // elsewhere, so for the types only the actual types should be compared.
-                            if (targetPropType != undefined && !isRelatedTo(removeUndefined(sourcePropType), removeUndefined(targetPropType), reportErrors)) {
+                            if (sourcePropType !== undefinedType && targetPropType !== undefined && targetPropType !== undefinedType && !isRelatedTo(removeUndefined(sourcePropType), removeUndefined(targetPropType), reportErrors)) {
                                 return Ternary.False;
                             }
                         }
@@ -7901,18 +7908,28 @@ namespace ts {
                             const names = sourceprops.map(x => x.name);
                             if (names.indexOf(prop.name) == -1) {
                                 if (reportErrors) {
-                                    reportError(Diagnostics.Property_0_of_type_1_is_unknown_in_type_2, prop.name, typeToString(source), typeToString(target));
+                                    reportError(Diagnostics.Property_0_of_type_1_is_unknown_in_type_2, prop.name, typeToString(target), typeToString(source));
                                 }
                                 return Ternary.False;
                             }
                             return Ternary.True;
                         } else {
+                            const propType = getTypeOfSymbol(prop);
                             const predicateStr = translatePredicates(predicatessource);
-                            if (!prove(predicateStr + " > " + prop.name)) {
-                                if (reportErrors) {
-                                    reportError(Diagnostics.Property_0_is_not_present_in_type_1, prop.name, typeToString(source));
+                            if (propType === undefinedType){
+                                if (!prove(predicateStr + " > !" + prop.name)) {
+                                    if (reportErrors) {
+                                        reportError(Diagnostics.Property_0_is_not_absent_in_type_1, prop.name, typeToString(source));
+                                    }
+                                    return Ternary.False;
                                 }
-                                return Ternary.False;
+                            } else {
+                                if (!prove(predicateStr + " > " + prop.name)) {
+                                    if (reportErrors) {
+                                        reportError(Diagnostics.Property_0_is_not_present_in_type_1, prop.name, typeToString(source));
+                                    }
+                                    return Ternary.False;
+                                }
                             }
                             // otherwise: continue
                         }
@@ -8097,7 +8114,8 @@ namespace ts {
                             for (const name of args) {
                                 const resolved = resolveStructuredTypeMembers(<ObjectType>source);
                                 const symbol = resolved.members[name];
-                                if (!(symbol && symbolIsValue(symbol))) {
+                                const typeOfSource = getTypeOfPropertyOfType(source, name);
+                                if (!(symbol && symbolIsValue(symbol)) || typeOfSource === undefinedType) {
                                     if (reportErrors) {
                                         reportError(Diagnostics.Property_0_is_missing_in_type_1, name, typeToString(source))
                                     }
@@ -12188,6 +12206,47 @@ namespace ts {
             return createIndexInfo(unionType, /*isReadonly*/ false);
         }
 
+
+        //<Nathalie> TOOD expression instead of statement?
+        function checkObjectUpdate(node: ObjectUpdateExpression, contextualMapper?: TypeMapper): Type {
+            checkGrammarStatementInAmbientContext(node);
+
+            //TODO toch nog checks toevoegen voor lengte
+            const args = node.arguments;
+            if(args === undefined || args.length !== 2) {
+                return unknownType;
+            }
+
+            const target = checkExpression(args[0]);
+            const sourcepart = checkExpression(args[1]);
+            if (!(target.flags & TypeFlags.Object && getObjectFlags(target) & ObjectFlags.Interface)) {
+                error(node.arguments[0], Diagnostics.The_first_argument_of_the_function_objupdate_must_be_an_interface_type);
+                return unknownType;
+            }
+            const predicates = (<InterfaceTypeWithDeclaredMembers>target).declaredPredicates;
+            if (predicates === undefined || predicates.length == 0) {
+                error(node.arguments[0], Diagnostics.The_first_argument_of_the_function_objupdate_must_be_an_interface_type_with_predicates);
+                return unknownType;
+            }
+
+            if (!(getObjectFlags(sourcepart) & ObjectFlags.ObjectLiteral && sourcepart.flags & TypeFlags.FreshLiteral)) {
+                //TODO hier nog error nodig?
+                return unknownType;
+            }
+            contextualMapper;
+
+            const slicedTarget = slice(<InterfaceTypeWithDeclaredMembers>target, <FreshObjectLiteralType>sourcepart);
+            slicedTarget;
+            if (checkTypeAssignableTo(sourcepart, slicedTarget, node)) {
+                return target;
+            }
+            return undefinedType;
+
+            function slice(target: InterfaceTypeWithDeclaredMembers, sourcePart: FreshObjectLiteralType): Type {
+                sourcePart;
+                return target;
+            }
+        }
         function checkObjectLiteral(node: ObjectLiteralExpression, contextualMapper?: TypeMapper): Type {
             const inDestructuringPattern = isAssignmentTarget(node);
             // Grammar checking
@@ -15986,6 +16045,11 @@ namespace ts {
                     return checkArrayLiteral(<ArrayLiteralExpression>node, contextualMapper);
                 case SyntaxKind.ObjectLiteralExpression:
                     return checkObjectLiteral(<ObjectLiteralExpression>node, contextualMapper);
+
+                //<nathalie>
+                case SyntaxKind.ObjectUpdateExpression:
+                    return checkObjectUpdate(<ObjectUpdateExpression>node, contextualMapper);
+
                 case SyntaxKind.PropertyAccessExpression:
                     return checkPropertyAccessExpression(<PropertyAccessExpression>node);
                 case SyntaxKind.ElementAccessExpression:
@@ -18116,6 +18180,7 @@ namespace ts {
             checkExpression(node.expression);
             checkSourceElement(node.statement);
         }
+
 
         function checkForStatement(node: ForStatement) {
             // Grammar checking

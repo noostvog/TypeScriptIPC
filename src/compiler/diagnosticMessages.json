@@ -3306,5 +3306,25 @@
     "Only fresh object literals may be assigned to an interface with predicates (type '{0}')": {
         "category": "Error",
         "code": 95015
+    },
+    "The built-in function 'objupdate' expects exactly two arguments": {
+        "category": "Error",
+        "code": 95016
+    },
+    "The built-in function 'objupdate' expects an object literal as second arguments": {
+        "category": "Error",
+        "code": 95017
+    },
+    "The first argument of the function 'objupdate' must be an interface type" : {
+        "category": "Error",
+        "code": 95018
+    },
+    "The first argument of the function 'objupdate' must be an interface type with predicates": {
+        "category": "Error",
+        "code": 95019
+    },
+    "Property '{0}' is not absent in type '{1}'": {
+        "category": "Error",
+        "code": 95020
     }
 }
