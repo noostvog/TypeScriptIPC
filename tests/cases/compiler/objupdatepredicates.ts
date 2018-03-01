@@ -1,4 +1,4 @@
-@strictNullChecks: true
+//@strictNullChecks: true
 
 interface PrivateMessage {
     text?: string;

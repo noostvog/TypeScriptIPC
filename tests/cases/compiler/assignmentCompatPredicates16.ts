@@ -8,4 +8,4 @@ or(and(present(userid), not(present(screenname))),
     and(not(present(userid)), present(screenname)));
 }
 
-let pm1: PrivateMessage = {text: "Hi!", userid: 42, screenname: undefined};
+let pm1: PrivateMessage = {text: "Hi!", userid: undefined, screenname: undefined};

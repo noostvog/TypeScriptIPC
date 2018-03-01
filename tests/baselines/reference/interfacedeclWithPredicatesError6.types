@@ -1,0 +1,17 @@
+=== tests/cases/compiler/interfacedeclWithPredicatesError6.ts ===
+
+interface UsersShow{
+>UsersShow : UsersShow
+
+    user_id?: number;
+>user_id : number | undefined
+
+    screen_name?: string;
+>screen_name : string | undefined
+
+    text?: string;
+>text : string | undefined
+
+} with {
+    //type(user_id) == shtring;
+}

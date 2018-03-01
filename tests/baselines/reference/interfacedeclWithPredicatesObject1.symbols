@@ -9,7 +9,7 @@ interface PrivateMessage{
     screenname?: any;
 >screenname : Symbol(PrivateMessage.screenname, Decl(interfacedeclWithPredicatesObject1.ts, 2, 17))
 
-    text: any;
+    text?: any;
 >text : Symbol(PrivateMessage.text, Decl(interfacedeclWithPredicatesObject1.ts, 3, 21))
 
 } with {

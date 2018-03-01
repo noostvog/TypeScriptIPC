@@ -5,7 +5,7 @@ interface UsersShow{
     screen_name?: string;
     text?: string;
 } with {
-    types(test) == string;
+    //types(test) == string;
 }
 
 //// [interfacedeclWithPredicatesError2.js]

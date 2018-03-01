@@ -1,0 +1,50 @@
+tests/cases/compiler/ifElseWithStatements3Error.ts(15,8): error TS95025: Predicates in else branch of if statement are unsatisfiable because of extra knowledge from the if condition
+tests/cases/compiler/ifElseWithStatements3Error.ts(21,23): error TS95025: Predicates in then branch of if statement are unsatisfiable because of extra knowledge from the if condition
+tests/cases/compiler/ifElseWithStatements3Error.ts(27,12): error TS95025: Predicates in else branch of if statement are unsatisfiable because of extra knowledge from the if condition
+
+
+==== tests/cases/compiler/ifElseWithStatements3Error.ts (3 errors) ====
+    interface PrivateMessage {
+        text?: string;
+        userid?: number;
+        screenname?: string;
+    } with {
+        present(text);
+    or(and(present(userid), not(present(screenname))),
+        and(not(present(userid)), present(screenname)));
+    }
+    
+    let pm: PrivateMessage = {text: "Hi!", userid: 42};
+    
+    if (pm.text) {
+        true;
+    } else {
+           ~
+        true;
+    ~~~~~~~~~
+        //ERROR
+    ~~~~~~~~~~~
+    }
+    ~
+!!! error TS95025: Predicates in else branch of if statement are unsatisfiable because of extra knowledge from the if condition
+    
+    if (pm.userid) {
+        if(pm.screenname) {
+                          ~
+            true; //ERROR
+    ~~~~~~~~~~~~~~~~~~~~~
+        }
+    ~~~~~
+!!! error TS95025: Predicates in then branch of if statement are unsatisfiable because of extra knowledge from the if condition
+    } else {
+        if (pm.screenname){
+            true;
+        } else {
+               ~
+            true; //ERROR
+    ~~~~~~~~~~~~~~~~~~~~~
+        }
+    ~~~~~
+!!! error TS95025: Predicates in else branch of if statement are unsatisfiable because of extra knowledge from the if condition
+    }
+    

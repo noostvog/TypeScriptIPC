@@ -7,7 +7,7 @@ tests/cases/compiler/interfacedeclWithPredicatesObjectError1.ts(12,5): error TS2
     interface PrivateMessage{
         userid?: any;
         screenname?: any;
-        text: any;
+        text?: any;
     } with {
         or(and(present(userid), not(present(screenname))),
         and(present(screenname), not(present(userid))));

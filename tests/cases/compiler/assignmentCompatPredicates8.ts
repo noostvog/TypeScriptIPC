@@ -1,5 +1,5 @@
 interface PrivateMessage {
-    text?: number;
+    text?: string;
     userid?: number;
     screenname?: string;
     smthg?: number;
@@ -10,4 +10,5 @@ or(and(present(userid), not(present(screenname))),
 not(present(smthg));
 }
 
-let pm1: PrivateMessage1 = {text: "Hi!", screenname: "Alice", userid: 42};
+let obj: {text: "Hi!", userid: 42}
+let pm1: PrivateMessage = obj;

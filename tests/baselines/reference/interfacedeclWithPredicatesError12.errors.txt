@@ -1,0 +1,17 @@
+tests/cases/compiler/interfacedeclWithPredicatesError12.ts(2,11): error TS95024: Predicates of interface 'UsersShow' have to be satisfiable
+
+
+==== tests/cases/compiler/interfacedeclWithPredicatesError12.ts (1 errors) ====
+    
+    interface UsersShow {
+              ~~~~~~~~~
+!!! error TS95024: Predicates of interface 'UsersShow' have to be satisfiable
+        user_id?: number;
+        screen_name?: string;
+        text?: string;
+    } with {
+        present(text);
+        present(user_id);
+        present(screen_name);
+        not(present(text));
+    }

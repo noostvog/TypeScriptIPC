@@ -9,7 +9,7 @@ interface PrivateMessage{
     screenname?: any;
 >screenname : any
 
-    text: any;
+    text?: any;
 >text : any
 
 } with {

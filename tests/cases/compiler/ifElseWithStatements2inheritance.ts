@@ -1,10 +1,16 @@
-interface PrivateMessage {
+interface PrivateMessage2 {
     text?: string;
     userid?: number;
-    screenname?: string;
 } with {
     present(text);
-or(and(present(userid), not(present(screenname))),
+
+}
+
+interface PrivateMessage extends PrivateMessage2 {
+    // inherit properties
+    screenname?: string;
+} with {
+    or(and(present(userid), not(present(screenname))),
     and(not(present(userid)), present(screenname)));
 }
 

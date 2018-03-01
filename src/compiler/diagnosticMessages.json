@@ -3338,5 +3338,13 @@
     "Property {0} has to be an optional property, as it is part of an interface with predicates": {
         "category": "Error",
         "code": 95023
+    },
+    "Predicates of interface '{0}' have to be satisfiable": {
+        "category": "Error",
+        "code": 95024
+    },
+    "Predicates in {0} branch of if statement are unsatisfiable because if extra knowledge from the if condition": {
+        "category": "Error",
+        "code": 95025
     }
 }

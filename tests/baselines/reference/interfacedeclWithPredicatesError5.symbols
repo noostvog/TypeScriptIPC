@@ -1,0 +1,17 @@
+=== tests/cases/compiler/interfacedeclWithPredicatesError5.ts ===
+
+interface UsersShow{
+>UsersShow : Symbol(UsersShow, Decl(interfacedeclWithPredicatesError5.ts, 0, 0))
+
+    user_id?: number;
+>user_id : Symbol(UsersShow.user_id, Decl(interfacedeclWithPredicatesError5.ts, 1, 20))
+
+    screen_name?: string;
+>screen_name : Symbol(UsersShow.screen_name, Decl(interfacedeclWithPredicatesError5.ts, 2, 21))
+
+    text?: string;
+>text : Symbol(UsersShow.text, Decl(interfacedeclWithPredicatesError5.ts, 3, 25))
+
+} with {
+    //type(bla) == string;
+}

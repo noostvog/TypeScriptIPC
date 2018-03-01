@@ -1,11 +1,14 @@
-var x = { one: 1 };
-var y: { [index: string]: any };
-var z: { [index: number]: any };
-x = y;  // Error
-y = x;  // Ok because index signature type is any
-x = z;  // Error
-z = x;  // Ok because index signature type is any
-y = "foo"; // Error
-z = "foo"; // OK, string has numeric indexer
-z = false; // Error
+// @strictNullChecks: true
 
+interface PrivateMessage {
+    text?: string;
+    userid?: number;
+    screenname?: string;
+} with {
+    present(text);
+    or(and(present(userid), not(present(screenname))),
+    and(not(present(userid)), present(screenname)));
+}
+
+let pm: PrivateMessage = { text: "Hi!", userid: 42 };
+let obj: { text: string, userid: number } = pm;

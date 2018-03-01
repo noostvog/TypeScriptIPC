@@ -11,5 +11,5 @@ or(and(present(userid), not(present(screenname))),
 present(screenname);
 }
 
-let pm1: PrivateMessage = {text: "Hi!", userid: 42, screenname: undefined};
+let pm1: PrivateMessage = {text: "Hi!", userid: undefined, screenname: "Alice"};
 let pm2: {text: string, userid: undefined} = pm1;

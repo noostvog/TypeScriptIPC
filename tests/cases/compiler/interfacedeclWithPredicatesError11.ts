@@ -1,9 +1,11 @@
 // @strictNullChecks: true
 
-interface UsersShow{
+interface UsersShow {
     user_id?: number;
-    screen_name?: string;
+    screen_name?: undefined;
     text?: string;
 } with {
-    5;
+    present(text);
+    present(user_id);
+    present(screen_name);
 }

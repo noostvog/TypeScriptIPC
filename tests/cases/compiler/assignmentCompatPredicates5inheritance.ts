@@ -21,12 +21,10 @@ present(screenname);
 present(userid);
 }
 
-interface PrivateMessage2 {
-    text?: string;
-    userid?: number;
+interface PrivateMessage2 extends PrivateMessage{
+    // inherit properties
 } with {
-    present(text);
-present(userid);
+    present(userid);
 }
 
 let pm1: PrivateMessage1 = {text: "Hi!", screenname: "Alice", userid: 42};

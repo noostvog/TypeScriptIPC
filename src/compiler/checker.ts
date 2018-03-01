@@ -1,7 +1,7 @@
 ﻿/// <reference path="moduleNameResolver.ts"/>
 /// <reference path="binder.ts"/>
 /// <reference path="../../scripts/propositional-sequent-calculus-prover.ts"/>
-// <reference path="../../scripts/proplog.ts"/>
+/// <reference path="../../scripts/proplog.ts"/>
 
 
 /* @internal */
@@ -7246,32 +7246,36 @@ namespace ts {
             return "unknown logical operator";
         }
 
-        function translatePredicates(predicates: PredicateExpression[]): string {
+        function translatePredicates(predicates: PredicateExpression[], notOperator?: string): string {
             let resultaat: string = "";
+            if (!notOperator) {
+                notOperator = "!";
+            }
             for (const predicate of predicates) {
                 resultaat += " " + translatePredicate(predicate) + " & ";
             }
             resultaat = resultaat.substring(0, resultaat.length - 3);
             return resultaat;
+
+            function translatePredicate(predicate: PredicateExpression): string {
+                switch (predicate.kind) {
+                    case SyntaxKind.PredicatePresentExpression:
+                        const present = <PredicatePresentExpression>predicate;
+                        //TODO werkt alleen als maar 1 argument voor present.
+                        return present.arguments[0].text
+                    //return present.expression.text + "(" + present.arguments.map(txt => txt.text) + ")"
+                    case SyntaxKind.PredicateLogicalExpression:
+                        const logical = <PredicateLogicalExpression>predicate;
+                        if (logical.expression.text == "not") {
+                            return notOperator + "(" + translatePredicate(logical.arguments[0]) + ")";
+                        } else {
+                            return "(" + translatePredicate(logical.arguments[0]) + " " + translateLogicalOperator(logical.expression.text) + " " + translatePredicate(logical.arguments[1]) + ")";
+                        }
+                }
+                return "unknown predicate";
+            }
         }
 
-        function translatePredicate(predicate: PredicateExpression): string {
-            switch (predicate.kind) {
-                case SyntaxKind.PredicatePresentExpression:
-                    const present = <PredicatePresentExpression>predicate;
-                    //TODO werkt alleen als maar 1 argument voor present.
-                    return present.arguments[0].text
-                //return present.expression.text + "(" + present.arguments.map(txt => txt.text) + ")"
-                case SyntaxKind.PredicateLogicalExpression:
-                    const logical = <PredicateLogicalExpression>predicate;
-                    if (logical.expression.text == "not") {
-                        return "!(" + translatePredicate(logical.arguments[0]) + ")";
-                    } else {
-                        return "(" + translatePredicate(logical.arguments[0]) + " " + translateLogicalOperator(logical.expression.text) + " " + translatePredicate(logical.arguments[1]) + ")";
-                    }
-            }
-            return "unknown predicate";
-        }
 
         /**
          * Checks if 'source' is related to 'target' (e.g.: is a assignable to).
@@ -8021,20 +8025,7 @@ namespace ts {
                         }
                     }
                     return Ternary.True;
-                    function predicateToString(predicate: PredicateExpression): string {
-                        switch (predicate.kind) {
-                            case SyntaxKind.PredicateTypeExpression:
-                                const type = <PredicateTypeExpression>predicate;
-                                return type.left_get.text + "(" + type.left_arg.text + ") == " + type.right.text;
-                            case SyntaxKind.PredicatePresentExpression:
-                                const present = <PredicatePresentExpression>predicate;
-                                return present.expression.text + "(" + present.arguments.map(txt => txt.text) + ")"
-                            case SyntaxKind.PredicateLogicalExpression:
-                                const logical = <PredicateLogicalExpression>predicate;
-                                return logical.expression.text + "(" + logical.arguments.map(predicateToString) + ")";
-                        }
-                        return "unknown predicate";
-                    }
+
 
                     function isCallPredicateSatisfied(source: Type, callexpr: PredicateLogicalExpression, reportErrors: boolean): Ternary {
                         switch (callexpr.expression.text) {
@@ -8156,6 +8147,21 @@ namespace ts {
                         return Ternary.True;
                     }
                 }
+            }
+
+            function predicateToString(predicate: PredicateExpression): string {
+                switch (predicate.kind) {
+                    case SyntaxKind.PredicateTypeExpression:
+                        const type = <PredicateTypeExpression>predicate;
+                        return type.left_get.text + "(" + type.left_arg.text + ") == " + type.right.text;
+                    case SyntaxKind.PredicatePresentExpression:
+                        const present = <PredicatePresentExpression>predicate;
+                        return present.expression.text + "(" + present.arguments.map(txt => txt.text) + ")"
+                    case SyntaxKind.PredicateLogicalExpression:
+                        const logical = <PredicateLogicalExpression>predicate;
+                        return logical.expression.text + "(" + logical.arguments.map(predicateToString) + ")";
+                }
+                return "unknown predicate";
             }
 
 
@@ -18328,6 +18334,9 @@ namespace ts {
 
             if (specialPredicateIf) {
                 objectType.predicates.push(predicateThen);
+                if (!Proplog.solve(translatePredicates(objectType.predicates), "none")) {
+                    error(node.expression, Diagnostics.Predicates_in_0_branch_of_if_statement_are_unsatisfiable_because_if_extra_knowledge_from_the_if_condition, "then");
+                }
             }
             checkSourceElement(node.thenStatement);
 
@@ -18339,6 +18348,9 @@ namespace ts {
                 objectType.predicates = origPredicates; //remove true branch
                 origPredicates = Object.assign([], origPredicates);
                 objectType.predicates.push(predicateElse);
+                if (!Proplog.solve(translatePredicates(objectType.predicates), "none")) {
+                    error(node.expression, Diagnostics.Predicates_in_0_branch_of_if_statement_are_unsatisfiable_because_if_extra_knowledge_from_the_if_condition, "else");
+                }
             }
             checkSourceElement(node.elseStatement);
 
@@ -19409,7 +19421,7 @@ namespace ts {
                         }
                         checkIndexConstraints(type);
                     }
-                    checkInterfacePredicateDeclarations(type);
+                    checkInterfaceWithPredicateDeclarations(type);
                 }
                 checkObjectTypeForDuplicateDeclarations(node);
                 //TODO check whether predicates are satisfiable.
@@ -19429,7 +19441,7 @@ namespace ts {
             }
 
 
-            function checkInterfacePredicateDeclarations(type: InterfaceType) {
+            function checkInterfaceWithPredicateDeclarations(type: InterfaceType) {
                 const resolved = resolveStructuredTypeMembers(type);
                 resolved.predicates.map(checkInterfacePredicateDeclaration);
 
@@ -19444,6 +19456,11 @@ namespace ts {
                         if (!(member.symbol.flags & SymbolFlags.Optional)) {
                             error(node, Diagnostics.Property_0_has_to_be_an_optional_property_as_it_is_part_of_an_interface_with_predicates, node.symbol.name);
                         }
+                    }
+
+                    //predicates should be satisfiable (there should be at least one solution for the predicates)
+                    if (!Proplog.solve(translatePredicates(resolved.predicates, "-"), "none")) {
+                        error(node, Diagnostics.Predicates_of_interface_0_have_to_be_satisfiable, node.symbol.name);
                     }
                 }
 

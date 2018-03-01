@@ -1,3 +1,5 @@
+// @strictNullChecks: true
+
 interface PrivateMessage {
     text?: string;
     userid?: number;
@@ -8,5 +10,5 @@ interface PrivateMessage {
     not(present(screenname));
 }
 
-let pm: PrivateMessage = { text: "Hi!"};
-let obj: { text: string } = pm;
+let pm: PrivateMessage = { text: "Hi!", userid: 42};
+let obj: { text: string, x?: number } = pm;
