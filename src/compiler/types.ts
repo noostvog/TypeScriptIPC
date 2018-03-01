@@ -3002,6 +3002,7 @@ namespace ts {
         constructSignatures: Signature[];  // Construct signatures of type
         stringIndexInfo?: IndexInfo;       // String indexing info
         numberIndexInfo?: IndexInfo;       // Numeric indexing info
+        predicates: PredicateExpression[]; // Predicates <Nathalie>
     }
 
     /* @internal */

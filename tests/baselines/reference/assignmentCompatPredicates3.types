@@ -1,0 +1,42 @@
+=== tests/cases/compiler/assignmentCompatPredicates3.ts ===
+
+interface PrivateMessage {
+>PrivateMessage : PrivateMessage
+
+    text?: string;
+>text : string
+
+    userid?: number;
+>userid : number | undefined
+
+    screenname?: string;
+>screenname : string
+
+} with {
+    present(text);
+>present : any
+>text : any
+
+    not(present(userid));
+>not : any
+>present : any
+>userid : any
+
+    not(present(screenname));
+>not : any
+>present : any
+>screenname : any
+}
+
+let pm: PrivateMessage = { text: "Hi!"};
+>pm : PrivateMessage
+>PrivateMessage : PrivateMessage
+>{ text: "Hi!"} : { text: string; }
+>text : string
+>"Hi!" : "Hi!"
+
+let obj: { text: string } = pm;
+>obj : { text: string; }
+>text : string
+>pm : PrivateMessage
+

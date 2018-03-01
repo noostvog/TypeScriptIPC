@@ -1,0 +1,29 @@
+tests/cases/compiler/assignmentCompatPredicates19.ts(13,5): error TS2322: Type '{ text: string; userid: number; screenname: undefined; }' is not assignable to type 'PrivateMessage'.
+  Predicate present(screenname) was not satisfied in type { text: string; userid: number; screenname: undefined; }
+    Property 'screenname' is missing in type '{ text: string; userid: number; screenname: undefined; }'.
+tests/cases/compiler/assignmentCompatPredicates19.ts(14,5): error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: undefined; }'.
+  Property 'screenname' is not absent in type 'PrivateMessage'
+
+
+==== tests/cases/compiler/assignmentCompatPredicates19.ts (2 errors) ====
+    
+    interface PrivateMessage {
+        text?: string;
+        userid?: number;
+        screenname?: string;
+    } with {
+        present(text);
+    or(and(present(userid), not(present(screenname))),
+        and(not(present(userid)), present(screenname)));
+    present(screenname);
+    }
+    
+    let pm1: PrivateMessage = {text: "Hi!", userid: 42, screenname: undefined};
+        ~~~
+!!! error TS2322: Type '{ text: string; userid: number; screenname: undefined; }' is not assignable to type 'PrivateMessage'.
+!!! error TS2322:   Predicate present(screenname) was not satisfied in type { text: string; userid: number; screenname: undefined; }
+!!! error TS2322:     Property 'screenname' is missing in type '{ text: string; userid: number; screenname: undefined; }'.
+    let pm2: {text: string, screenname: undefined} = pm1;
+        ~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: undefined; }'.
+!!! error TS2322:   Property 'screenname' is not absent in type 'PrivateMessage'

@@ -1,0 +1,44 @@
+=== tests/cases/compiler/assignmentCompatPredicates12inheritance.ts ===
+
+
+
+interface PrivateMessage2 {
+>PrivateMessage2 : Symbol(PrivateMessage2, Decl(assignmentCompatPredicates12inheritance.ts, 0, 0))
+
+    text?: string;
+>text : Symbol(PrivateMessage2.text, Decl(assignmentCompatPredicates12inheritance.ts, 3, 27))
+
+    userid?: number;
+>userid : Symbol(PrivateMessage2.userid, Decl(assignmentCompatPredicates12inheritance.ts, 4, 18))
+
+    screenname?: string;
+>screenname : Symbol(PrivateMessage2.screenname, Decl(assignmentCompatPredicates12inheritance.ts, 5, 20))
+
+    smthg?: number;
+>smthg : Symbol(PrivateMessage2.smthg, Decl(assignmentCompatPredicates12inheritance.ts, 6, 24))
+
+} with {
+    not(present(smthg));
+}
+interface PrivateMessage extends PrivateMessage2 {
+>PrivateMessage : Symbol(PrivateMessage, Decl(assignmentCompatPredicates12inheritance.ts, 10, 1))
+>PrivateMessage2 : Symbol(PrivateMessage2, Decl(assignmentCompatPredicates12inheritance.ts, 0, 0))
+
+    //...
+} with {
+    present(text);
+or(and(present(userid), not(present(screenname))),
+    and(not(present(userid)), present(screenname)));
+}
+
+let pm1: PrivateMessage = {text: "Hi!", userid: 42};
+>pm1 : Symbol(pm1, Decl(assignmentCompatPredicates12inheritance.ts, 19, 3))
+>PrivateMessage : Symbol(PrivateMessage, Decl(assignmentCompatPredicates12inheritance.ts, 10, 1))
+>text : Symbol(text, Decl(assignmentCompatPredicates12inheritance.ts, 19, 27))
+>userid : Symbol(userid, Decl(assignmentCompatPredicates12inheritance.ts, 19, 39))
+
+let pm2: PrivateMessage2 = pm1;
+>pm2 : Symbol(pm2, Decl(assignmentCompatPredicates12inheritance.ts, 20, 3))
+>PrivateMessage2 : Symbol(PrivateMessage2, Decl(assignmentCompatPredicates12inheritance.ts, 0, 0))
+>pm1 : Symbol(pm1, Decl(assignmentCompatPredicates12inheritance.ts, 19, 3))
+

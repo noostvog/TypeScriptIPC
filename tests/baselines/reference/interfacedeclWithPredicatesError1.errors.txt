@@ -1,7 +1,8 @@
-tests/cases/compiler/interfacedeclWithPredicatesError1.ts(5,9): error TS1005: 'Call expression' expected.
+tests/cases/compiler/interfacedeclWithPredicatesError1.ts(6,9): error TS1005: 'Call expression' expected.
 
 
 ==== tests/cases/compiler/interfacedeclWithPredicatesError1.ts (1 errors) ====
+    
     interface UsersShow{
         user_id?: number;
         screen_name?: string;

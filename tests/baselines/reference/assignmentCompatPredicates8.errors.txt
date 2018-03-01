@@ -1,0 +1,23 @@
+tests/cases/compiler/assignmentCompatPredicates8.ts(14,5): error TS2322: Type '{ text: "Hi!"; userid: 42; }' is not assignable to type 'PrivateMessage'.
+  Only fresh object literals may be assigned to an interface with predicates (type 'PrivateMessage')
+
+
+==== tests/cases/compiler/assignmentCompatPredicates8.ts (1 errors) ====
+    interface PrivateMessage {
+        text?: string;
+        userid?: number;
+        screenname?: string;
+        smthg?: number;
+    } with {
+        present(text);
+    or(and(present(userid), not(present(screenname))),
+        and(not(present(userid)), present(screenname)));
+    not(present(smthg));
+    }
+    
+    let obj: {text: "Hi!", userid: 42}
+    let pm1: PrivateMessage = obj;
+        ~~~
+!!! error TS2322: Type '{ text: "Hi!"; userid: 42; }' is not assignable to type 'PrivateMessage'.
+!!! error TS2322:   Only fresh object literals may be assigned to an interface with predicates (type 'PrivateMessage')
+    

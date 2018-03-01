@@ -1,4 +1,5 @@
 //// [interfacedeclWithPredicatesObjectError1.ts]
+
 interface PrivateMessage{
     userid?: any;
     screenname?: any;

@@ -1,0 +1,25 @@
+tests/cases/compiler/assignmentCompatPredicates1inheritance.ts(17,5): error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; userid: number; }'.
+  Property 'userid' is not present in type 'PrivateMessage'.
+
+
+==== tests/cases/compiler/assignmentCompatPredicates1inheritance.ts (1 errors) ====
+    
+    interface PrivateMessage1 {
+        text?: string;
+        userid?: number;
+        screenname?: string;
+    } with {
+        present(text);
+    }
+    
+    interface PrivateMessage extends PrivateMessage1{
+        //everything
+    } with {
+        or(and(present(userid), not(present(screenname))),
+        and(not(present(userid)), present(screenname)));
+    }
+    let pm: PrivateMessage = { text: "Hi!", userid: 42 };
+    let obj: { text: string, userid: number } = pm;
+        ~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; userid: number; }'.
+!!! error TS2322:   Property 'userid' is not present in type 'PrivateMessage'.

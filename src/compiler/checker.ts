@@ -1,6 +1,8 @@
 ﻿/// <reference path="moduleNameResolver.ts"/>
 /// <reference path="binder.ts"/>
 /// <reference path="../../scripts/propositional-sequent-calculus-prover.ts"/>
+// <reference path="../../scripts/proplog.ts"/>
+
 
 /* @internal */
 namespace ts {
@@ -1723,19 +1725,25 @@ namespace ts {
             return result || emptyArray;
         }
 
-        function setStructuredTypeMembers(type: StructuredType, members: SymbolTable, callSignatures: Signature[], constructSignatures: Signature[], stringIndexInfo: IndexInfo, numberIndexInfo: IndexInfo): ResolvedType {
+        function setStructuredTypeMembers(type: StructuredType, members: SymbolTable, callSignatures: Signature[], constructSignatures: Signature[], stringIndexInfo: IndexInfo, numberIndexInfo: IndexInfo, predicates?: PredicateExpression[]): ResolvedType {
             (<ResolvedType>type).members = members;
             (<ResolvedType>type).properties = getNamedMembers(members);
             (<ResolvedType>type).callSignatures = callSignatures;
             (<ResolvedType>type).constructSignatures = constructSignatures;
             if (stringIndexInfo) (<ResolvedType>type).stringIndexInfo = stringIndexInfo;
             if (numberIndexInfo) (<ResolvedType>type).numberIndexInfo = numberIndexInfo;
+            //<Nathalie>
+            if (predicates) {
+                (<ResolvedType>type).predicates = predicates;
+            } else {
+                (<ResolvedType>type).predicates = [];
+            }
             return <ResolvedType>type;
         }
 
         function createAnonymousType(symbol: Symbol, members: SymbolTable, callSignatures: Signature[], constructSignatures: Signature[], stringIndexInfo: IndexInfo, numberIndexInfo: IndexInfo): ResolvedType {
             return setStructuredTypeMembers(createObjectType(ObjectFlags.Anonymous, symbol),
-                members, callSignatures, constructSignatures, stringIndexInfo, numberIndexInfo);
+                members, callSignatures, constructSignatures, stringIndexInfo, numberIndexInfo, []); //last argument si predicates, which do not exist for anonymous types (?)
         }
 
         function forEachSymbolTableInScope<T>(enclosingDeclaration: Node, callback: (symbolTable: SymbolTable) => T): T {
@@ -4268,6 +4276,13 @@ namespace ts {
             }
         }
 
+        // <Nathalie>
+        function addInheritedPredicates(predicates: PredicateExpression[], basePredicates: PredicateExpression[]) {
+            for (const p of basePredicates) {
+                predicates.push(p);
+            }
+        }
+
         function resolveDeclaredMembers(type: InterfaceType): InterfaceTypeWithDeclaredMembers {
 
             if (!(<InterfaceTypeWithDeclaredMembers>type).declaredProperties) {
@@ -4309,6 +4324,7 @@ namespace ts {
             let constructSignatures: Signature[];
             let stringIndexInfo: IndexInfo;
             let numberIndexInfo: IndexInfo;
+            let predicates: PredicateExpression[];
             if (rangeEquals(typeParameters, typeArguments, 0, typeParameters.length)) {
                 mapper = identityMapper;
                 members = source.symbol ? source.symbol.members : createSymbolTable(source.declaredProperties);
@@ -4316,6 +4332,7 @@ namespace ts {
                 constructSignatures = source.declaredConstructSignatures;
                 stringIndexInfo = source.declaredStringIndexInfo;
                 numberIndexInfo = source.declaredNumberIndexInfo;
+                predicates = Object.assign([], source.declaredPredicates);
             }
             else {
                 mapper = createTypeMapper(typeParameters, typeArguments);
@@ -4324,6 +4341,7 @@ namespace ts {
                 constructSignatures = instantiateSignatures(source.declaredConstructSignatures, mapper);
                 stringIndexInfo = instantiateIndexInfo(source.declaredStringIndexInfo, mapper);
                 numberIndexInfo = instantiateIndexInfo(source.declaredNumberIndexInfo, mapper);
+                predicates = []; //<nathalie> correct?
             }
             const baseTypes = getBaseTypes(source);
             if (baseTypes.length) {
@@ -4338,9 +4356,10 @@ namespace ts {
                     constructSignatures = concatenate(constructSignatures, getSignaturesOfType(instantiatedBaseType, SignatureKind.Construct));
                     stringIndexInfo = stringIndexInfo || getIndexInfoOfType(instantiatedBaseType, IndexKind.String);
                     numberIndexInfo = numberIndexInfo || getIndexInfoOfType(instantiatedBaseType, IndexKind.Number);
+                    addInheritedPredicates(predicates, getPredicatesOfObjectType(instantiatedBaseType));
                 }
             }
-            setStructuredTypeMembers(type, members, callSignatures, constructSignatures, stringIndexInfo, numberIndexInfo);
+            setStructuredTypeMembers(type, members, callSignatures, constructSignatures, stringIndexInfo, numberIndexInfo, predicates);
         }
 
         function resolveClassOrInterfaceMembers(type: InterfaceType): void {
@@ -4705,6 +4724,14 @@ namespace ts {
         function getPropertiesOfObjectType(type: Type): Symbol[] {
             if (type.flags & TypeFlags.Object) {
                 return resolveStructuredTypeMembers(<ObjectType>type).properties;
+            }
+            return emptyArray;
+        }
+
+        //<<Nathalie>
+        function getPredicatesOfObjectType(type: Type): PredicateExpression[] {
+            if (type.flags & TypeFlags.Object) {
+                return resolveStructuredTypeMembers(<ObjectType>type).predicates;
             }
             return emptyArray;
         }
@@ -7219,7 +7246,7 @@ namespace ts {
             return "unknown logical operator";
         }
 
-        function translatePredicates(predicates: NodeArray<PredicateExpression>): string {
+        function translatePredicates(predicates: PredicateExpression[]): string {
             let resultaat: string = "";
             for (const predicate of predicates) {
                 resultaat += " " + translatePredicate(predicate) + " & ";
@@ -7823,7 +7850,8 @@ namespace ts {
                 //<Nathalie>
                 function predicatesRelatedTo(source: Type, target: Type, reportErrors: boolean): Ternary {
                     if (getObjectFlags(target) & ObjectFlags.Interface) {
-                        const predicatesT = (<InterfaceTypeWithDeclaredMembers>target).declaredPredicates;
+                        const resolvedT = resolveStructuredTypeMembers(<ObjectType>target);
+                        const predicatesT = resolvedT.predicates;
                         if (getObjectFlags(source) & ObjectFlags.Anonymous) {
                             if (predicatesT == undefined || predicatesT.length == 0) {
                                 return Ternary.Maybe;
@@ -7843,7 +7871,8 @@ namespace ts {
                                 return Ternary.False;
                             }
                         } else if (getObjectFlags(source) & ObjectFlags.Interface) {
-                            const predicatesS = (<InterfaceTypeWithDeclaredMembers> source).declaredPredicates;
+                            const resolvedS = resolveStructuredTypeMembers(<ObjectType>source);
+                            const predicatesS = resolvedS.predicates;
                             if ((predicatesS == undefined || predicatesS.length == 0) && (predicatesT == undefined || predicatesT.length == 0)) {
                                 return Ternary.Maybe;
                             } else if ((predicatesS == undefined || predicatesS.length == 0 || predicatesT == undefined || predicatesT.length == 0)) {
@@ -7860,7 +7889,8 @@ namespace ts {
                         }
                     } else if (getObjectFlags(target) & ObjectFlags.Anonymous) {
                         if (getObjectFlags(source) & ObjectFlags.Interface) {
-                            const predicatesS = (<InterfaceTypeWithDeclaredMembers> source).declaredPredicates;
+                            const resolvedS = resolveStructuredTypeMembers(<ObjectType>source);
+                            const predicatesS = resolvedS.predicates;
                             if (predicatesS == undefined || predicatesS.length == 0) {
                                 return Ternary.Maybe;
                             }
@@ -7898,7 +7928,7 @@ namespace ts {
                         return Ternary.True;
                     }
                 }
-                function predicatesRelatedToIntfObj(source: Type, predicatessource: NodeArray<PredicateExpression>, target: Type, reportErrors: boolean): Ternary {
+                function predicatesRelatedToIntfObj(source: Type, predicatessource: PredicateExpression[], target: Type, reportErrors: boolean): Ternary {
                     const sourceprops = getPropertiesOfType(source);
                     const targetprops = getPropertiesOfType(target);
                     for (const prop of targetprops) {
@@ -7950,7 +7980,7 @@ namespace ts {
                     return Ternary.True;
 
                 }
-                function predicatesRelatedToIntfIntf(source: Type, predicatesS: NodeArray<PredicateExpression>, target: Type, predicatesT: NodeArray<PredicateExpression>, reportErrors: boolean): Ternary {
+                function predicatesRelatedToIntfIntf(source: Type, predicatesS: PredicateExpression[], target: Type, predicatesT: PredicateExpression[], reportErrors: boolean): Ternary {
                     let predicateSourceStr = translatePredicates(predicatesS);
                     let predicateTargetStr = translatePredicates(predicatesT);
                     const sourceprops = getPropertiesOfType(source);
@@ -7980,7 +8010,7 @@ namespace ts {
 
                 }
 
-                function predicatesRelatedToObjIntf(source: Type, predicates: NodeArray<PredicateExpression>, mainLevel: boolean, reportErrors: boolean): Ternary {
+                function predicatesRelatedToObjIntf(source: Type, predicates: PredicateExpression[], mainLevel: boolean, reportErrors: boolean): Ternary {
                     for (const predicate of predicates) {
                         // assume top level is callexpression => checken while type checking interface?
                         if (!isPredicateSatisfied(source, predicate, reportErrors)) {
@@ -10660,7 +10690,7 @@ namespace ts {
     }*/
             // }
             //<nathalie>
-            function addPredicateAndSimplify(field: Identifier, predicates: NodeArray<PredicateExpression>, include: TypeFacts): NodeArray<PredicateExpression> {
+            function addPredicateAndSimplify(field: Identifier, predicates: PredicateExpression[], include: TypeFacts): NodeArray<PredicateExpression> {
                 const simplPredicates: NodeArray<PredicateExpression> = createNodeArray<PredicateExpression>();
                 predicates.forEach((p:PredicateExpression) => simplPredicates.push(p));
                 //simplPredicates.push(predicates);
@@ -10724,7 +10754,7 @@ namespace ts {
                 }
             }
 
-            function getTypeWithFactsAndPredicates(field: Identifier, include: TypeFacts, predicates: NodeArray<PredicateExpression>): Type {
+            function getTypeWithFactsAndPredicates(field: Identifier, include: TypeFacts, predicates: PredicateExpression[]): Type {
                 const simplPredicates = addPredicateAndSimplify(field, predicates, include);
                 //1. present(field) must be in simplPredicates
                 //2. is type(field) === ??? present? if so: return that type, otherwise: return any;
@@ -10751,7 +10781,8 @@ namespace ts {
                     const apparentType = getApparentType(getWidenedType(objtype));
                     if (getObjectFlags(apparentType) & ObjectFlags.Interface) {
                         //negeer types
-                        const predicates = (<InterfaceTypeWithDeclaredMembers> apparentType).declaredPredicates;
+                        const resolvedT = resolveStructuredTypeMembers(<ObjectType>apparentType);
+                        const predicates = resolvedT.predicates;
                         if (predicates.length > 0) { //Only do this for interfaces that have predicates (to be compatible with existing interfaces)
                             return getTypeWithFactsAndPredicates((<PropertyAccessExpression> reference).name, include, predicates);
                         }
@@ -12217,13 +12248,14 @@ namespace ts {
                 return unknownType;
             }
 
-            const target = checkExpression(args[0]);
+            let target = checkExpression(args[0]);
             const sourcepart = checkExpression(args[1]);
             if (!(target.flags & TypeFlags.Object && getObjectFlags(target) & ObjectFlags.Interface)) {
                 error(node.arguments[0], Diagnostics.The_first_argument_of_the_function_objupdate_must_be_an_interface_type);
                 return unknownType;
             }
-            const predicates = (<InterfaceTypeWithDeclaredMembers>target).declaredPredicates;
+            const resolvedT = resolveStructuredTypeMembers(<ObjectType>target);
+            const predicates = resolvedT.predicates;
             if (predicates === undefined || predicates.length == 0) {
                 error(node.arguments[0], Diagnostics.The_first_argument_of_the_function_objupdate_must_be_an_interface_type_with_predicates);
                 return unknownType;
@@ -12233,18 +12265,123 @@ namespace ts {
                 //TODO hier nog error nodig?
                 return unknownType;
             }
+            const resolvedS = resolveStructuredTypeMembers(<ObjectType>sourcepart);
             contextualMapper;
 
-            const slicedTarget = slice(<InterfaceTypeWithDeclaredMembers>target, <FreshObjectLiteralType>sourcepart);
-            slicedTarget;
+
+            let slicedTarget = cloneTarget(resolvedT); //clone such that original target is not changed
+            slice(slicedTarget, <FreshObjectLiteralType>sourcepart);
+            const resolvedST = resolveStructuredTypeMembers(<ObjectType>slicedTarget);
+            if (!sameProps(resolvedS.properties, resolvedST.properties)) {
+                error(node, Diagnostics.All_properties_from_the_predicates_in_which_the_properties_of_the_second_argument_are_mentioned_must_be_a_part_of_the_second_argument);
+            }
             if (checkTypeAssignableTo(sourcepart, slicedTarget, node)) {
                 return target;
             }
             return undefinedType;
 
-            function slice(target: InterfaceTypeWithDeclaredMembers, sourcePart: FreshObjectLiteralType): Type {
-                sourcePart;
+            function sameProps(props1: Symbol[], props2: Symbol[]): boolean {
+                let array1 = props1.map(x => x.name);
+                let array2 = props2.map(x => x.name);
+                array1 = array1.sort();
+                array2 = array2.sort();
+                return (array1.length == array2.length) && array1.every(function(element, index) {
+                    return element === array2[index];});
+            }
+            function cloneTarget(target: ResolvedType): ResolvedType {
+                let clonedTarget = Object.assign({}, target);
+                clonedTarget.symbol.name += "Sliced"; //TODO dit werkt niet precies
+                //to be sure
+                clonedTarget.predicates = Object.assign([], target.predicates);
+                clonedTarget.properties = Object.assign([], target.properties);
+                clonedTarget.members = Object.assign({}, target.members);
+                clonedTarget.properties = Object.assign([], target.properties);
+                return clonedTarget;
+            }
+            function slice(target: ResolvedType, sourcePart: FreshObjectLiteralType): ResolvedType {
+                let predicates = target.predicates;
+                let collectedPredicates = createNodeArray<PredicateExpression>();
+                let collectedProperties = Object.assign([], sourcePart.properties);
+                let result = addPredicatesWithTheseProperties(collectedProperties);
+                while (result.length !== 0) {
+                    let moreProperties: Symbol[] = []; //: Map<Symbol> = createMap<Symbol>(); //new Array<Symbol>(100); //not good
+                    for(const predicate of result) {
+                        let props = getPropertiesFromPredicate(predicate);
+                        //TODO add props to moreProperties and to collectedProperties;
+                        for (const prop of props) {
+                            const symbol = createSymbol(SymbolFlags.Property, prop.text);
+                            if (collectedProperties.map(x => x.name).indexOf(prop.text) == -1) { //mogelijks alleen op naam testen
+                                collectedProperties.push(symbol);
+                                moreProperties.push(symbol);
+                            }
+                        }
+                    }
+                    //add predicates adds them to collectPredicates, but also returns new predicates;
+                    result = addPredicatesWithTheseProperties(moreProperties);
+                }
+                target = removeUnusedProperties(target, collectedProperties);
+                target = limitPredicates(target, collectedPredicates);
                 return target;
+
+                function getPropertiesFromPredicate(predicate: PredicateExpression): NodeArray<Identifier> {
+                    let props = createNodeArray<Identifier>();
+                    switch (predicate.kind) {
+                        //case SyntaxKind.PredicateTypeExpression:
+                        //    checkInterfacePredicateTypeExpression(<PredicateTypeExpression>predicate); break;
+                        case SyntaxKind.PredicateLogicalExpression:
+                            (<PredicateLogicalExpression>predicate).arguments.map(pr => getPropertiesFromPredicate(pr).map(p => noDupPush(p)));
+                            break;
+                        case SyntaxKind.PredicatePresentExpression:
+                            (<PredicatePresentExpression>predicate).arguments.forEach(a => noDupPush(a));
+                            break;
+                    }
+                    return props;
+
+                    function noDupPush(a: Identifier) {
+                        if (props.indexOf(a) == -1) {
+                            props.push(a);
+                        }
+                    }
+                }
+                // adds predicates to collectedPredicates
+                // and returns them as result
+                // only adds predicates which are not a part of collectedPredicates
+                function addPredicatesWithTheseProperties(properties: Array<Symbol>): NodeArray<PredicateExpression> {
+                    let somethingFound = createNodeArray<PredicateExpression>();
+                    for (const prop of properties) {
+                        for (const pred of predicates) {
+                            if (collectedPredicates.indexOf(pred) == -1) { //only when predicate is not already collected
+                                let predprops = getPropertiesFromPredicate(pred);
+                                predprops = createNodeArray(deduplicate(predprops));
+                                if (predprops.map(p => p.text).indexOf(prop.name) !== -1) {
+                                    //this predicate has one of the properties in it
+                                    //add to resultpredicates
+                                    collectedPredicates.push(pred);
+                                    somethingFound.push(pred); // = true;
+                                }
+                            }
+                        }
+                    }
+                    return somethingFound;
+                }
+                function removeUnusedProperties(target: ResolvedType, usedProperties: Symbol[]): ResolvedType {
+                    //TODO use removeWhere instead?
+                    //let newDeclaredProperties: Symbol[] = [];
+                    const usedPropNames = usedProperties.map(x => x.name);
+                    for (const declProp of target.properties) {
+                        if (usedPropNames.indexOf(declProp.name) == -1) {
+                            //this property / member should be removed
+                            delete target.members[declProp.name];
+                            //target.properties = target.proper.filter(x => x.name !== declProp.name);
+                            target.properties = target.properties.filter(x => x.name !== declProp.name); //only on object type?
+                        }
+                    }
+                    return target;
+                }
+                function limitPredicates(target: ResolvedType, usedPredicates: NodeArray<PredicateExpression>): ResolvedType {
+                    target.predicates = usedPredicates;
+                    return target;
+                }
             }
         }
         function checkObjectLiteral(node: ObjectLiteralExpression, contextualMapper?: TypeMapper): Type {
@@ -13135,7 +13272,8 @@ namespace ts {
             if (node.kind == SyntaxKind.PropertyAccessExpression) {
                 if (getObjectFlags(apparentType) & ObjectFlags.Interface) {
                     // ignore type inferred from this field before if there are predicates
-                    const predicates = (<InterfaceTypeWithDeclaredMembers> apparentType).declaredPredicates;
+                    const resolvedT = resolveStructuredTypeMembers(<ObjectType>apparentType);
+                    const predicates = resolvedT.predicates;
                     if (predicates.length > 0) {
                         //predicatePresent = getPresenceOfFieldInPredicates(predicates, right);
                         const predicateStr = translatePredicates(predicates);
@@ -18155,14 +18293,59 @@ namespace ts {
             // Grammar checking
             checkGrammarStatementInAmbientContext(node);
 
-            checkExpression(node.expression);
+            let specialPredicateIf = false;
+            let origPredicates;
+            let objectType: ResolvedType;
+            let predicateThen: PredicatePresentExpression;
+            let predicateElse: PredicateLogicalExpression;
+            if (node.expression.kind === SyntaxKind.PropertyAccessExpression){
+                const paeExpressionType = checkExpression((<PropertyAccessExpression>node.expression).expression);
+                if (getObjectFlags(paeExpressionType) & ObjectFlags.Interface) {
+                    objectType = resolveStructuredTypeMembers(<ObjectType>paeExpressionType);
+                    let preds = objectType.predicates;
+                    origPredicates = Object.assign([], preds);
+                    if (preds !== undefined && preds.length > 0) {
+                        // Predicate toevoegen aan paeExpressionType;
+                        specialPredicateIf = true;
+
+                        // create present predicate for then branch
+                        const thenArgs = createNodeArray<Identifier>();
+                        thenArgs.push(<Identifier>{kind: SyntaxKind.Identifier, text: (<PropertyAccessExpression>node.expression).name.text})
+                        const presentexpr = <Identifier>{kind: SyntaxKind.Identifier, text: "present" };
+                        predicateThen = <PredicatePresentExpression>{ kind: SyntaxKind.PredicatePresentExpression, expression: presentexpr, arguments: thenArgs };
+
+                        // create not-present predicate for else branch
+                        const notexpr = <Identifier>{kind: SyntaxKind.Identifier, text: "not" };
+                        const elseArgs = createNodeArray<PredicateExpression>();
+                        elseArgs.push(predicateThen);
+                        predicateElse = <PredicateLogicalExpression>{ kind: SyntaxKind.PredicateLogicalExpression, expression: notexpr, arguments: elseArgs };
+                    }
+                }
+            }
+            if (!specialPredicateIf) {
+                checkExpression(node.expression);
+            }
+
+            if (specialPredicateIf) {
+                objectType.predicates.push(predicateThen);
+            }
             checkSourceElement(node.thenStatement);
 
             if (node.thenStatement.kind === SyntaxKind.EmptyStatement) {
                 error(node.thenStatement, Diagnostics.The_body_of_an_if_statement_cannot_be_the_empty_statement);
             }
 
+            if (specialPredicateIf) {
+                objectType.predicates = origPredicates; //remove true branch
+                origPredicates = Object.assign([], origPredicates);
+                objectType.predicates.push(predicateElse);
+            }
             checkSourceElement(node.elseStatement);
+
+            if (specialPredicateIf) {
+                objectType.predicates = origPredicates;
+            }
+
         }
 
         function checkDoStatement(node: DoStatement) {
@@ -19226,9 +19409,10 @@ namespace ts {
                         }
                         checkIndexConstraints(type);
                     }
+                    checkInterfacePredicateDeclarations(type);
                 }
                 checkObjectTypeForDuplicateDeclarations(node);
-                checkInterfacePredicateDeclarations(node);
+                //TODO check whether predicates are satisfiable.
             }
             forEach(getInterfaceBaseTypeNodes(node), heritageElement => {
                 if (!isEntityNameExpression(heritageElement.expression)) {
@@ -19244,80 +19428,102 @@ namespace ts {
                 registerForUnusedIdentifiersCheck(node);
             }
 
-        }
 
-        function checkInterfacePredicateDeclarations(node: InterfaceDeclaration) {
+            function checkInterfacePredicateDeclarations(type: InterfaceType) {
+                const resolved = resolveStructuredTypeMembers(type);
+                resolved.predicates.map(checkInterfacePredicateDeclaration);
 
-            node.predicates.map(checkInterfacePredicateDeclaration);
-
-            function checkInterfacePredicateDeclaration(predicate: PredicateExpression) {
-                switch (predicate.kind) {
-                    case SyntaxKind.PredicateTypeExpression:
-                        checkInterfacePredicateTypeExpression(<PredicateTypeExpression>predicate); break;
-                    case SyntaxKind.PredicateLogicalExpression:
-                        checkInterfacePredicateLogicalExpression(<PredicateLogicalExpression>predicate); break;
-                    case SyntaxKind.PredicatePresentExpression:
-                        checkInterfacePredicatePresentExpression(<PredicatePresentExpression>predicate); break;
-                }
-            }
-            function checkInterfacePredicateTypeExpression(predicate: PredicateTypeExpression) {
-                if (predicate.left_get.text !== "type") {
-                    error(node, Diagnostics._0_is_an_unknown_predicate_operation_expected_the_following_predicate_s_Colon_1, predicate.left_get.text,  "type");
-                }
-                checkValidParameter(predicate.left_arg);
-                if (predicate.operatorToken.kind !== SyntaxKind.EqualsEqualsToken) {
-                    error(node, Diagnostics.The_type_predicate_can_only_be_used_wiht_an_equality_operator);
-                }
-                switch (predicate.right.text) {
-                    case "any":
-                    case "number":
-                    case "boolean":
-                    case "string":
-                    case "symbol":
-                    case "void":
-                    case "object": break;
-                    default: error(node, Diagnostics.The_type_predicate_expects_one_of_the_following_types_Colon_string_number_boolean_any_object_symbol_void);
-
-                }
-            }
-            function checkInterfacePredicateLogicalExpression(predicate: PredicateLogicalExpression) {
-                // check valid logical expression
-                // check valid veldjesnamen
-                // check exact two arguments for iff and implic
-                switch (predicate.expression.text) {
-                    case "or":
-                    case "and":
-                    case "not":
-                        break;
-                    case "implic":
-                    case "iff":
-                        if (predicate.arguments.length !== 2) {
-                            error(node, Diagnostics.The_iff_and_implic_predicates_expect_exactly_two_arguments)
+                if (resolved.predicates && resolved.predicates.length > 0) {
+                    //if there are predicates, every property should be optional and the type should be different from undefined
+                    for (const member of node.members) {
+                        const type = getTypeOfSymbol(member.symbol);
+                        if (type === undefinedType) {
+                            error(node, Diagnostics.Property_0_may_not_have_type_undefined_as_it_is_part_of_an_interface_with_predicates, node.symbol.name);
                         }
-                        break;
-                    default:
-                        error(node, Diagnostics._0_is_an_unknown_predicate_operation_expected_the_following_predicate_s_Colon_1, predicate.expression.text, "or, and, not, implic, iff")
-                }
-                predicate.arguments.map(checkInterfacePredicateDeclaration);
-            }
-            function checkInterfacePredicatePresentExpression(predicate: PredicatePresentExpression) {
-                // check valid veldjesnaam/namen
-                if (predicate.expression.text !== "present") {
-                    error(node, Diagnostics._0_is_an_unknown_predicate_operation_expected_the_following_predicate_s_Colon_1, predicate.expression.text, "present");
-                }
-                predicate.arguments.map(checkValidParameter);
-            }
-            function checkValidParameter(name: Identifier) {
-                for (const member of node.members) {
-                    if (member.symbol.name == name.text) {
-                        return;
+
+                        if (!(member.symbol.flags & SymbolFlags.Optional)) {
+                            error(node, Diagnostics.Property_0_has_to_be_an_optional_property_as_it_is_part_of_an_interface_with_predicates, node.symbol.name);
+                        }
                     }
                 }
-                error(node, Diagnostics.The_field_0_is_used_in_a_predicate_but_not_described_in_the_interface, name.text);
+
+                function checkInterfacePredicateDeclaration(predicate: PredicateExpression) {
+                    switch (predicate.kind) {
+                        case SyntaxKind.PredicateTypeExpression:
+                            checkInterfacePredicateTypeExpression(<PredicateTypeExpression>predicate);
+                            break;
+                        case SyntaxKind.PredicateLogicalExpression:
+                            checkInterfacePredicateLogicalExpression(<PredicateLogicalExpression>predicate);
+                            break;
+                        case SyntaxKind.PredicatePresentExpression:
+                            checkInterfacePredicatePresentExpression(<PredicatePresentExpression>predicate);
+                            break;
+                    }
+                }
+
+                function checkInterfacePredicateTypeExpression(predicate: PredicateTypeExpression) {
+                    if (predicate.left_get.text !== "type") {
+                        error(node, Diagnostics._0_is_an_unknown_predicate_operation_expected_the_following_predicate_s_Colon_1, predicate.left_get.text, "type");
+                    }
+                    checkValidParameter(predicate.left_arg);
+                    if (predicate.operatorToken.kind !== SyntaxKind.EqualsEqualsToken) {
+                        error(node, Diagnostics.The_type_predicate_can_only_be_used_wiht_an_equality_operator);
+                    }
+                    switch (predicate.right.text) {
+                        case "any":
+                        case "number":
+                        case "boolean":
+                        case "string":
+                        case "symbol":
+                        case "void":
+                        case "object":
+                            break;
+                        default:
+                            error(node, Diagnostics.The_type_predicate_expects_one_of_the_following_types_Colon_string_number_boolean_any_object_symbol_void);
+
+                    }
+                }
+
+                function checkInterfacePredicateLogicalExpression(predicate: PredicateLogicalExpression) {
+                    // check valid logical expression
+                    // check valid veldjesnamen
+                    // check exact two arguments for iff and implic
+                    switch (predicate.expression.text) {
+                        case "or":
+                        case "and":
+                        case "not":
+                            break;
+                        case "implic":
+                        case "iff":
+                            if (predicate.arguments.length !== 2) {
+                                error(node, Diagnostics.The_iff_and_implic_predicates_expect_exactly_two_arguments)
+                            }
+                            break;
+                        default:
+                            error(node, Diagnostics._0_is_an_unknown_predicate_operation_expected_the_following_predicate_s_Colon_1, predicate.expression.text, "or, and, not, implic, iff")
+                    }
+                    predicate.arguments.map(checkInterfacePredicateDeclaration);
+                }
+
+                function checkInterfacePredicatePresentExpression(predicate: PredicatePresentExpression) {
+                    // check valid veldjesnaam/namen
+                    if (predicate.expression.text !== "present") {
+                        error(node, Diagnostics._0_is_an_unknown_predicate_operation_expected_the_following_predicate_s_Colon_1, predicate.expression.text, "present");
+                    }
+                    predicate.arguments.map(checkValidParameter);
+                }
+
+                function checkValidParameter(name: Identifier) {
+                    for (const member of resolved.properties) {
+                        if (member.name == name.text) {
+                            return;
+                        }
+                    }
+                    error(node, Diagnostics.The_field_0_is_used_in_a_predicate_but_not_described_in_the_interface, name.text);
+                }
+
             }
-
         }
-
         function checkTypeAliasDeclaration(node: TypeAliasDeclaration) {
             // Grammar checking
             checkGrammarDecorators(node) || checkGrammarModifiers(node);

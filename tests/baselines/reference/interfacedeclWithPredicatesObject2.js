@@ -1,4 +1,5 @@
 //// [interfacedeclWithPredicatesObject2.ts]
+
 interface PrivateMessage{
     userid?: any;
     screenname?: any;

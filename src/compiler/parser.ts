@@ -155,8 +155,8 @@ namespace ts {
                 return visitNodes(cbNodes, (<ArrayLiteralExpression>node).elements);
             case SyntaxKind.ObjectLiteralExpression:
                 return visitNodes(cbNodes, (<ObjectLiteralExpression>node).properties);
-            /*case SyntaxKind.ObjectUpdateExpression:
-                return visitNodes(cbNodes, (<ObjectUpdateExpression>node).arguments);*/
+            case SyntaxKind.ObjectUpdateExpression:
+                return visitNodes(cbNodes, (<ObjectUpdateExpression>node).arguments);
             case SyntaxKind.PropertyAccessExpression:
                 return visitNode(cbNode, (<PropertyAccessExpression>node).expression) ||
                     visitNode(cbNode, (<PropertyAccessExpression>node).name);
@@ -4693,16 +4693,6 @@ namespace ts {
             node.statement = parseStatement();
             return finishNode(node);
         }
-
-        //<Nathalie>
-        /*
-        function parseObjectUpdateStatement(): ObjectUpdateStatement {
-            const node = <ObjectUpdateStatement>createNode(SyntaxKind.ObjectUpdateStatement);
-            parseExpected(SyntaxKind.ObjectUpdateKeyword);
-            node.arguments = parseArgumentList();
-            return finishNode(node);
-        }
-        */
 
         function parseForOrForInOrForOfStatement(): Statement {
             const pos = getNodePos();

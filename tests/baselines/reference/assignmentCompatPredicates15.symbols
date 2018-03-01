@@ -1,0 +1,28 @@
+=== tests/cases/compiler/assignmentCompatPredicates15.ts ===
+
+interface PrivateMessage {
+>PrivateMessage : Symbol(PrivateMessage, Decl(assignmentCompatPredicates15.ts, 0, 0))
+
+    text?: string;
+>text : Symbol(PrivateMessage.text, Decl(assignmentCompatPredicates15.ts, 1, 26))
+
+    userid?: number;
+>userid : Symbol(PrivateMessage.userid, Decl(assignmentCompatPredicates15.ts, 2, 18))
+
+    screenname?: string;
+>screenname : Symbol(PrivateMessage.screenname, Decl(assignmentCompatPredicates15.ts, 3, 20))
+
+} with {
+    present(text);
+or(and(present(userid), not(present(screenname))),
+    and(not(present(userid)), present(screenname)));
+}
+
+let pm1: PrivateMessage = {text: "Hi!", userid: 42, screenname: undefined};
+>pm1 : Symbol(pm1, Decl(assignmentCompatPredicates15.ts, 11, 3))
+>PrivateMessage : Symbol(PrivateMessage, Decl(assignmentCompatPredicates15.ts, 0, 0))
+>text : Symbol(text, Decl(assignmentCompatPredicates15.ts, 11, 27))
+>userid : Symbol(userid, Decl(assignmentCompatPredicates15.ts, 11, 39))
+>screenname : Symbol(screenname, Decl(assignmentCompatPredicates15.ts, 11, 51))
+>undefined : Symbol(undefined)
+

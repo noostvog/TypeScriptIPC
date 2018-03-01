@@ -1,0 +1,26 @@
+tests/cases/compiler/assignmentCompatPredicates4.ts(12,5): error TS2322: Type '{ text: string; userid: number; }' is not assignable to type 'PrivateMessage'.
+  Predicate not(present(userid)) was not satisfied in type { text: string; userid: number; }
+tests/cases/compiler/assignmentCompatPredicates4.ts(13,5): error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; x?: number | undefined; }'.
+  Property 'x' of type '{ text: string; x?: number | undefined; }' is unknown in type 'PrivateMessage'
+
+
+==== tests/cases/compiler/assignmentCompatPredicates4.ts (2 errors) ====
+    
+    interface PrivateMessage {
+        text?: string;
+        userid?: number;
+        screenname?: string;
+    } with {
+        present(text);
+        not(present(userid));
+        not(present(screenname));
+    }
+    
+    let pm: PrivateMessage = { text: "Hi!", userid: 42};
+        ~~
+!!! error TS2322: Type '{ text: string; userid: number; }' is not assignable to type 'PrivateMessage'.
+!!! error TS2322:   Predicate not(present(userid)) was not satisfied in type { text: string; userid: number; }
+    let obj: { text: string, x?: number } = pm;
+        ~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; x?: number | undefined; }'.
+!!! error TS2322:   Property 'x' of type '{ text: string; x?: number | undefined; }' is unknown in type 'PrivateMessage'

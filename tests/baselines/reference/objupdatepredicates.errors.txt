@@ -1,0 +1,29 @@
+tests/cases/compiler/objupdatepredicates.ts(16,9): error TS95021: All properties from the predicates in which the properties of the second argument are mentioned, must be a part of the second argument
+tests/cases/compiler/objupdatepredicates.ts(18,9): error TS2322: Type '{ userid: number; screenname: number; }' is not assignable to type 'PrivateMessage'.
+  Predicate or(and(present(userid),not(present(screenname))),and(not(present(userid)),present(screenname))) was not satisfied in type { userid: number; screenname: number; }
+
+
+==== tests/cases/compiler/objupdatepredicates.ts (2 errors) ====
+    
+    interface PrivateMessage {
+        text?: string;
+        userid?: number;
+        screenname?: number;
+    } with {
+        present(text);
+    or(and(present(userid), not(present(screenname))),
+        and(not(present(userid)), present(screenname)));
+    }
+    
+    
+    let a: PrivateMessage = {text: "Hi!", userid: 5};
+    
+    let b = objupdate(a, {text: "Hello"}); //OK
+    let c = objupdate(a, {userid: 5}); //NOK
+            ~~~~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS95021: All properties from the predicates in which the properties of the second argument are mentioned, must be a part of the second argument
+    let d = objupdate(a, {userid: 5, screenname: undefined}); //OK
+    let e = objupdate(a, {userid: 5, screenname: 6}); //NOK
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS2322: Type '{ userid: number; screenname: number; }' is not assignable to type 'PrivateMessage'.
+!!! error TS2322:   Predicate or(and(present(userid),not(present(screenname))),and(not(present(userid)),present(screenname))) was not satisfied in type { userid: number; screenname: number; }

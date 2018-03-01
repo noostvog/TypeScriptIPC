@@ -1,0 +1,23 @@
+tests/cases/compiler/assignmentCompatPredicates13.ts(14,5): error TS2322: Type '{ text: number; userid: number; }' is not assignable to type 'PrivateMessage'.
+  Type 'number' is not assignable to type 'string'.
+
+
+==== tests/cases/compiler/assignmentCompatPredicates13.ts (1 errors) ====
+    
+    interface PrivateMessage {
+        text?: string;
+        userid?: number;
+        screenname?: string;
+        smthg?: number;
+    } with {
+        present(text);
+    or(and(present(userid), not(present(screenname))),
+        and(not(present(userid)), present(screenname)));
+    not(present(smthg));
+    }
+    
+    let pm1: PrivateMessage = {text: 5, userid: 42};
+        ~~~
+!!! error TS2322: Type '{ text: number; userid: number; }' is not assignable to type 'PrivateMessage'.
+!!! error TS2322:   Type 'number' is not assignable to type 'string'.
+    

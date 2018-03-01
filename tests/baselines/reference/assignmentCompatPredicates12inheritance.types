@@ -1,0 +1,67 @@
+=== tests/cases/compiler/assignmentCompatPredicates12inheritance.ts ===
+
+
+
+interface PrivateMessage2 {
+>PrivateMessage2 : PrivateMessage2
+
+    text?: string;
+>text : string
+
+    userid?: number;
+>userid : number
+
+    screenname?: string;
+>screenname : string
+
+    smthg?: number;
+>smthg : number
+
+} with {
+    not(present(smthg));
+>not : any
+>present : any
+>smthg : any
+}
+interface PrivateMessage extends PrivateMessage2 {
+>PrivateMessage : PrivateMessage
+>PrivateMessage2 : PrivateMessage2
+
+    //...
+} with {
+    present(text);
+>present : any
+>text : any
+
+or(and(present(userid), not(present(screenname))),
+>or : any
+>and : any
+>present : any
+>userid : any
+>not : any
+>present : any
+>screenname : any
+
+    and(not(present(userid)), present(screenname)));
+>and : any
+>not : any
+>present : any
+>userid : any
+>present : any
+>screenname : any
+}
+
+let pm1: PrivateMessage = {text: "Hi!", userid: 42};
+>pm1 : PrivateMessage
+>PrivateMessage : PrivateMessage
+>{text: "Hi!", userid: 42} : { text: string; userid: number; }
+>text : string
+>"Hi!" : "Hi!"
+>userid : number
+>42 : 42
+
+let pm2: PrivateMessage2 = pm1;
+>pm2 : PrivateMessage2
+>PrivateMessage2 : PrivateMessage2
+>pm1 : PrivateMessage
+

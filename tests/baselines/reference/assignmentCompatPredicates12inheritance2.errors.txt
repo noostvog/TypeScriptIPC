@@ -1,0 +1,29 @@
+tests/cases/compiler/assignmentCompatPredicates12inheritance2.ts(21,5): error TS2322: Type 'PrivateMessage2' is not assignable to type 'PrivateMessage'.
+  Invalid assignment of type PrivateMessage2 tot type PrivateMessage. Check if predicates are correct
+
+
+==== tests/cases/compiler/assignmentCompatPredicates12inheritance2.ts (1 errors) ====
+    
+    
+    
+    interface PrivateMessage2 {
+        text?: string;
+        userid?: number;
+        screenname?: string;
+        smthg?: number;
+    } with {
+        not(present(smthg));
+    }
+    interface PrivateMessage extends PrivateMessage2 {
+        //...
+    } with {
+        present(text);
+    or(and(present(userid), not(present(screenname))),
+        and(not(present(userid)), present(screenname)));
+    }
+    
+    let pm1: PrivateMessage2 = {text: "Hi!", userid: 42};
+    let pm2: PrivateMessage = pm1;
+        ~~~
+!!! error TS2322: Type 'PrivateMessage2' is not assignable to type 'PrivateMessage'.
+!!! error TS2322:   Invalid assignment of type PrivateMessage2 tot type PrivateMessage. Check if predicates are correct

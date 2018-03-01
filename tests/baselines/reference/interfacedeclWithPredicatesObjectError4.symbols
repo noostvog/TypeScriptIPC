@@ -1,15 +1,16 @@
 === tests/cases/compiler/interfacedeclWithPredicatesObjectError4.ts ===
+
 interface PrivateMessage{
 >PrivateMessage : Symbol(PrivateMessage, Decl(interfacedeclWithPredicatesObjectError4.ts, 0, 0))
 
     userid?: any;
->userid : Symbol(PrivateMessage.userid, Decl(interfacedeclWithPredicatesObjectError4.ts, 0, 25))
+>userid : Symbol(PrivateMessage.userid, Decl(interfacedeclWithPredicatesObjectError4.ts, 1, 25))
 
     screenname?: any;
->screenname : Symbol(PrivateMessage.screenname, Decl(interfacedeclWithPredicatesObjectError4.ts, 1, 17))
+>screenname : Symbol(PrivateMessage.screenname, Decl(interfacedeclWithPredicatesObjectError4.ts, 2, 17))
 
     text: any;
->text : Symbol(PrivateMessage.text, Decl(interfacedeclWithPredicatesObjectError4.ts, 2, 21))
+>text : Symbol(PrivateMessage.text, Decl(interfacedeclWithPredicatesObjectError4.ts, 3, 21))
 
 } with {
     or(and(present(userid), not(present(screenname))),
@@ -18,8 +19,8 @@ present(text);
 }
 
 let object: PrivateMessage = {userid: "25", text: "text"};
->object : Symbol(object, Decl(interfacedeclWithPredicatesObjectError4.ts, 10, 3))
+>object : Symbol(object, Decl(interfacedeclWithPredicatesObjectError4.ts, 11, 3))
 >PrivateMessage : Symbol(PrivateMessage, Decl(interfacedeclWithPredicatesObjectError4.ts, 0, 0))
->userid : Symbol(userid, Decl(interfacedeclWithPredicatesObjectError4.ts, 10, 30))
->text : Symbol(text, Decl(interfacedeclWithPredicatesObjectError4.ts, 10, 43))
+>userid : Symbol(userid, Decl(interfacedeclWithPredicatesObjectError4.ts, 11, 30))
+>text : Symbol(text, Decl(interfacedeclWithPredicatesObjectError4.ts, 11, 43))
 

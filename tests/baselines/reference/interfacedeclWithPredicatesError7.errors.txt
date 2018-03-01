@@ -1,7 +1,8 @@
-tests/cases/compiler/interfacedeclWithPredicatesError7.ts(1,11): error TS95003: The field unknown is used in a predicate but not described in the interface
+tests/cases/compiler/interfacedeclWithPredicatesError7.ts(2,11): error TS95003: The field unknown is used in a predicate but not described in the interface
 
 
 ==== tests/cases/compiler/interfacedeclWithPredicatesError7.ts (1 errors) ====
+    
     interface UsersShow{
               ~~~~~~~~~
 !!! error TS95003: The field unknown is used in a predicate but not described in the interface

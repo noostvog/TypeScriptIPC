@@ -1,0 +1,58 @@
+=== tests/cases/compiler/assignmentCompatPredicates21.ts ===
+
+interface PrivateMessage {
+>PrivateMessage : PrivateMessage
+
+    text?: string;
+>text : string
+
+    userid?: number;
+>userid : number | undefined
+
+    screenname?: string;
+>screenname : string
+
+} with {
+    present(text);
+>present : any
+>text : any
+
+or(and(present(userid), not(present(screenname))),
+>or : any
+>and : any
+>present : any
+>userid : any
+>not : any
+>present : any
+>screenname : any
+
+    and(not(present(userid)), present(screenname)));
+>and : any
+>not : any
+>present : any
+>userid : any
+>present : any
+>screenname : any
+
+present(screenname);
+>present : any
+>screenname : any
+}
+
+let pm1: PrivateMessage = {text: "Hi!", userid: undefined, screenname: "Alice"};
+>pm1 : PrivateMessage
+>PrivateMessage : PrivateMessage
+>{text: "Hi!", userid: undefined, screenname: "Alice"} : { text: string; userid: undefined; screenname: string; }
+>text : string
+>"Hi!" : "Hi!"
+>userid : undefined
+>undefined : undefined
+>screenname : string
+>"Alice" : "Alice"
+
+let pm2: {text: string, userid: undefined} = pm1;
+>pm2 : { text: string; userid: undefined; }
+>text : string
+>userid : undefined
+>pm1 : PrivateMessage
+

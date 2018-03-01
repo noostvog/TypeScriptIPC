@@ -1,4 +1,5 @@
 //// [interfacedeclWithPredicatesError6.ts]
+
 interface UsersShow{
     user_id?: number;
     screen_name?: string;

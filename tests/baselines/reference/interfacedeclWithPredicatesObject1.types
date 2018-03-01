@@ -1,4 +1,5 @@
 === tests/cases/compiler/interfacedeclWithPredicatesObject1.ts ===
+
 interface PrivateMessage{
 >PrivateMessage : PrivateMessage
 

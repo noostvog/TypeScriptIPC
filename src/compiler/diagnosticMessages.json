@@ -3326,5 +3326,17 @@
     "Property '{0}' is not absent in type '{1}'": {
         "category": "Error",
         "code": 95020
+    },
+    "All properties from the predicates in which the properties of the second argument are mentioned, must be a part of the second argument": {
+        "category": "Error",
+        "code": 95021
+    },
+    "Property {0} may not have type 'undefined', as it is part of an interface with predicates": {
+        "category": "Error",
+        "code": 95022
+    },
+    "Property {0} has to be an optional property, as it is part of an interface with predicates": {
+        "category": "Error",
+        "code": 95023
     }
 }

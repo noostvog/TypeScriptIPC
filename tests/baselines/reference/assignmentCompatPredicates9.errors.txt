@@ -1,0 +1,33 @@
+tests/cases/compiler/assignmentCompatPredicates9.ts(15,5): error TS2322: Type '{ text: "Hi!"; userid: 42; }' is not assignable to type 'PrivateMessage'.
+  Only fresh object literals may be assigned to an interface with predicates (type 'PrivateMessage')
+tests/cases/compiler/assignmentCompatPredicates9.ts(15,27): error TS2454: Variable 'obj1' is used before being assigned.
+tests/cases/compiler/assignmentCompatPredicates9.ts(16,5): error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; userid: number; }'.
+  Property 'userid' is not present in type 'PrivateMessage'.
+
+
+==== tests/cases/compiler/assignmentCompatPredicates9.ts (3 errors) ====
+    
+    interface PrivateMessage {
+        text?: string;
+        userid?: number;
+        screenname?: string;
+        smthg?: number;
+    } with {
+        present(text);
+    or(and(present(userid), not(present(screenname))),
+        and(not(present(userid)), present(screenname)));
+    not(present(smthg));
+    }
+    
+    let obj1: {text: "Hi!", userid: 42}
+    let pm1: PrivateMessage = obj1;
+        ~~~
+!!! error TS2322: Type '{ text: "Hi!"; userid: 42; }' is not assignable to type 'PrivateMessage'.
+!!! error TS2322:   Only fresh object literals may be assigned to an interface with predicates (type 'PrivateMessage')
+                              ~~~~
+!!! error TS2454: Variable 'obj1' is used before being assigned.
+    let obj2: {text: string, userid: number} = pm1;
+        ~~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; userid: number; }'.
+!!! error TS2322:   Property 'userid' is not present in type 'PrivateMessage'.
+    

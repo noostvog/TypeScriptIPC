@@ -1,0 +1,16 @@
+tests/cases/compiler/interfacedeclWithPredicatesError11.ts(2,11): error TS95022: Property UsersShow may not have type 'undefined', as it is part of an interface with predicates
+
+
+==== tests/cases/compiler/interfacedeclWithPredicatesError11.ts (1 errors) ====
+    
+    interface UsersShow {
+              ~~~~~~~~~
+!!! error TS95022: Property UsersShow may not have type 'undefined', as it is part of an interface with predicates
+        user_id?: number;
+        screen_name?: undefined;
+        text?: string;
+    } with {
+        present(text);
+        present(user_id);
+        present(screen_name);
+    }

@@ -1,0 +1,46 @@
+tests/cases/compiler/ifElseWithStatements2.ts(13,1): error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
+tests/cases/compiler/ifElseWithStatements2.ts(14,1): error TS95009: Cannot access screenname from the object because its interface does not contain the predicate present(screenname). Use a non-undefined type guard.
+tests/cases/compiler/ifElseWithStatements2.ts(18,5): error TS2322: Type '"Alice"' is not assignable to type 'undefined'.
+tests/cases/compiler/ifElseWithStatements2.ts(20,5): error TS2322: Type '45' is not assignable to type 'undefined'.
+tests/cases/compiler/ifElseWithStatements2.ts(24,1): error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
+tests/cases/compiler/ifElseWithStatements2.ts(25,1): error TS95009: Cannot access screenname from the object because its interface does not contain the predicate present(screenname). Use a non-undefined type guard.
+
+
+==== tests/cases/compiler/ifElseWithStatements2.ts (6 errors) ====
+    interface PrivateMessage {
+        text?: string;
+        userid?: number;
+        screenname?: string;
+    } with {
+        present(text);
+    or(and(present(userid), not(present(screenname))),
+        and(not(present(userid)), present(screenname)));
+    }
+    
+    let pm: PrivateMessage = {text: "Hi!", userid: 42};
+    
+    pm.userid = 43; // NOK
+    ~~~~~~~~~
+!!! error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
+    pm.screenname = "Alice"; //NOK
+    ~~~~~~~~~~~~~
+!!! error TS95009: Cannot access screenname from the object because its interface does not contain the predicate present(screenname). Use a non-undefined type guard.
+    
+    if (pm.userid) {
+        pm.userid = 44; //OK
+        pm.screenname = "Alice"; //NOK
+        ~~~~~~~~~~~~~
+!!! error TS2322: Type '"Alice"' is not assignable to type 'undefined'.
+    } else {
+        pm.userid = 45; //NOK
+        ~~~~~~~~~
+!!! error TS2322: Type '45' is not assignable to type 'undefined'.
+        pm.screenname = "Alice"; //OK
+    }
+    
+    pm.userid = 46; //NOK
+    ~~~~~~~~~
+!!! error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
+    pm.screenname = "Alice"; //NOK
+    ~~~~~~~~~~~~~
+!!! error TS95009: Cannot access screenname from the object because its interface does not contain the predicate present(screenname). Use a non-undefined type guard.

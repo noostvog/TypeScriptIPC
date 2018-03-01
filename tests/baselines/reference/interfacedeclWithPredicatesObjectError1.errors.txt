@@ -1,8 +1,9 @@
-tests/cases/compiler/interfacedeclWithPredicatesObjectError1.ts(11,5): error TS2322: Type '{ text: string; }' is not assignable to type 'PrivateMessage'.
+tests/cases/compiler/interfacedeclWithPredicatesObjectError1.ts(12,5): error TS2322: Type '{ text: string; }' is not assignable to type 'PrivateMessage'.
   Predicate or(and(present(userid),not(present(screenname))),and(present(screenname),not(present(userid)))) was not satisfied in type { text: string; }
 
 
 ==== tests/cases/compiler/interfacedeclWithPredicatesObjectError1.ts (1 errors) ====
+    
     interface PrivateMessage{
         userid?: any;
         screenname?: any;

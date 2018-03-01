@@ -1,15 +1,16 @@
 === tests/cases/compiler/interfacedeclWithPredicates1.ts ===
+
 interface UsersShow{
 >UsersShow : UsersShow
 
     user_id?: number;
->user_id : number
+>user_id : number | undefined
 
     screen_name?: string;
->screen_name : string
+>screen_name : string | undefined
 
     text?: string;
->text : string
+>text : string | undefined
 
 } with {
     or(and(present(user_id), not(present(screen_name))),

@@ -1,0 +1,32 @@
+=== tests/cases/compiler/assignmentCompatPredicates2.ts ===
+
+interface PrivateMessage {
+>PrivateMessage : Symbol(PrivateMessage, Decl(assignmentCompatPredicates2.ts, 0, 0))
+
+    text?: string;
+>text : Symbol(PrivateMessage.text, Decl(assignmentCompatPredicates2.ts, 1, 26))
+
+    userid?: number;
+>userid : Symbol(PrivateMessage.userid, Decl(assignmentCompatPredicates2.ts, 2, 18))
+
+    screenname?: string;
+>screenname : Symbol(PrivateMessage.screenname, Decl(assignmentCompatPredicates2.ts, 3, 20))
+
+} with {
+    present(text);
+    or(and(present(userid), not(present(screenname))), and(not(present(userid)), present(screenname)));
+    present(userid);
+}
+
+let pm: PrivateMessage = { text: "Hi!", userid: 42 };
+>pm : Symbol(pm, Decl(assignmentCompatPredicates2.ts, 11, 3))
+>PrivateMessage : Symbol(PrivateMessage, Decl(assignmentCompatPredicates2.ts, 0, 0))
+>text : Symbol(text, Decl(assignmentCompatPredicates2.ts, 11, 26))
+>userid : Symbol(userid, Decl(assignmentCompatPredicates2.ts, 11, 39))
+
+let obj: { text: string, userid: number } = pm;
+>obj : Symbol(obj, Decl(assignmentCompatPredicates2.ts, 12, 3))
+>text : Symbol(text, Decl(assignmentCompatPredicates2.ts, 12, 10))
+>userid : Symbol(userid, Decl(assignmentCompatPredicates2.ts, 12, 24))
+>pm : Symbol(pm, Decl(assignmentCompatPredicates2.ts, 11, 3))
+
