@@ -1,98 +1,49 @@
-[![Build Status](https://travis-ci.org/Microsoft/TypeScript.svg?branch=master)](https://travis-ci.org/Microsoft/TypeScript)
-[![npm version](https://badge.fury.io/js/typescript.svg)](https://www.npmjs.com/package/typescript)
-[![Downloads](https://img.shields.io/npm/dm/TypeScript.svg)](https://www.npmjs.com/package/typescript)
+# TypeScript<sub>IPC</sub>
 
-# TypeScript
+TypeScript<sub>IPC</sub> is an extension of TypeScript, which adds propositional logic to interface declarations to express constraints on the presence of interface properties. This has consequences on how objects with an interface type are created, accessed and updated.
 
-[![Join the chat at https://gitter.im/Microsoft/TypeScript](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Microsoft/TypeScript?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+This project contains a prototype implementation of TypeScript<sub>IPC</sub>. Because TypeScript<sub>IPC</sub> is implemented as an extension of a recent version of TypeScript, there are some differences between the implementation and the formalisation.
 
-[TypeScript](http://www.typescriptlang.org/) is a language for application-scale JavaScript. TypeScript adds optional types, classes, and modules to JavaScript. TypeScript supports tools for large-scale JavaScript applications for any browser, for any host, on any OS. TypeScript compiles to readable, standards-based JavaScript. Try it out at the [playground](http://www.typescriptlang.org/Playground), and stay up to date via [our blog](https://blogs.msdn.microsoft.com/typescript) and [Twitter account](https://twitter.com/typescriptlang).
-
-## Installing
-
-For the latest stable version:
+* In order to stay consistent with existing TypeScript programs, we did not replace the existing interface definition of TypeScript with the interface definitions from the paper. Instead, required and optional properties can still be expressed in this implementation. Constraints are an optional extension of interfaces, and should always be combined with properties which are all optional (presence constraints in the first section of an interface definition (required properties are not taken into consideration when there is a constraints section). Properties of interfaces with constraints should not have the type "undefined". For example, the running example from the paper should be defined as follows (underscores in property names are not supported yet):
 
 ```
-npm install -g typescript
+interface PrivateMessage {
+  text?: string;
+  userid?: number;
+  screenname?: string;
+} constrains {
+  present(text);
+  or(and(present(userid), not(present(screenname))),
+     and(not(present(userid)), present(screenname)));
+}
 ```
 
-For our nightly builds:
+* To prevent the existence of _hidden_ properties in objects, the paper limits the creation of object with as type an interface to the cast of an object literal to that interface.
+Since TypeScript 1.6, object literals cannot contain extra properties anymore. However, it is still possible to have _hidden_ properties when a variable with an interface type is assigned to a variable with an object type (literal or interface). Therefore, our implementation still limits these assignments.
+Variables with interface types can only be assigned to each other if both have or lack constraints.
 
+Casts are currently not supported, and should not be used in combination with interfaces with constraints.
+Instead of `<PrivateMessage> {text: "Hi!", userid: 42}` use an assignment:
 ```
-npm install -g typescript@next
-```
+ let pm: PrivateMessage = {text: "Hi!", userid: 42}
+ ```
 
-## Contribute
+The paper does not take object literal with optional properties into account. To deal with this, the following additional check is added: when assigning an interface with predicates to an object literal with optional properties, the type checker requires that that optional property is a part of the property list of the interface. Additional constraint checks are unnecessary as an _optional_ presence constraint is always true.
 
-There are many ways to [contribute](https://github.com/Microsoft/TypeScript/blob/master/CONTRIBUTING.md) to TypeScript.
-* [Submit bugs](https://github.com/Microsoft/TypeScript/issues) and help us verify fixes as they are checked in.
-* Review the [source code changes](https://github.com/Microsoft/TypeScript/pulls).
-* Engage with other TypeScript users and developers on [StackOverflow](http://stackoverflow.com/questions/tagged/typescript). 
-* Join the [#typescript](http://twitter.com/#!/search/realtime/%23typescript) discussion on Twitter.
-* [Contribute bug fixes](https://github.com/Microsoft/TypeScript/blob/master/CONTRIBUTING.md).
-* Read the language specification ([docx](https://github.com/Microsoft/TypeScript/blob/master/doc/TypeScript%20Language%20Specification.docx?raw=true),
- [pdf](https://github.com/Microsoft/TypeScript/blob/master/doc/TypeScript%20Language%20Specification.pdf?raw=true), [md](https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md)).
+* Scoping in if statements: inside if-statements, only `let` declarations should be used, as `var` declarations are also visible outside the if-statement (because of the lack of block scoping in JavaScript). The type checker does not enforce this, yet.
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see 
-the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) 
-with any additional questions or comments.
-
-## Documentation
-
-*  [Quick tutorial](http://www.typescriptlang.org/Tutorial)
-*  [Programming handbook](http://www.typescriptlang.org/Handbook)
-*  [Language specification](https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md)
-*  [Homepage](http://www.typescriptlang.org/)
-
-## Building
-
-In order to build the TypeScript compiler, ensure that you have [Git](http://git-scm.com/downloads) and [Node.js](http://nodejs.org/) installed.
-
-Clone a copy of the repo:
-
-```
-git clone https://github.com/Microsoft/TypeScript.git
+* Currently only presence checks in if statements of the following form are accepted:
+```javascript
+if(o.m){
+  //...
+} else {
+  //...
+}
 ```
 
-Change to the TypeScript directory:
-
-```
-cd TypeScript
-```
-
-Install Gulp tools and dev dependencies:
-
-```
-npm install -g gulp
-npm install
-```
-
-Use one of the following to build and test:
-
-```
-gulp local            # Build the compiler into built/local 
-gulp clean            # Delete the built compiler 
-gulp LKG              # Replace the last known good with the built one.
-                      # Bootstrapping step to be executed when the built compiler reaches a stable state.
-gulp tests            # Build the test infrastructure using the built compiler. 
-gulp runtests         # Run tests using the built compiler and test infrastructure. 
-                      # You can override the host or specify a test for this command. 
-                      # Use host=<hostName> or tests=<testPath>. 
-gulp runtests-browser # Runs the tests using the built run.js file. Syntax is gulp runtests. Optional
-                        parameters 'host=', 'tests=[regex], reporter=[list|spec|json|<more>]'.
-gulp baseline-accept  # This replaces the baseline test results with the results obtained from gulp runtests.
-gulp lint             # Runs tslint on the TypeScript source.
-gulp help             # List the above commands. 
-```
-
-
-## Usage
-
+* Usage
 ```shell
-node built/local/tsc.js hello.ts
+built/local/tsc.js paper.ts --strictNullChecks
 ```
 
-
-## Roadmap
-
-For details on our planned features and future direction please refer to our [roadmap](https://github.com/Microsoft/TypeScript/wiki/Roadmap).
+The file `paper.ts` contains an extended version of all the code snippets shown in the paper.

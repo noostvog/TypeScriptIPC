@@ -7268,6 +7268,19 @@ namespace ts {
                         const logical = <PredicateLogicalExpression>predicate;
                         if (logical.expression.text == "not") {
                             return notOperator + "(" + translatePredicate(logical.arguments[0]) + ")";
+                        } else if (logical.expression.text === "implic") {
+                            const left = logical.arguments[0];
+                            const right = logical.arguments[1];
+                            return "(" + notOperator + "(" + translatePredicate(left) + ") | " + translatePredicate(right) + ")";
+                        } else if (logical.expression.text === "iff") {
+                            const left = Object.assign({}, logical);
+                            const right = Object.assign({}, logical);
+                            const right_l = right.arguments[0];
+                            left.expression.text = "implic";
+                            right.expression.text = "implic"
+                            right.arguments[0] = right.arguments[1];
+                            right.arguments[1] = right_l;
+                            return "(" + translatePredicate(left) + " & " + translatePredicate(right) + ")";
                         } else {
                             return "(" + translatePredicate(logical.arguments[0]) + " " + translateLogicalOperator(logical.expression.text) + " " + translatePredicate(logical.arguments[1]) + ")";
                         }
@@ -12281,10 +12294,8 @@ namespace ts {
             if (!sameProps(resolvedS.properties, resolvedST.properties)) {
                 error(node, Diagnostics.All_properties_from_the_predicates_in_which_the_properties_of_the_second_argument_are_mentioned_must_be_a_part_of_the_second_argument);
             }
-            if (checkTypeAssignableTo(sourcepart, slicedTarget, node)) {
-                return target;
-            }
-            return undefinedType;
+            checkTypeAssignableTo(sourcepart, slicedTarget, node);
+            return target;
 
             function sameProps(props1: Symbol[], props2: Symbol[]): boolean {
                 let array1 = props1.map(x => x.name);
