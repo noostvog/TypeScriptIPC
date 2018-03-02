@@ -12,7 +12,7 @@ interface PrivateMessage{
     text?: any;
 >text : Symbol(PrivateMessage.text, Decl(interfacedeclWithPredicatesObject1.ts, 3, 21))
 
-} with {
+} constrains {
     or(and(present(userid), not(present(screenname))),
     and(present(screenname), not(present(userid))));
     present(text);

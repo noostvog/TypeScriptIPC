@@ -8,7 +8,7 @@ tests/cases/compiler/interfacedeclWithPredicatesObjectError1.ts(12,5): error TS2
         userid?: any;
         screenname?: any;
         text?: any;
-    } with {
+    } constrains {
         or(and(present(userid), not(present(screenname))),
         and(present(screenname), not(present(userid))));
     present(text);

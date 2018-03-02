@@ -12,6 +12,6 @@ interface UsersShow{
     text?: string;
 >text : string | undefined
 
-} with {
+} constrains {
     //type(user_id) == shtring;
 }

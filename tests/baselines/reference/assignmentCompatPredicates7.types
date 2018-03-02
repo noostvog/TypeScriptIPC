@@ -15,7 +15,7 @@ interface PrivateMessage {
     smthg?: number;
 >smthg : number | undefined
 
-} with {
+} constrains {
     present(text);
 >present : any
 >text : any

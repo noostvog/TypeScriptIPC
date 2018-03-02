@@ -1,4 +1,4 @@
-tests/cases/compiler/interfacedeclWithPredicatesError3.ts(6,9): error TS1005: 'identifier as argument for 'type'' expected.
+tests/cases/compiler/interfacedeclWithPredicatesError3.ts(6,15): error TS1005: 'identifier as argument for 'type'' expected.
 
 
 ==== tests/cases/compiler/interfacedeclWithPredicatesError3.ts (1 errors) ====
@@ -7,8 +7,8 @@ tests/cases/compiler/interfacedeclWithPredicatesError3.ts(6,9): error TS1005: 'i
         user_id?: number;
         screen_name?: string;
         text?: string;
-    } with {
-            
+    } constrains {
+                  
         type(5) == string;
     ~~~~~~~~~~~~~~~~~~~~~
 !!! error TS1005: 'identifier as argument for 'type'' expected.

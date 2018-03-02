@@ -17,7 +17,7 @@ interface PrivateMessage2 {
     smthg?: number;
 >smthg : Symbol(PrivateMessage2.smthg, Decl(assignmentCompatPredicates12inheritance.ts, 6, 24))
 
-} with {
+} constrains {
     not(present(smthg));
 }
 interface PrivateMessage extends PrivateMessage2 {
@@ -25,7 +25,7 @@ interface PrivateMessage extends PrivateMessage2 {
 >PrivateMessage2 : Symbol(PrivateMessage2, Decl(assignmentCompatPredicates12inheritance.ts, 0, 0))
 
     //...
-} with {
+} constrains {
     present(text);
 or(and(present(userid), not(present(screenname))),
     and(not(present(userid)), present(screenname)));

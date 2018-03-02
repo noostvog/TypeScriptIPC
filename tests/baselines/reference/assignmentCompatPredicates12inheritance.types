@@ -17,7 +17,7 @@ interface PrivateMessage2 {
     smthg?: number;
 >smthg : number
 
-} with {
+} constrains {
     not(present(smthg));
 >not : any
 >present : any
@@ -28,7 +28,7 @@ interface PrivateMessage extends PrivateMessage2 {
 >PrivateMessage2 : PrivateMessage2
 
     //...
-} with {
+} constrains {
     present(text);
 >present : any
 >text : any

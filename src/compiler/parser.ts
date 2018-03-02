@@ -2453,7 +2453,7 @@ namespace ts {
         }
 
         function parseInterfacePredicates(): NodeArray<PredicateExpression> {
-            if (parseOptional(SyntaxKind.WithKeyword)) {
+            if (parseOptional(SyntaxKind.ConstrainsKeyword)) { //<nathalie>
                 parseExpected(SyntaxKind.OpenBraceToken);
                 // TODO: this parses all kinds of statements, however: we only want function calls  with as parameters identifiers or other function calls
                 const predicates: NodeArray<Statement> = parseList(ParsingContext.BlockStatements, parseStatement); // parseInterfacePredicate);

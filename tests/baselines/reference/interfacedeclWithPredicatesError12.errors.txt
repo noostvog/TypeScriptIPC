@@ -9,7 +9,7 @@ tests/cases/compiler/interfacedeclWithPredicatesError12.ts(2,11): error TS95024:
         user_id?: number;
         screen_name?: string;
         text?: string;
-    } with {
+    } constrains {
         present(text);
         present(user_id);
         present(screen_name);

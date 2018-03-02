@@ -12,6 +12,6 @@ interface UsersShow{
     text?: string;
 >text : Symbol(UsersShow.text, Decl(interfacedeclWithPredicatesError5.ts, 3, 25))
 
-} with {
+} constrains {
     //type(bla) == string;
 }

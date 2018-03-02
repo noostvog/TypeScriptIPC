@@ -11,7 +11,7 @@ interface PrivateMessage {
     screenname?: string;
 >screenname : string
 
-} with {
+} constrains {
     present(text);
 >present : any
 >text : any

@@ -4,7 +4,7 @@ interface PrivateMessage {
     text?: string;
     userid?: number;
     screenname?: string;
-} with {
+} constrains {
     present(text);
     not(present(userid));
     not(present(screenname));

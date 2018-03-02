@@ -18335,7 +18335,7 @@ namespace ts {
             if (specialPredicateIf) {
                 objectType.predicates.push(predicateThen);
                 if (!Proplog.solve(translatePredicates(objectType.predicates), "none")) {
-                    error(node.expression, Diagnostics.Predicates_in_0_branch_of_if_statement_are_unsatisfiable_because_if_extra_knowledge_from_the_if_condition, "then");
+                    error(node.thenStatement, Diagnostics.Predicates_in_0_branch_of_if_statement_are_unsatisfiable_because_of_extra_knowledge_from_the_if_condition, "then");
                 }
             }
             checkSourceElement(node.thenStatement);
@@ -18349,7 +18349,7 @@ namespace ts {
                 origPredicates = Object.assign([], origPredicates);
                 objectType.predicates.push(predicateElse);
                 if (!Proplog.solve(translatePredicates(objectType.predicates), "none")) {
-                    error(node.expression, Diagnostics.Predicates_in_0_branch_of_if_statement_are_unsatisfiable_because_if_extra_knowledge_from_the_if_condition, "else");
+                    error(node.elseStatement, Diagnostics.Predicates_in_0_branch_of_if_statement_are_unsatisfiable_because_of_extra_knowledge_from_the_if_condition, "else");
                 }
             }
             checkSourceElement(node.elseStatement);

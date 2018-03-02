@@ -9,7 +9,7 @@ tests/cases/compiler/interfacedeclWithPredicatesError11.ts(2,11): error TS95022:
         user_id?: number;
         screen_name?: undefined;
         text?: string;
-    } with {
+    } constrains {
         present(text);
         present(user_id);
         present(screen_name);

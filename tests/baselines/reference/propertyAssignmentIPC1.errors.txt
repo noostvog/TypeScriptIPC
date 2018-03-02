@@ -1,15 +1,17 @@
-tests/cases/compiler/propertyAssignmentIPC1.ts(17,1): error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
+tests/cases/compiler/propertyAssignmentIPC1.ts(17,1): error TS2322: Type 'undefined' is not assignable to type 'string'.
 tests/cases/compiler/propertyAssignmentIPC1.ts(18,1): error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
-tests/cases/compiler/propertyAssignmentIPC1.ts(20,1): error TS2322: Type '55' is not assignable to type 'undefined'.
+tests/cases/compiler/propertyAssignmentIPC1.ts(19,1): error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
+tests/cases/compiler/propertyAssignmentIPC1.ts(21,1): error TS2322: Type '55' is not assignable to type 'undefined'.
 
 
-==== tests/cases/compiler/propertyAssignmentIPC1.ts (3 errors) ====
+==== tests/cases/compiler/propertyAssignmentIPC1.ts (4 errors) ====
+    
     interface PrivateMessage {
         text?: string;
         userid?: number;
         screenname?: string;
         absent?: number;
-    } with {
+    } constrains {
         present(text);
         or(and(present(userid), not(present(screenname))),
             and(not(present(userid)), present(screenname)));
@@ -20,6 +22,8 @@ tests/cases/compiler/propertyAssignmentIPC1.ts(20,1): error TS2322: Type '55' is
     let msg: PrivateMessage = {text: "Hello", userid: 123};
     msg.text = "Hi!"; //OK
     msg.text = undefined; //NOK
+    ~~~~~~~~
+!!! error TS2322: Type 'undefined' is not assignable to type 'string'.
     msg.userid = 22; //NOK
     ~~~~~~~~~~
 !!! error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.

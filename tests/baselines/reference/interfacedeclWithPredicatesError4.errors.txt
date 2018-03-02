@@ -1,4 +1,4 @@
-tests/cases/compiler/interfacedeclWithPredicatesError4.ts(6,9): error TS1005: 'String, Number, Boolean or Object type as right side' expected.
+tests/cases/compiler/interfacedeclWithPredicatesError4.ts(6,15): error TS1005: 'String, Number, Boolean or Object type as right side' expected.
 
 
 ==== tests/cases/compiler/interfacedeclWithPredicatesError4.ts (1 errors) ====
@@ -7,8 +7,8 @@ tests/cases/compiler/interfacedeclWithPredicatesError4.ts(6,9): error TS1005: 'S
         user_id?: number;
         screen_name?: string;
         text?: string;
-    } with {
-            
+    } constrains {
+                  
         type(bla) == 5;
     ~~~~~~~~~~~~~~~~~~
 !!! error TS1005: 'String, Number, Boolean or Object type as right side' expected.

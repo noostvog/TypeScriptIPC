@@ -11,12 +11,12 @@ tests/cases/compiler/assignmentCompatPredicates12inheritance2.ts(21,5): error TS
         userid?: number;
         screenname?: string;
         smthg?: number;
-    } with {
+    } constrains {
         not(present(smthg));
     }
     interface PrivateMessage extends PrivateMessage2 {
         //...
-    } with {
+    } constrains {
         present(text);
     or(and(present(userid), not(present(screenname))),
         and(not(present(userid)), present(screenname)));

@@ -3343,7 +3343,7 @@
         "category": "Error",
         "code": 95024
     },
-    "Predicates in {0} branch of if statement are unsatisfiable because if extra knowledge from the if condition": {
+    "Predicates in {0} branch of if statement are unsatisfiable because of extra knowledge from the if condition": {
         "category": "Error",
         "code": 95025
     }

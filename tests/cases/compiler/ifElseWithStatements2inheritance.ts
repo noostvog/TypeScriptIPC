@@ -1,7 +1,7 @@
 interface PrivateMessage2 {
     text?: string;
     userid?: number;
-} with {
+} constrains {
     present(text);
 
 }
@@ -9,7 +9,7 @@ interface PrivateMessage2 {
 interface PrivateMessage extends PrivateMessage2 {
     // inherit properties
     screenname?: string;
-} with {
+} constrains {
     or(and(present(userid), not(present(screenname))),
     and(not(present(userid)), present(screenname)));
 }

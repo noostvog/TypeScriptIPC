@@ -4,13 +4,13 @@ interface PrivateMessage1 {
     text?: string;
     userid?: number;
     screenname?: string;
-} with {
+} constrains {
     present(text);
 }
 
 interface PrivateMessage extends PrivateMessage1{
     //everything
-} with {
+} constrains {
     or(and(present(userid), not(present(screenname))),
     and(not(present(userid)), present(screenname)));
 }

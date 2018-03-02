@@ -12,7 +12,7 @@ tests/cases/compiler/assignmentCompatPredicates9.ts(16,5): error TS2322: Type 'P
         userid?: number;
         screenname?: string;
         smthg?: number;
-    } with {
+    } constrains {
         present(text);
     or(and(present(userid), not(present(screenname))),
         and(not(present(userid)), present(screenname)));

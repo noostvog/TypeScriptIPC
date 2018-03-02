@@ -8,7 +8,7 @@ tests/cases/compiler/ifElseWithStatements3Error.ts(27,12): error TS95025: Predic
         text?: string;
         userid?: number;
         screenname?: string;
-    } with {
+    } constrains {
         present(text);
     or(and(present(userid), not(present(screenname))),
         and(not(present(userid)), present(screenname)));

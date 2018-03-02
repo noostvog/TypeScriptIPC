@@ -12,7 +12,7 @@ tests/cases/compiler/interfacedeclWithPredicates.ts(2,11): error TS95024: Predic
         user_id?: number;
         screen_name?: string;
         text?: string;
-    } with {
+    } constrains {
         xor(present(user_id), present(screen_name));
         //type(user_id) == number; // obsolete but to test syntax
         //type(screen_name) == string; // obsolete but to test syntax

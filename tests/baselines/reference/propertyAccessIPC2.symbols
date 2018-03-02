@@ -11,7 +11,7 @@ interface PrivateMessage {
     screenname?: string;
 >screenname : Symbol(PrivateMessage.screenname, Decl(propertyAccessIPC2.ts, 2, 20))
 
-} with {
+} constrains {
     present(text);
     or(and(present(userid), not(present(screenname))),
         and(not(present(userid)), present(screenname)));

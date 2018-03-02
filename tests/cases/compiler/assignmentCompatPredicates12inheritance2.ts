@@ -7,12 +7,12 @@ interface PrivateMessage2 {
     userid?: number;
     screenname?: string;
     smthg?: number;
-} with {
+} constrains {
     not(present(smthg));
 }
 interface PrivateMessage extends PrivateMessage2 {
     //...
-} with {
+} constrains {
     present(text);
 or(and(present(userid), not(present(screenname))),
     and(not(present(userid)), present(screenname)));

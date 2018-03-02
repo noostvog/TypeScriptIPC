@@ -9,7 +9,7 @@ tests/cases/compiler/assignmentCompatPredicates5inheritance.ts(30,5): error TS23
         userid?: number;
         screenname?: string;
         smthg?: number;
-    } with {
+    } constrains {
         present(text);
     or(and(present(userid), not(present(screenname))),
         and(not(present(userid)), present(screenname)));
@@ -19,7 +19,7 @@ tests/cases/compiler/assignmentCompatPredicates5inheritance.ts(30,5): error TS23
         text?: string;
         userid?: number;
         screenname?: string;
-    } with {
+    } constrains {
         present(text);
     present(screenname);
     present(userid);
@@ -27,7 +27,7 @@ tests/cases/compiler/assignmentCompatPredicates5inheritance.ts(30,5): error TS23
     
     interface PrivateMessage2 extends PrivateMessage{
         // inherit properties
-    } with {
+    } constrains {
         present(userid);
     }
     

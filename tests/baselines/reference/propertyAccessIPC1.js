@@ -3,7 +3,7 @@ interface PrivateMessage {
     text?: string;
     userid?: number;
     screenname?: string;
-} with {
+} constrains {
     present(text);
     or(and(present(userid), not(present(screenname))),
         and(not(present(userid)), present(screenname)));

@@ -9,7 +9,7 @@ tests/cases/compiler/interfacedeclWithPredicatesError7.ts(2,11): error TS95003: 
         user_id?: number;
         screen_name?: string;
         text?: string;
-    } with {
+    } constrains {
         present(unknown);
     }
     

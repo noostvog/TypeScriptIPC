@@ -4,7 +4,7 @@ interface UsersShow {
     user_id?: number;
     screen_name?: undefined;
     text?: string;
-} with {
+} constrains {
     present(text);
     present(user_id);
     present(screen_name);

@@ -116,6 +116,7 @@ namespace ts {
         CatchKeyword,
         ClassKeyword,
         ConstKeyword,
+        ConstrainsKeyword, //<Nathalie>
         ContinueKeyword,
         DebuggerKeyword,
         DefaultKeyword,

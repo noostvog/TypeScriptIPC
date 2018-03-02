@@ -15,7 +15,7 @@ interface PrivateMessage {
     smthg?: number;
 >smthg : Symbol(PrivateMessage.smthg, Decl(assignmentCompatPredicates7.ts, 4, 24))
 
-} with {
+} constrains {
     present(text);
 or(and(present(userid), not(present(screenname))),
     and(not(present(userid)), present(screenname)));

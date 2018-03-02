@@ -12,7 +12,7 @@ tests/cases/compiler/ifElseWithStatements2inheritance.ts(31,1): error TS95009: C
     interface PrivateMessage2 {
         text?: string;
         userid?: number;
-    } with {
+    } constrains {
         present(text);
     
     }
@@ -23,7 +23,7 @@ tests/cases/compiler/ifElseWithStatements2inheritance.ts(31,1): error TS95009: C
 !!! error TS2430:   Invalid assignment of type PrivateMessage tot type PrivateMessage2. Check if predicates are correct
         // inherit properties
         screenname?: string;
-    } with {
+    } constrains {
         or(and(present(userid), not(present(screenname))),
         and(not(present(userid)), present(screenname)));
     }

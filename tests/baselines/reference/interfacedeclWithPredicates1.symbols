@@ -12,7 +12,7 @@ interface UsersShow{
     text?: string;
 >text : Symbol(UsersShow.text, Decl(interfacedeclWithPredicates1.ts, 3, 25))
 
-} with {
+} constrains {
     or(and(present(user_id), not(present(screen_name))),
        and(present(screen_name), not(present(user_id))));
 }

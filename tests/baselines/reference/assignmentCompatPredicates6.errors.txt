@@ -9,7 +9,7 @@ tests/cases/compiler/assignmentCompatPredicates6.ts(32,5): error TS2322: Type 'P
         userid?: number;
         screenname?: string;
         smthg?: number;
-    } with {
+    } constrains {
         present(text);
     or(and(present(userid), not(present(screenname))),
         and(not(present(userid)), present(screenname)));
@@ -19,7 +19,7 @@ tests/cases/compiler/assignmentCompatPredicates6.ts(32,5): error TS2322: Type 'P
         text?: string;
         userid?: number;
         screenname?: string;
-    } with {
+    } constrains {
         present(text);
     present(screenname);
     present(userid);
@@ -28,7 +28,7 @@ tests/cases/compiler/assignmentCompatPredicates6.ts(32,5): error TS2322: Type 'P
     interface PrivateMessage2 {
         text?: string;
         userid?: number;
-    } with {
+    } constrains {
         present(text);
     present(userid);
     }
