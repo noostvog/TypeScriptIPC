@@ -16,7 +16,7 @@ In the rest of this section, we introduce TypeScript<sub>IPC</sub> and show to p
   ```
 
 ### Definition of interfaces with constraints
-The first part of the interface is identical to the default TypeScript interface. The second part indicates the constraints on the presence of the properties. Constraints are composed using logical operators (and, or, not, implic, iff). When inter-property constraints are defined, all properties must be indicated as optional in the first part, as the constraints on the presence of those properties is defined below.
+The first part of the interface is identical to the default TypeScript interface. The second part indicates the constraints on the presence of the properties. Constraints are composed using logical operators (and, or, not, implic, iff). When inter-property constraints are defined, all properties must be indicated as optional in the first part, as the constraints on the presence of those properties is defined below. The second part of the interface must contain at least one constraint in order to not be treated as a regular TypeScript interface.
 
 The following example shows the interface for the data Twitter requires for sending a direct message. Next to the message itself (which is a required field, cfr. the first constraint), the interface has two properties to indicate the receiver. As already explained, only (and exactly) one of these two properties should be present. This is enforced using the second constraint.
 ```
@@ -30,6 +30,7 @@ interface PrivateMessage {
      and(not(present(userid)), present(screenname)));
 }
 ```
+
 ### Object creation
 Objects only satisfy the interface if all constraints are satisfied:
 ```
