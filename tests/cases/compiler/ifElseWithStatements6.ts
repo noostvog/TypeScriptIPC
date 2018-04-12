@@ -10,20 +10,15 @@ or(and(present(userid), not(present(screenname))),
 
 let pm: PrivateMessage = {text: "Hi!", userid: 42};
 
-if (pm.text) {
-    pm.text;
+if (pm.userid) {
+    let pm: PrivateMessage = {text: "Hi!", userid: 42};
+    pm.userid = 44; //NOK
+    pm.screenname = "Alice"; //NOK
 } else {
-    pm.text; //ERROR
+    let pm: PrivateMessage = {text: "Hi!", userid: 42};
+    pm.userid = 44; //NOK
+    pm.screenname = "Alice"; //NOK
 }
 
-if (pm.userid) {
-    if(pm.screenname) {
-        pm.text; //ERROR
-    }
-} else {
-    if (pm.screenname){
-        pm.text;
-    } else {
-        pm.text; //ERROR
-    }
-}
+pm.userid = 46; //NOK
+pm.screenname = "Alice"; //NOK

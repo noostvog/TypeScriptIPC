@@ -1,6 +1,6 @@
-tests/cases/compiler/ifElseWithStatements3Error.ts(15,8): error TS95025: Predicates in else branch of if statement are unsatisfiable because of extra knowledge from the if condition
-tests/cases/compiler/ifElseWithStatements3Error.ts(21,23): error TS95025: Predicates in then branch of if statement are unsatisfiable because of extra knowledge from the if condition
-tests/cases/compiler/ifElseWithStatements3Error.ts(27,12): error TS95025: Predicates in else branch of if statement are unsatisfiable because of extra knowledge from the if condition
+tests/cases/compiler/ifElseWithStatements3Error.ts(16,5): error TS95025: Predicates in true or else branch of if statement are unsatisfiable because of extra knowledge from the if condition
+tests/cases/compiler/ifElseWithStatements3Error.ts(21,9): error TS95025: Predicates in true or else branch of if statement are unsatisfiable because of extra knowledge from the if condition
+tests/cases/compiler/ifElseWithStatements3Error.ts(27,9): error TS95025: Predicates in true or else branch of if statement are unsatisfiable because of extra knowledge from the if condition
 
 
 ==== tests/cases/compiler/ifElseWithStatements3Error.ts (3 errors) ====
@@ -17,34 +17,26 @@ tests/cases/compiler/ifElseWithStatements3Error.ts(27,12): error TS95025: Predic
     let pm: PrivateMessage = {text: "Hi!", userid: 42};
     
     if (pm.text) {
-        true;
+        pm.text;
     } else {
-           ~
-        true;
-    ~~~~~~~~~
-        //ERROR
-    ~~~~~~~~~~~
+        pm.text; //ERROR
+        ~~~~~~~
+!!! error TS95025: Predicates in true or else branch of if statement are unsatisfiable because of extra knowledge from the if condition
     }
-    ~
-!!! error TS95025: Predicates in else branch of if statement are unsatisfiable because of extra knowledge from the if condition
     
     if (pm.userid) {
         if(pm.screenname) {
-                          ~
-            true; //ERROR
-    ~~~~~~~~~~~~~~~~~~~~~
+            pm.text; //ERROR
+            ~~~~~~~
+!!! error TS95025: Predicates in true or else branch of if statement are unsatisfiable because of extra knowledge from the if condition
         }
-    ~~~~~
-!!! error TS95025: Predicates in then branch of if statement are unsatisfiable because of extra knowledge from the if condition
     } else {
         if (pm.screenname){
-            true;
+            pm.text;
         } else {
-               ~
-            true; //ERROR
-    ~~~~~~~~~~~~~~~~~~~~~
+            pm.text; //ERROR
+            ~~~~~~~
+!!! error TS95025: Predicates in true or else branch of if statement are unsatisfiable because of extra knowledge from the if condition
         }
-    ~~~~~
-!!! error TS95025: Predicates in else branch of if statement are unsatisfiable because of extra knowledge from the if condition
     }
     

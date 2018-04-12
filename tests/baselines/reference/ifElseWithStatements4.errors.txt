@@ -1,0 +1,47 @@
+tests/cases/compiler/ifElseWithStatements4.ts(15,5): error TS2322: Type '"Alice"' is not assignable to type 'undefined'.
+tests/cases/compiler/ifElseWithStatements4.ts(17,9): error TS95025: Predicates in true or else branch of if statement are unsatisfiable because of extra knowledge from the if condition
+tests/cases/compiler/ifElseWithStatements4.ts(18,9): error TS95025: Predicates in true or else branch of if statement are unsatisfiable because of extra knowledge from the if condition
+tests/cases/compiler/ifElseWithStatements4.ts(21,9): error TS2322: Type '"Alice"' is not assignable to type 'undefined'.
+tests/cases/compiler/ifElseWithStatements4.ts(25,1): error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
+tests/cases/compiler/ifElseWithStatements4.ts(26,1): error TS95009: Cannot access screenname from the object because its interface does not contain the predicate present(screenname). Use a non-undefined type guard.
+
+
+==== tests/cases/compiler/ifElseWithStatements4.ts (6 errors) ====
+    interface PrivateMessage {
+        text?: string;
+        userid?: number;
+        screenname?: string;
+    } constrains {
+        present(text);
+    or(and(present(userid), not(present(screenname))),
+        and(not(present(userid)), present(screenname)));
+    }
+    
+    let pm: PrivateMessage = {text: "Hi!", userid: 42};
+    
+    if (pm.userid) {
+        pm.userid = 44; //OK
+        pm.screenname = "Alice"; //NOK
+        ~~~~~~~~~~~~~
+!!! error TS2322: Type '"Alice"' is not assignable to type 'undefined'.
+        if (pm.screenname) {
+            pm.userid = 47; //NOK
+            ~~~~~~~~~
+!!! error TS95025: Predicates in true or else branch of if statement are unsatisfiable because of extra knowledge from the if condition
+            pm.screenname = "Alice"; //NOK
+            ~~~~~~~~~~~~~
+!!! error TS95025: Predicates in true or else branch of if statement are unsatisfiable because of extra knowledge from the if condition
+        } else {
+            pm.userid = 48; //OK
+            pm.screenname = "Alice"; //NOK
+            ~~~~~~~~~~~~~
+!!! error TS2322: Type '"Alice"' is not assignable to type 'undefined'.
+        }
+    }
+    
+    pm.userid = 46; //NOK
+    ~~~~~~~~~
+!!! error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
+    pm.screenname = "Alice"; //NOK
+    ~~~~~~~~~~~~~
+!!! error TS95009: Cannot access screenname from the object because its interface does not contain the predicate present(screenname). Use a non-undefined type guard.

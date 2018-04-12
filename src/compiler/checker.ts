@@ -13292,8 +13292,46 @@ namespace ts {
                     const resolvedT = resolveStructuredTypeMembers(<ObjectType>apparentType);
                     const predicates = resolvedT.predicates;
                     if (predicates.length > 0) {
-                        //predicatePresent = getPresenceOfFieldInPredicates(predicates, right);
-                        const predicateStr = translatePredicates(predicates);
+                        let extra_pred_from_conditional = "";
+                        let satcheck = "";
+                        //ANTECEDENT TESTING
+                        if (node.flowNode) {
+                            let ant:any = node.flowNode;
+                            while (ant) {
+                                if (ant.flags & FlowFlags.Condition) {
+                                    const propacc = ant.expression;
+                                    if (propacc.kind === SyntaxKind.PropertyAccessExpression) {
+                                        //check if same object
+                                        if (left.kind === SyntaxKind.Identifier && (<PropertyAccessExpression>propacc).expression.kind === SyntaxKind.Identifier) {
+                                            if ((<Identifier>(<PropertyAccessExpression>propacc).expression).text === (<Identifier>left).text) {
+                                                const s1 = getResolvedSymbol(<Identifier>(<PropertyAccessExpression>propacc).expression);
+                                                const s2 = getResolvedSymbol(<Identifier>left);
+                                                if (s1 === s2) {
+                                                    //2. add constraint
+                                                    if (ant.flags & FlowFlags.TrueCondition) {
+                                                        const constr = " & " + (<PropertyAccessExpression>propacc).name.text
+                                                        extra_pred_from_conditional += constr;
+                                                        satcheck += constr;
+                                                    } else if (ant.flags & FlowFlags.FalseCondition) {
+                                                        const constr = (<PropertyAccessExpression>propacc).name.text + ")";
+                                                        extra_pred_from_conditional += " & (!" + constr;
+                                                        satcheck += " & (-" + constr;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                ant = ant.antecedent;
+                            }
+                        }
+
+                        //check if still satisfiable with extra constraint
+                        if (!Proplog.solve(translatePredicates(predicates, "-") + satcheck, "none")) {
+                            error(node, Diagnostics.Predicates_in_0_branch_of_if_statement_are_unsatisfiable_because_of_extra_knowledge_from_the_if_condition, "true or else");
+                        }
+
+                        const predicateStr = translatePredicates(predicates) + extra_pred_from_conditional;
                         const provePresent = prove(predicateStr + " > " + node.name.text);
                         const proveAbsent  = prove(predicateStr + " > !" + node.name.text);
                         if (!provePresent && !proveAbsent){
@@ -13306,17 +13344,13 @@ namespace ts {
                             error(node, Diagnostics.Cannot_access_0_from_the_object_because_its_interface_does_not_contain_the_predicate_present_0_Use_a_non_undefined_type_guard, text);
                             return unknownType;
                         } else if (provePresent) {
-                            //predicatePresent = Ternary.True;
-                            //TODO remove "undefined" because everything is
                             if (propType.flags & TypeFlags.Union) {
                                 if (contains((<UnionType> propType).types, undefinedType)) {
                                     let filtered = (<UnionType> propType).types.filter(t => t !== undefinedType);
-                                    //assert.isTrue(parsed.errors.filter(e => e.code === expectedDiagnosticCode).length > 0, `Expected error code ${expectedDiagnosticCode} to be in ${JSON.stringify(parsed.errors)}`);
                                     (<UnionType> propType).types = filtered;
                                 }
                             }
                         } else if (proveAbsent) {
-                            //predicatePresent = Ternary.False;
                             propType = undefinedType;
                         }
                     }
@@ -18310,51 +18344,34 @@ namespace ts {
             // Grammar checking
             checkGrammarStatementInAmbientContext(node);
 
+
+            // <Nathalie>: if if-test contains an property access of an interface: no type checking
+            // (normally
             let specialPredicateIf = false;
-            let origPredicates;
-            let objectType: ResolvedType;
-            let predicateThen: PredicatePresentExpression;
-            let predicateElse: PredicateLogicalExpression;
             if (node.expression.kind === SyntaxKind.PropertyAccessExpression){
                 const paeExpressionType = checkExpression((<PropertyAccessExpression>node.expression).expression);
                 if (getObjectFlags(paeExpressionType) & ObjectFlags.Interface) {
-                    objectType = resolveStructuredTypeMembers(<ObjectType>paeExpressionType);
-                    let preds = objectType.predicates;
-                    origPredicates = Object.assign([], preds);
-                    if (preds !== undefined && preds.length > 0) {
-                        // Predicate toevoegen aan paeExpressionType;
-                        specialPredicateIf = true;
-
-                        // create present predicate for then branch
-                        const thenArgs = createNodeArray<Identifier>();
-                        thenArgs.push(<Identifier>{kind: SyntaxKind.Identifier, text: (<PropertyAccessExpression>node.expression).name.text})
-                        const presentexpr = <Identifier>{kind: SyntaxKind.Identifier, text: "present" };
-                        predicateThen = <PredicatePresentExpression>{ kind: SyntaxKind.PredicatePresentExpression, expression: presentexpr, arguments: thenArgs };
-
-                        // create not-present predicate for else branch
-                        const notexpr = <Identifier>{kind: SyntaxKind.Identifier, text: "not" };
-                        const elseArgs = createNodeArray<PredicateExpression>();
-                        elseArgs.push(predicateThen);
-                        predicateElse = <PredicateLogicalExpression>{ kind: SyntaxKind.PredicateLogicalExpression, expression: notexpr, arguments: elseArgs };
-                    }
+                    const objectType = resolveStructuredTypeMembers(<ObjectType>paeExpressionType);
+                    specialPredicateIf = objectType.predicates !== undefined && objectType.predicates.length > 0;
                 }
             }
             if (!specialPredicateIf) {
                 checkExpression(node.expression);
             }
 
-            if (specialPredicateIf) {
+            /*if (specialPredicateIf) {
                 objectType.predicates.push(predicateThen);
                 if (!Proplog.solve(translatePredicates(objectType.predicates), "none")) {
                     error(node.thenStatement, Diagnostics.Predicates_in_0_branch_of_if_statement_are_unsatisfiable_because_of_extra_knowledge_from_the_if_condition, "then");
                 }
-            }
+            }*/
             checkSourceElement(node.thenStatement);
 
             if (node.thenStatement.kind === SyntaxKind.EmptyStatement) {
                 error(node.thenStatement, Diagnostics.The_body_of_an_if_statement_cannot_be_the_empty_statement);
             }
 
+            /*
             if (specialPredicateIf) {
                 objectType.predicates = origPredicates; //remove true branch
                 origPredicates = Object.assign([], origPredicates);
@@ -18362,12 +18379,13 @@ namespace ts {
                 if (!Proplog.solve(translatePredicates(objectType.predicates), "none")) {
                     error(node.elseStatement, Diagnostics.Predicates_in_0_branch_of_if_statement_are_unsatisfiable_because_of_extra_knowledge_from_the_if_condition, "else");
                 }
-            }
+            }*/
             checkSourceElement(node.elseStatement);
 
+            /*
             if (specialPredicateIf) {
                 objectType.predicates = origPredicates;
-            }
+            }*/
 
         }
 

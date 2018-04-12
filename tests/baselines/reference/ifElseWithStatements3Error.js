@@ -12,21 +12,20 @@ or(and(present(userid), not(present(screenname))),
 let pm: PrivateMessage = {text: "Hi!", userid: 42};
 
 if (pm.text) {
-    true;
+    pm.text;
 } else {
-    true;
-    //ERROR
+    pm.text; //ERROR
 }
 
 if (pm.userid) {
     if(pm.screenname) {
-        true; //ERROR
+        pm.text; //ERROR
     }
 } else {
     if (pm.screenname){
-        true;
+        pm.text;
     } else {
-        true; //ERROR
+        pm.text; //ERROR
     }
 }
 
@@ -34,21 +33,21 @@ if (pm.userid) {
 //// [ifElseWithStatements3Error.js]
 var pm = { text: "Hi!", userid: 42 };
 if (pm.text) {
-    true;
+    pm.text;
 }
 else {
-    true;
+    pm.text; //ERROR
 }
 if (pm.userid) {
     if (pm.screenname) {
-        true; //ERROR
+        pm.text; //ERROR
     }
 }
 else {
     if (pm.screenname) {
-        true;
+        pm.text;
     }
     else {
-        true; //ERROR
+        pm.text; //ERROR
     }
 }

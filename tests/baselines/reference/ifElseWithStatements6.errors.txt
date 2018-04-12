@@ -1,0 +1,45 @@
+tests/cases/compiler/ifElseWithStatements6.ts(15,5): error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
+tests/cases/compiler/ifElseWithStatements6.ts(16,5): error TS95009: Cannot access screenname from the object because its interface does not contain the predicate present(screenname). Use a non-undefined type guard.
+tests/cases/compiler/ifElseWithStatements6.ts(19,5): error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
+tests/cases/compiler/ifElseWithStatements6.ts(20,5): error TS95009: Cannot access screenname from the object because its interface does not contain the predicate present(screenname). Use a non-undefined type guard.
+tests/cases/compiler/ifElseWithStatements6.ts(23,1): error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
+tests/cases/compiler/ifElseWithStatements6.ts(24,1): error TS95009: Cannot access screenname from the object because its interface does not contain the predicate present(screenname). Use a non-undefined type guard.
+
+
+==== tests/cases/compiler/ifElseWithStatements6.ts (6 errors) ====
+    interface PrivateMessage {
+        text?: string;
+        userid?: number;
+        screenname?: string;
+    } constrains {
+        present(text);
+    or(and(present(userid), not(present(screenname))),
+        and(not(present(userid)), present(screenname)));
+    }
+    
+    let pm: PrivateMessage = {text: "Hi!", userid: 42};
+    
+    if (pm.userid) {
+        let pm: PrivateMessage = {text: "Hi!", userid: 42};
+        pm.userid = 44; //NOK
+        ~~~~~~~~~
+!!! error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
+        pm.screenname = "Alice"; //NOK
+        ~~~~~~~~~~~~~
+!!! error TS95009: Cannot access screenname from the object because its interface does not contain the predicate present(screenname). Use a non-undefined type guard.
+    } else {
+        let pm: PrivateMessage = {text: "Hi!", userid: 42};
+        pm.userid = 44; //NOK
+        ~~~~~~~~~
+!!! error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
+        pm.screenname = "Alice"; //NOK
+        ~~~~~~~~~~~~~
+!!! error TS95009: Cannot access screenname from the object because its interface does not contain the predicate present(screenname). Use a non-undefined type guard.
+    }
+    
+    pm.userid = 46; //NOK
+    ~~~~~~~~~
+!!! error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
+    pm.screenname = "Alice"; //NOK
+    ~~~~~~~~~~~~~
+!!! error TS95009: Cannot access screenname from the object because its interface does not contain the predicate present(screenname). Use a non-undefined type guard.
