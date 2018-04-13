@@ -131,3 +131,19 @@ interface PrivateMessage3 {
 
 let msg12: PrivateMessage3 = {text: "Hello", ruserid: 42, suserid: 43};   //OK
 let msg13 = objupdate(msg12, {ruserid: undefined, rscreenname: "Alice"}); //OK
+
+function changeIdToName(msg: PrivateMessage3): PrivateMessage3 {
+  if (msg.ruserid) {
+    objupdate(msg, {ruserid: undefined, rscreenname: "Alice"}); //NOK
+    /*error TS2322: Type '{ ruserid: undefined; rscreenname: string; }' is not assignable to type 'PrivateMessage3'.
+      Predicate present(ruserid) was not satisfied in type { ruserid: undefined; rscreenname: string; }
+        Property 'ruserid' is missing in type '{ ruserid: undefined; rscreenname: string; }'.*/
+        
+    //The object msg contains an extra constraint inside this if statement
+    //For the update to succeed, the first argument must be of the original type
+    //So it is first casted back
+    let msg2: PrivateMessage3 = msg
+    return objupdate(msg2, {ruserid: undefined, rscreenname: "Alice"});
+  }
+  return msg;
+}
