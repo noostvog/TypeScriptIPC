@@ -1,0 +1,33 @@
+tests/cases/compiler/ifElseWithStatements7.ts(16,5): error TS2345: Argument of type 'PM1' is not assignable to parameter of type 'PM2'.
+  Invalid assignment of type PM1 tot type PM2. Check if predicates are correct
+tests/cases/compiler/ifElseWithStatements7.ts(20,5): error TS2345: Argument of type 'PM1' is not assignable to parameter of type 'PM2'.
+  Invalid assignment of type PM1 tot type PM2. Check if predicates are correct
+
+
+==== tests/cases/compiler/ifElseWithStatements7.ts (2 errors) ====
+    interface PM1 {
+        text?: string;
+    } constrains {
+        or(present(text), not(present(text)));
+    }
+    interface PM2 {
+        text?: string;
+    } constrains {
+        present(text);
+    }
+    
+    function bar(pm2: PM2) {
+        pm2.text;
+    }
+    let pm1: PM1 = {};
+    bar(pm1); //NOK
+        ~~~
+!!! error TS2345: Argument of type 'PM1' is not assignable to parameter of type 'PM2'.
+!!! error TS2345:   Invalid assignment of type PM1 tot type PM2. Check if predicates are correct
+    if (pm1.text) {
+        bar(pm1); //OK
+    }
+    bar(pm1); //NOK
+        ~~~
+!!! error TS2345: Argument of type 'PM1' is not assignable to parameter of type 'PM2'.
+!!! error TS2345:   Invalid assignment of type PM1 tot type PM2. Check if predicates are correct

@@ -20,14 +20,14 @@ tests/cases/compiler/ifElseWithStatements3Error.ts(27,9): error TS95025: Predica
         pm.text;
     } else {
         pm.text; //ERROR
-        ~~~~~~~
+        ~~
 !!! error TS95025: Predicates in true or else branch of if statement are unsatisfiable because of extra knowledge from the if condition
     }
     
     if (pm.userid) {
         if(pm.screenname) {
             pm.text; //ERROR
-            ~~~~~~~
+            ~~
 !!! error TS95025: Predicates in true or else branch of if statement are unsatisfiable because of extra knowledge from the if condition
         }
     } else {
@@ -35,7 +35,7 @@ tests/cases/compiler/ifElseWithStatements3Error.ts(27,9): error TS95025: Predica
             pm.text;
         } else {
             pm.text; //ERROR
-            ~~~~~~~
+            ~~
 !!! error TS95025: Predicates in true or else branch of if statement are unsatisfiable because of extra knowledge from the if condition
         }
     }

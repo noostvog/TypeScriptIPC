@@ -3004,6 +3004,7 @@ namespace ts {
         stringIndexInfo?: IndexInfo;       // String indexing info
         numberIndexInfo?: IndexInfo;       // Numeric indexing info
         predicates: PredicateExpression[]; // Predicates <Nathalie>
+        origPredicates: PredicateExpression[]; //Predicates again <IPC>
     }
 
     /* @internal */

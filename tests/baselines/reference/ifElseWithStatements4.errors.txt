@@ -26,10 +26,10 @@ tests/cases/compiler/ifElseWithStatements4.ts(26,1): error TS95009: Cannot acces
 !!! error TS2322: Type '"Alice"' is not assignable to type 'undefined'.
         if (pm.screenname) {
             pm.userid = 47; //NOK
-            ~~~~~~~~~
+            ~~
 !!! error TS95025: Predicates in true or else branch of if statement are unsatisfiable because of extra knowledge from the if condition
             pm.screenname = "Alice"; //NOK
-            ~~~~~~~~~~~~~
+            ~~
 !!! error TS95025: Predicates in true or else branch of if statement are unsatisfiable because of extra knowledge from the if condition
         } else {
             pm.userid = 48; //OK

@@ -1735,8 +1735,11 @@ namespace ts {
             //<Nathalie>
             if (predicates) {
                 (<ResolvedType>type).predicates = predicates;
+                (<ResolvedType>type).origPredicates = predicates;
             } else {
                 (<ResolvedType>type).predicates = [];
+                (<ResolvedType>type).origPredicates = predicates;
+
             }
             return <ResolvedType>type;
         }
@@ -4325,6 +4328,7 @@ namespace ts {
             let stringIndexInfo: IndexInfo;
             let numberIndexInfo: IndexInfo;
             let predicates: PredicateExpression[];
+            let origPredicates: PredicateExpression[];
             if (rangeEquals(typeParameters, typeArguments, 0, typeParameters.length)) {
                 mapper = identityMapper;
                 members = source.symbol ? source.symbol.members : createSymbolTable(source.declaredProperties);
@@ -4333,6 +4337,7 @@ namespace ts {
                 stringIndexInfo = source.declaredStringIndexInfo;
                 numberIndexInfo = source.declaredNumberIndexInfo;
                 predicates = Object.assign([], source.declaredPredicates);
+                origPredicates = Object.assign([], source.declaredPredicates);
             }
             else {
                 mapper = createTypeMapper(typeParameters, typeArguments);
@@ -7778,15 +7783,19 @@ namespace ts {
                     return Ternary.False;
                 }
                 const id = relation !== identityRelation || source.id < target.id ? source.id + "," + target.id : target.id + "," + source.id;
-                const related = relation[id];
+                let related = relation[id];
                 if (related !== undefined) {
-                    if (reportErrors && related === RelationComparisonResult.Failed) {
-                        // We are elaborating errors and the cached result is an unreported failure. Record the result as a reported
-                        // failure and continue computing the relation such that errors get reported.
-                        relation[id] = RelationComparisonResult.FailedAndReported;
-                    }
-                    else {
-                        return related === RelationComparisonResult.Succeeded ? Ternary.True : Ternary.False;
+                    if (isIPCInterface(source) || isIPCInterface(target)) {
+                        related = undefined; //ignore previous related checks... (might have extra constraints now...)
+                    } else {
+                        if (reportErrors && related === RelationComparisonResult.Failed) {
+                            // We are elaborating errors and the cached result is an unreported failure. Record the result as a reported
+                            // failure and continue computing the relation such that errors get reported.
+                            relation[id] = RelationComparisonResult.FailedAndReported;
+                        }
+                        else {
+                            return related === RelationComparisonResult.Succeeded ? Ternary.True : Ternary.False;
+                        }
                     }
                 }
                 if (depth > 0) {
@@ -7864,6 +7873,16 @@ namespace ts {
                 }
                 return result;
 
+                function isIPCInterface(type: Type): Ternary{
+                    if (getObjectFlags(type) & ObjectFlags.Interface) {
+                        const resolved = resolveStructuredTypeMembers(<ObjectType>type);
+                        const predicates = resolved.predicates;
+                        if (predicates !== undefined && predicates.length > 0) {
+                            return Ternary.True;
+                        }
+                    }
+                    return Ternary.False;
+                }
                 //<Nathalie>
                 function predicatesRelatedTo(source: Type, target: Type, reportErrors: boolean): Ternary {
                     if (getObjectFlags(target) & ObjectFlags.Interface) {
@@ -11110,6 +11129,61 @@ namespace ts {
                 // Return the declared type to reduce follow-on errors
                 return type;
             }
+
+            //<nathalie> hier moet getest worden of dat eigenlijk in een if zit. zo ja => type uitbreiden
+            if (getObjectFlags(flowType) & ObjectFlags.Interface) {
+                const resolvedT = resolveStructuredTypeMembers(<ObjectType>flowType);
+                //TODO not sure if this entirely correct but reset predicates such that predicates from previous check-identifiers
+                let predicates = Object.assign([], resolvedT.origPredicates);
+                if (predicates.length > 0) {
+                    true;
+                    if (node.flowNode) {
+                        let ant: any = node.flowNode;
+                        while (ant) {
+                            if (ant.flags & FlowFlags.Condition) {
+                                const propacc = ant.expression;
+                                if (propacc.kind === SyntaxKind.PropertyAccessExpression) {
+                                    //check if same object
+                                    if ((<PropertyAccessExpression>propacc).expression.kind === SyntaxKind.Identifier) {
+                                        if ((<Identifier>(<PropertyAccessExpression>propacc).expression).text === node.text) {
+                                            const s1 = getResolvedSymbol(<Identifier>(<PropertyAccessExpression>propacc).expression);
+                                            const s2 = getResolvedSymbol(node);
+                                            if (s1 === s2) {
+                                                //2. add constraint
+                                                const ppe_kind = SyntaxKind.PredicatePresentExpression;
+                                                let ppe_expr = <Identifier>createNode(SyntaxKind.Identifier);
+                                                ppe_expr.text = "present";
+                                                const ppe_args: NodeArray<Identifier> = createNodeArray<Identifier>();
+                                                ppe_args.push((<PropertyAccessExpression>propacc).name);
+                                                const presentC = <PredicatePresentExpression>{ kind: ppe_kind, expression: ppe_expr, arguments: ppe_args };
+                                                if (ant.flags & FlowFlags.TrueCondition) {
+                                                    predicates.push(presentC);
+                                                } else if (ant.flags & FlowFlags.FalseCondition) {
+                                                    const ple_kind = SyntaxKind.PredicateLogicalExpression;
+                                                    let ple_expr = <Identifier> createNode(SyntaxKind.Identifier);
+                                                    ple_expr.text = "not";
+                                                    const ple_args: NodeArray<PredicateExpression> = createNodeArray<PredicateExpression>();
+                                                    ple_args.push(presentC);
+                                                    const notpresentC = <PredicateLogicalExpression> {kind: ple_kind, expression: ple_expr, arguments: ple_args};
+                                                    predicates.push(notpresentC);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            ant = ant.antecedent;
+                        }
+                    }
+                    if (!Proplog.solve(translatePredicates(predicates, "-"), "none")) {
+                        error(node, Diagnostics.Predicates_in_0_branch_of_if_statement_are_unsatisfiable_because_of_extra_knowledge_from_the_if_condition, "true or else");
+                    }
+                    resolvedT.predicates = predicates;
+                }
+            }
+
+
+            //einde <nathalie>
             return assignmentKind ? getBaseTypeOfLiteralType(flowType) : flowType;
         }
 
@@ -12310,6 +12384,7 @@ namespace ts {
                 clonedTarget.symbol.name += "Sliced"; //TODO dit werkt niet precies
                 //to be sure
                 clonedTarget.predicates = Object.assign([], target.predicates);
+                clonedTarget.origPredicates = Object.assign([], target.origPredicates);
                 clonedTarget.properties = Object.assign([], target.properties);
                 clonedTarget.members = Object.assign({}, target.members);
                 clonedTarget.properties = Object.assign([], target.properties);
@@ -13251,47 +13326,13 @@ namespace ts {
             }
 
             //<nathalie>
-            // If the left side has an interface type: take predicates into account for checking presence and type
-            //let errorMessage = null;
-            //let errorInfo: DiagnosticMessageChain;
-            /*
-            let predicateType: Type;
-            let predicatePresent: boolean;
-            if (node.kind == SyntaxKind.PropertyAccessExpression) {
-                if (getObjectFlags(apparentType) & ObjectFlags.Interface) {
-                    // ignore type inferred from this field before if there are predicates
-                    const predicates = (<InterfaceTypeWithDeclaredMembers> apparentType).declaredPredicates;
-                    if (predicates.length > 0) {
-                        /* TODO BUG let's take the following predicates:
-                        - present(a);
-                        - implic(present(a), present(b));
-                        then: present(b) must be present as well in every case,
-                        thus it should actually be present(a) + present(b)
-                        this is not yet supported
-                        => future work (possibly with simplifyPredicates)
-                         *//*
-                        // TODO the type gets ignored for now: we only concern ourselves with presence constraints...
-                        //predicateType = getTypeOfFieldInPredicates(predicates, right);
-                        predicatePresent = getPresenceOfFieldInPredicates(predicates, right);
-                        //propType = predicateType;
-
-                        //if (newtype) {
-                            //propType = type;
-                            //errorInfo = error;
-                        //} else {
-                            //field is not found: maybe still be found after flowtype
-                          //  errorInfo = chainDiagnosticMessages(errorInfo, Diagnostics.Cannot_access_0_from_the_object_because_its_interface_does_not_contain_the_predicate_present_0_Use_a_non_undefined_type_guard, right.text);
-                        //}
-                }
-                    }
-            }*/
-
             if (node.kind == SyntaxKind.PropertyAccessExpression) {
                 if (getObjectFlags(apparentType) & ObjectFlags.Interface) {
                     // ignore type inferred from this field before if there are predicates
                     const resolvedT = resolveStructuredTypeMembers(<ObjectType>apparentType);
                     const predicates = resolvedT.predicates;
                     if (predicates.length > 0) {
+                        /*
                         let extra_pred_from_conditional = "";
                         let satcheck = "";
                         //ANTECEDENT TESTING
@@ -13324,14 +13365,15 @@ namespace ts {
                                 }
                                 ant = ant.antecedent;
                             }
-                        }
+                        }*/
 
+                        /*
                         //check if still satisfiable with extra constraint
                         if (!Proplog.solve(translatePredicates(predicates, "-") + satcheck, "none")) {
                             error(node, Diagnostics.Predicates_in_0_branch_of_if_statement_are_unsatisfiable_because_of_extra_knowledge_from_the_if_condition, "true or else");
-                        }
+                        }*/
 
-                        const predicateStr = translatePredicates(predicates) + extra_pred_from_conditional;
+                        const predicateStr = translatePredicates(predicates); // + extra_pred_from_conditional;
                         const provePresent = prove(predicateStr + " > " + node.name.text);
                         const proveAbsent  = prove(predicateStr + " > !" + node.name.text);
                         if (!provePresent && !proveAbsent){
