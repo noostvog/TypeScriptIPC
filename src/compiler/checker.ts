@@ -7278,14 +7278,11 @@ namespace ts {
                             const right = logical.arguments[1];
                             return "(" + notOperator + "(" + translatePredicate(left) + ") | " + translatePredicate(right) + ")";
                         } else if (logical.expression.text === "iff") {
-                            const left = Object.assign({}, logical);
-                            const right = Object.assign({}, logical);
-                            const right_l = right.arguments[0];
-                            left.expression.text = "implic";
-                            right.expression.text = "implic"
-                            right.arguments[0] = right.arguments[1];
-                            right.arguments[1] = right_l;
-                            return "(" + translatePredicate(left) + " & " + translatePredicate(right) + ")";
+                            const left = translatePredicate(logical.arguments[0]);
+                            const right = translatePredicate(logical.arguments[1]);
+                            const lefttoright = "(" + notOperator + "(" + left + ") | " + right + ")";
+                            const righttoleft = "(" + notOperator + "(" + right + ") | " + left + ")";;
+                            return "(" + lefttoright + ") & (" + righttoleft + ")";
                         } else {
                             return "(" + translatePredicate(logical.arguments[0]) + " " + translateLogicalOperator(logical.expression.text) + " " + translatePredicate(logical.arguments[1]) + ")";
                         }
@@ -19466,7 +19463,7 @@ namespace ts {
         }
 
         function checkInterfaceDeclaration(node: InterfaceDeclaration) {
-            if (node.symbol.name == "TestNathalie") {
+            if (node.symbol.name == "Picture") {
                 true;
             }
             // Grammar checking
