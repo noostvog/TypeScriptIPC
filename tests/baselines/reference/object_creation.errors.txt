@@ -1,0 +1,27 @@
+tests/cases/compiler/object_creation.ts(12,5): error TS2322: Type '{ text: string; }' is not assignable to type 'PrivateMessage'.
+  Predicate or(and(present(userid),not(present(screenname))),and(not(present(userid)),present(screenname))) was not satisfied in type { text: string; }
+tests/cases/compiler/object_creation.ts(13,5): error TS2322: Type '{ text: string; userid: number; screenname: string; }' is not assignable to type 'PrivateMessage'.
+  Predicate or(and(present(userid),not(present(screenname))),and(not(present(userid)),present(screenname))) was not satisfied in type { text: string; userid: number; screenname: string; }
+
+
+==== tests/cases/compiler/object_creation.ts (2 errors) ====
+    interface PrivateMessage {
+      text?: string;
+      userid?: number;
+      screenname?: string;
+    } constrains {
+      present(text);
+      or(and(present(userid), not(present(screenname))),
+         and(not(present(userid)), present(screenname)));
+    }
+    
+    let msg1: PrivateMessage = {text: "Hello", userid: 42}; //OK
+    let msg2: PrivateMessage = {text: "Hello"}; //ERROR
+        ~~~~
+!!! error TS2322: Type '{ text: string; }' is not assignable to type 'PrivateMessage'.
+!!! error TS2322:   Predicate or(and(present(userid),not(present(screenname))),and(not(present(userid)),present(screenname))) was not satisfied in type { text: string; }
+    let msg3: PrivateMessage = {text: "Hello", userid: 42, screenname: "Alice"}; //ERROR
+        ~~~~
+!!! error TS2322: Type '{ text: string; userid: number; screenname: string; }' is not assignable to type 'PrivateMessage'.
+!!! error TS2322:   Predicate or(and(present(userid),not(present(screenname))),and(not(present(userid)),present(screenname))) was not satisfied in type { text: string; userid: number; screenname: string; }
+    

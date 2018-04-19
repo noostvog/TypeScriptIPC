@@ -1,0 +1,39 @@
+tests/cases/compiler/property_access.ts(15,3): error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
+tests/cases/compiler/property_access.ts(27,9): error TS2345: Argument of type '{ text: string; userid: number; screenname: string; }' is not assignable to parameter of type 'PrivateMessage'.
+  Predicate or(and(present(userid),not(present(screenname))),and(not(present(userid)),present(screenname))) was not satisfied in type { text: string; userid: number; screenname: string; }
+
+
+==== tests/cases/compiler/property_access.ts (2 errors) ====
+    interface PrivateMessage {
+      text?: string;
+      userid?: number;
+      screenname?: string;
+    } constrains {
+      present(text);
+      or(and(present(userid), not(present(screenname))),
+         and(not(present(userid)), present(screenname)));
+    }
+    
+    let msg: PrivateMessage = {text: "Hello", userid: 42}; //OK
+    
+    function getUser(msg3: PrivateMessage) {
+      msg3.text; //OK
+      msg3.userid; //ERROR
+      ~~~~~~~~~~~
+!!! error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
+      if (msg3.userid) {
+        msg3.userid;     //OK: number
+        msg3.screenname; //OK: undefined
+      } else {
+        msg3.userid;     //OK: undefined
+        msg3.screenname; //OK: string
+      }
+    }
+    
+    let msg1: PrivateMessage = {text: "Hello", userid: 42}; //OK
+    getUser(msg1); //OK
+    getUser({text: "Hello", userid: 42, screenname: "Alice"}); //ERROR
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS2345: Argument of type '{ text: string; userid: number; screenname: string; }' is not assignable to parameter of type 'PrivateMessage'.
+!!! error TS2345:   Predicate or(and(present(userid),not(present(screenname))),and(not(present(userid)),present(screenname))) was not satisfied in type { text: string; userid: number; screenname: string; }
+    

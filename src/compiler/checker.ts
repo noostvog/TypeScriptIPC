@@ -7939,8 +7939,12 @@ namespace ts {
                     function removeUndefined(type: Type): Type{
                         if (type.flags & TypeFlags.Union) {
                             if (contains((<UnionType> type).types, undefinedType)) {
-                                let filtered = (<UnionType> type).types.filter(t => t !== undefinedType);
-                                (<UnionType> type).types = filtered;
+                                let typeClone:UnionType = <UnionType>Object.assign({}, type);
+                                typeClone.types = Object.assign([], (<UnionType> type).types);
+                                let filtered = (<UnionType> typeClone).types.filter(t => t !== undefinedType);
+                                typeClone.types = filtered;
+                                type = getUnionType(filtered);
+                                //type = typeClone;
                             }
                         }
                         return type;
@@ -7975,7 +7979,7 @@ namespace ts {
                                 }
                                 return Ternary.False;
                             }
-                            return Ternary.True;
+                            //otherwise: continue
                         } else {
                             const propType = getTypeOfSymbol(prop);
                             const predicateStr = translatePredicates(predicatessource);
@@ -8143,8 +8147,8 @@ namespace ts {
 
                     function iffPredicatesSatisfied(source: Type, predicates: NodeArray<PredicateExpression>, reportErrors: boolean): Ternary {
                         const reversed = createNodeArray<PredicateExpression>();
-                        reversed.push(predicates[0]);
                         reversed.push(predicates[1]);
+                        reversed.push(predicates[0]);
                         return implicPredicatesSatisfied(source, predicates, reportErrors)
                             && implicPredicatesSatisfied(source, reversed, reportErrors);
                     }
@@ -13385,8 +13389,12 @@ namespace ts {
                         } else if (provePresent) {
                             if (propType.flags & TypeFlags.Union) {
                                 if (contains((<UnionType> propType).types, undefinedType)) {
-                                    let filtered = (<UnionType> propType).types.filter(t => t !== undefinedType);
-                                    (<UnionType> propType).types = filtered;
+                                    let propTypeClone: UnionType = <UnionType>Object.assign({}, propType);
+                                    propTypeClone.types = Object.assign([], (<UnionType> propType).types);
+                                    let filtered = propTypeClone.types.filter(t => t !== undefinedType);
+                                    propTypeClone.types = filtered;
+                                    propType = getUnionType(filtered);
+                                    //propType = propTypeClone;
                                 }
                             }
                         } else if (proveAbsent) {
@@ -18387,10 +18395,11 @@ namespace ts {
             // <Nathalie>: if if-test contains an property access of an interface: no type checking
             // (normally
             let specialPredicateIf = false;
+            let objectType;
             if (node.expression.kind === SyntaxKind.PropertyAccessExpression){
                 const paeExpressionType = checkExpression((<PropertyAccessExpression>node.expression).expression);
                 if (getObjectFlags(paeExpressionType) & ObjectFlags.Interface) {
-                    const objectType = resolveStructuredTypeMembers(<ObjectType>paeExpressionType);
+                    objectType = resolveStructuredTypeMembers(<ObjectType>paeExpressionType);
                     specialPredicateIf = objectType.predicates !== undefined && objectType.predicates.length > 0;
                 }
             }
@@ -18410,21 +18419,25 @@ namespace ts {
                 error(node.thenStatement, Diagnostics.The_body_of_an_if_statement_cannot_be_the_empty_statement);
             }
 
-            /*
+
             if (specialPredicateIf) {
-                objectType.predicates = origPredicates; //remove true branch
+                "todo";
+                objectType.predicates = objectType.origPredicates;
+                /*objectType.predicates = origPredicates; //remove true branch
                 origPredicates = Object.assign([], origPredicates);
                 objectType.predicates.push(predicateElse);
                 if (!Proplog.solve(translatePredicates(objectType.predicates), "none")) {
                     error(node.elseStatement, Diagnostics.Predicates_in_0_branch_of_if_statement_are_unsatisfiable_because_of_extra_knowledge_from_the_if_condition, "else");
-                }
-            }*/
+                }*/
+            }
             checkSourceElement(node.elseStatement);
 
-            /*
+
             if (specialPredicateIf) {
-                objectType.predicates = origPredicates;
-            }*/
+                "todo";
+                objectType.predicates = objectType.origPredicates;
+                //objectType.predicates = origPredicates;
+            }
 
         }
 
@@ -19492,7 +19505,6 @@ namespace ts {
                     checkInterfaceWithPredicateDeclarations(type);
                 }
                 checkObjectTypeForDuplicateDeclarations(node);
-                //TODO check whether predicates are satisfiable.
             }
             forEach(getInterfaceBaseTypeNodes(node), heritageElement => {
                 if (!isEntityNameExpression(heritageElement.expression)) {
@@ -19514,6 +19526,11 @@ namespace ts {
                 resolved.predicates.map(checkInterfacePredicateDeclaration);
 
                 if (resolved.predicates && resolved.predicates.length > 0) {
+                    //check if strictnullchecks is on: important for correct working of IPC interfaces
+                    if (!strictNullChecks) {
+                        error(node, Diagnostics.Interfaces_with_constraints_may_only_be_used_in_strict_null_checking_mode);
+                    }
+
                     //if there are predicates, every property should be optional and the type should be different from undefined
                     for (const member of node.members) {
                         const type = getTypeOfSymbol(member.symbol);

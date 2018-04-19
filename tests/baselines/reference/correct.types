@@ -1,0 +1,117 @@
+=== tests/cases/compiler/correct.ts ===
+interface PrivateMessage {
+>PrivateMessage : PrivateMessage
+
+  text?: string;
+>text : string | undefined
+
+  userid?: number;
+>userid : number | undefined
+
+  screenname?: string;
+>screenname : string | undefined
+
+} constrains {
+  present(text);
+>present : any
+>text : any
+
+  or(and(present(userid), not(present(screenname))),
+>or : any
+>and : any
+>present : any
+>userid : any
+>not : any
+>present : any
+>screenname : any
+
+     and(not(present(userid)), present(screenname)));
+>and : any
+>not : any
+>present : any
+>userid : any
+>present : any
+>screenname : any
+}
+
+let msg1: PrivateMessage = {text: "Hello", userid: 42};
+>msg1 : PrivateMessage
+>PrivateMessage : PrivateMessage
+>{text: "Hello", userid: 42} : { text: string; userid: number; }
+>text : string
+>"Hello" : "Hello"
+>userid : number
+>42 : 42
+
+function getUser(msg: PrivateMessage): number | string {
+>getUser : (msg: PrivateMessage) => string | number
+>msg : PrivateMessage
+>PrivateMessage : PrivateMessage
+
+  if (msg.userid) {
+>msg.userid : any
+>msg : PrivateMessage
+>userid : any
+
+    return msg.userid;
+>msg.userid : number
+>msg : PrivateMessage
+>userid : number
+
+  } else {
+    return msg.screenname;
+>msg.screenname : string
+>msg : PrivateMessage
+>screenname : string
+  }
+}
+
+getUser(msg1); 
+>getUser(msg1) : string | number
+>getUser : (msg: PrivateMessage) => string | number
+>msg1 : PrivateMessage
+
+getUser({text: "Hello", screenname: "Alice"});
+>getUser({text: "Hello", screenname: "Alice"}) : string | number
+>getUser : (msg: PrivateMessage) => string | number
+>{text: "Hello", screenname: "Alice"} : { text: string; screenname: string; }
+>text : string
+>"Hello" : "Hello"
+>screenname : string
+>"Alice" : "Alice"
+
+function changeIdToName(msg: PrivateMessage, name: string): PrivateMessage {
+>changeIdToName : (msg: PrivateMessage, name: string) => PrivateMessage
+>msg : PrivateMessage
+>PrivateMessage : PrivateMessage
+>name : string
+>PrivateMessage : PrivateMessage
+
+  if (msg.ruserid) {
+>msg.ruserid : any
+>msg : PrivateMessage
+>ruserid : any
+
+    let msg2: PrivateMessage = msg;
+>msg2 : PrivateMessage
+>PrivateMessage : PrivateMessage
+>msg : PrivateMessage
+
+    return objupdate(msg2, {userid: undefined, screenname: name});
+>msg2 : any
+>{userid: undefined, screenname: name} : { userid: undefined; screenname: string; }
+>userid : undefined
+>undefined : undefined
+>screenname : string
+>name : string
+  }
+  return msg;
+>msg : PrivateMessage
+}
+
+changeIdToName(msg1, "Alice");
+>changeIdToName(msg1, "Alice") : PrivateMessage
+>changeIdToName : (msg: PrivateMessage, name: string) => PrivateMessage
+>msg1 : PrivateMessage
+>"Alice" : "Alice"
+

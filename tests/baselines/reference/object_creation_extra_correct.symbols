@@ -1,0 +1,64 @@
+=== tests/cases/compiler/object_creation_extra_correct.ts ===
+interface Picture {
+>Picture : Symbol(Picture, Decl(object_creation_extra_correct.ts, 0, 0))
+
+  caption?: string;
+>caption : Symbol(Picture.caption, Decl(object_creation_extra_correct.ts, 0, 19))
+
+  picture?: string;
+>picture : Symbol(Picture.picture, Decl(object_creation_extra_correct.ts, 1, 19))
+
+  lat?: number;
+>lat : Symbol(Picture.lat, Decl(object_creation_extra_correct.ts, 2, 19))
+
+  long?: number;
+>long : Symbol(Picture.long, Decl(object_creation_extra_correct.ts, 3, 15))
+
+} constrains {
+  present(caption);
+  implic(present(lat), present(picture));
+  implic(present(long), present(picture));
+  iff(present(lat), present(long))
+}
+
+interface OSUTime {
+>OSUTime : Symbol(OSUTime, Decl(object_creation_extra_correct.ts, 10, 1))
+
+  times?: number;
+>times : Symbol(OSUTime.times, Decl(object_creation_extra_correct.ts, 12, 19))
+
+  ns?: number
+>ns : Symbol(OSUTime.ns, Decl(object_creation_extra_correct.ts, 13, 17))
+
+} constrains {
+  not(and(present(times),
+          present(ns)));
+}
+
+let pic1: Picture = {caption: "On holiday"}; //OK
+>pic1 : Symbol(pic1, Decl(object_creation_extra_correct.ts, 20, 3))
+>Picture : Symbol(Picture, Decl(object_creation_extra_correct.ts, 0, 0))
+>caption : Symbol(caption, Decl(object_creation_extra_correct.ts, 20, 21))
+
+let pic2: Picture = {caption: "On holiday", lat: 5, long: 6, picture: "path"}; //OK
+>pic2 : Symbol(pic2, Decl(object_creation_extra_correct.ts, 21, 3))
+>Picture : Symbol(Picture, Decl(object_creation_extra_correct.ts, 0, 0))
+>caption : Symbol(caption, Decl(object_creation_extra_correct.ts, 21, 21))
+>lat : Symbol(lat, Decl(object_creation_extra_correct.ts, 21, 43))
+>long : Symbol(long, Decl(object_creation_extra_correct.ts, 21, 51))
+>picture : Symbol(picture, Decl(object_creation_extra_correct.ts, 21, 60))
+
+let time1: OSUTime = {}; //OK
+>time1 : Symbol(time1, Decl(object_creation_extra_correct.ts, 23, 3))
+>OSUTime : Symbol(OSUTime, Decl(object_creation_extra_correct.ts, 10, 1))
+
+let time2: OSUTime = {times: 5}; //OK
+>time2 : Symbol(time2, Decl(object_creation_extra_correct.ts, 24, 3))
+>OSUTime : Symbol(OSUTime, Decl(object_creation_extra_correct.ts, 10, 1))
+>times : Symbol(times, Decl(object_creation_extra_correct.ts, 24, 22))
+
+let time3: OSUTime = {ns: 6}; //OK
+>time3 : Symbol(time3, Decl(object_creation_extra_correct.ts, 25, 3))
+>OSUTime : Symbol(OSUTime, Decl(object_creation_extra_correct.ts, 10, 1))
+>ns : Symbol(ns, Decl(object_creation_extra_correct.ts, 25, 22))
+

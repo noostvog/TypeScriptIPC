@@ -1,0 +1,291 @@
+tests/cases/compiler/property_assign.ts(39,5): error TS2322: Type 'PrivateMessage1' is not assignable to type 'PrivateMessage2'.
+  Invalid assignment of type PrivateMessage1 tot type PrivateMessage2. Check if predicates are correct
+tests/cases/compiler/property_assign.ts(48,5): error TS2322: Type 'PrivateMessage1' is not assignable to type 'PrivateMessage'.
+  Invalid assignment of type PrivateMessage1 tot type PrivateMessage. Check if predicates are correct
+tests/cases/compiler/property_assign.ts(50,5): error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage'.
+  Invalid assignment of type PrivateMessage3 tot type PrivateMessage. Check if predicates are correct
+tests/cases/compiler/property_assign.ts(52,5): error TS2322: Type 'PrivateMessage' is not assignable to type 'PrivateMessage1'.
+  Invalid assignment of type PrivateMessage tot type PrivateMessage1. Check if predicates are correct
+tests/cases/compiler/property_assign.ts(54,5): error TS2322: Type 'PrivateMessage2' is not assignable to type 'PrivateMessage1'.
+  Invalid assignment of type PrivateMessage2 tot type PrivateMessage1. Check if predicates are correct
+tests/cases/compiler/property_assign.ts(55,5): error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage1'.
+  Invalid assignment of type PrivateMessage3 tot type PrivateMessage1. Check if predicates are correct
+tests/cases/compiler/property_assign.ts(57,5): error TS2322: Type 'PrivateMessage' is not assignable to type 'PrivateMessage2'.
+  Invalid assignment of type PrivateMessage tot type PrivateMessage2. Check if predicates are correct
+tests/cases/compiler/property_assign.ts(58,5): error TS2322: Type 'PrivateMessage1' is not assignable to type 'PrivateMessage2'.
+  Invalid assignment of type PrivateMessage1 tot type PrivateMessage2. Check if predicates are correct
+tests/cases/compiler/property_assign.ts(60,5): error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage2'.
+  Invalid assignment of type PrivateMessage3 tot type PrivateMessage2. Check if predicates are correct
+tests/cases/compiler/property_assign.ts(68,9): error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage'.
+  Invalid assignment of type PrivateMessage3 tot type PrivateMessage. Check if predicates are correct
+tests/cases/compiler/property_assign.ts(69,9): error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage1'.
+  Invalid assignment of type PrivateMessage3 tot type PrivateMessage1. Check if predicates are correct
+tests/cases/compiler/property_assign.ts(70,9): error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage2'.
+  Invalid assignment of type PrivateMessage3 tot type PrivateMessage2. Check if predicates are correct
+tests/cases/compiler/property_assign.ts(72,13): error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage'.
+  Invalid assignment of type PrivateMessage3 tot type PrivateMessage. Check if predicates are correct
+tests/cases/compiler/property_assign.ts(74,13): error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage2'.
+  Invalid assignment of type PrivateMessage3 tot type PrivateMessage2. Check if predicates are correct
+tests/cases/compiler/property_assign.ts(77,13): error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage1'.
+  Invalid assignment of type PrivateMessage3 tot type PrivateMessage1. Check if predicates are correct
+tests/cases/compiler/property_assign.ts(86,5): error TS2322: Type 'PrivateMessage1' is not assignable to type 'PrivateMessage'.
+  Invalid assignment of type PrivateMessage1 tot type PrivateMessage. Check if predicates are correct
+tests/cases/compiler/property_assign.ts(88,5): error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage'.
+  Invalid assignment of type PrivateMessage3 tot type PrivateMessage. Check if predicates are correct
+tests/cases/compiler/property_assign.ts(92,5): error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: string; }'.
+  Property 'screenname' is not present in type 'PrivateMessage'.
+tests/cases/compiler/property_assign.ts(94,5): error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: undefined; userid: number; }'.
+  Property 'screenname' is not absent in type 'PrivateMessage'
+tests/cases/compiler/property_assign.ts(96,5): error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname?: boolean | undefined; userid?: boolean | undefined; }'.
+  Type 'number' is not assignable to type 'boolean'.
+tests/cases/compiler/property_assign.ts(97,5): error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; unknownProperty?: number | undefined; }'.
+  Property 'unknownProperty' of type '{ text: string; unknownProperty?: number | undefined; }' is unknown in type 'PrivateMessage'
+tests/cases/compiler/property_assign.ts(98,5): error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; unknownProperty: number; }'.
+  Property 'unknownProperty' is not present in type 'PrivateMessage'.
+tests/cases/compiler/property_assign.ts(99,5): error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: string; userid: undefined; }'.
+  Property 'screenname' is not present in type 'PrivateMessage'.
+tests/cases/compiler/property_assign.ts(103,9): error TS2322: Type 'PrivateMessage' is not assignable to type '{ userid: number; }'.
+  Property 'userid' is not present in type 'PrivateMessage'.
+tests/cases/compiler/property_assign.ts(105,9): error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: number; }'.
+  Type 'string' is not assignable to type 'number'.
+tests/cases/compiler/property_assign.ts(108,9): error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: undefined; userid: number; }'.
+  Property 'screenname' is not absent in type 'PrivateMessage'
+tests/cases/compiler/property_assign.ts(110,9): error TS2322: Type 'PrivateMessage' is not assignable to type '{ screenname: string; }'.
+  Property 'screenname' is not present in type 'PrivateMessage'.
+tests/cases/compiler/property_assign.ts(112,9): error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: string; }'.
+  Property 'screenname' is not present in type 'PrivateMessage'.
+tests/cases/compiler/property_assign.ts(114,9): error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: string; userid: undefined; }'.
+  Property 'screenname' is not present in type 'PrivateMessage'.
+tests/cases/compiler/property_assign.ts(118,5): error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: string; }'.
+  Property 'screenname' is not present in type 'PrivateMessage'.
+tests/cases/compiler/property_assign.ts(119,5): error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; userid: number; }'.
+  Property 'userid' is not present in type 'PrivateMessage'.
+tests/cases/compiler/property_assign.ts(120,5): error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: string; userid: undefined; }'.
+  Property 'screenname' is not present in type 'PrivateMessage'.
+tests/cases/compiler/property_assign.ts(121,5): error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: undefined; userid: number; }'.
+  Property 'screenname' is not absent in type 'PrivateMessage'
+
+
+==== tests/cases/compiler/property_assign.ts (33 errors) ====
+    interface PrivateMessage {
+        text?: string;
+        userid?: number;
+        screenname?: string;
+    } constrains {
+        present(text);
+        or(and(present(userid), not(present(screenname))),
+            and(not(present(userid)), present(screenname)));
+    }
+    
+    //Interface to Interface Assignment
+    interface PrivateMessage1 {
+        text?: string;
+        userid?: number;
+        screenname?: string;
+    } constrains {
+        present(text);
+        present(screenname);
+        present(userid);
+    }
+    
+    interface PrivateMessage2 {
+        text?: string;
+        userid?: number;
+    } constrains {
+        present(text);
+        present(userid);
+    }
+    
+    interface PrivateMessage3 {
+        text?: string;
+        userid?: number;
+        screenname?: string;
+    } constrains {
+        present(text);
+    }
+    
+    let msg9: PrivateMessage1 = {text: "Hello", userid: 42, screenname: "Alice"}; //OK
+    let msg10: PrivateMessage2 = msg9; //ERROR
+        ~~~~~
+!!! error TS2322: Type 'PrivateMessage1' is not assignable to type 'PrivateMessage2'.
+!!! error TS2322:   Invalid assignment of type PrivateMessage1 tot type PrivateMessage2. Check if predicates are correct
+    let msg11: PrivateMessage = msg10; //OK
+    
+    let pm0: PrivateMessage = {text: "Hello", screenname: "Alice"}; //OK
+    let pm1: PrivateMessage1 = {text: "Hello", userid: 42, screenname: "Alice"}; //OK
+    let pm2: PrivateMessage2 = {text: "Hello", userid: 42}; //OK
+    let pm3: PrivateMessage3 = {text: "Hello"}; //OK
+    
+    let pm4: PrivateMessage = pm0; //OK
+    let pm5: PrivateMessage = pm1; //ERROR
+        ~~~
+!!! error TS2322: Type 'PrivateMessage1' is not assignable to type 'PrivateMessage'.
+!!! error TS2322:   Invalid assignment of type PrivateMessage1 tot type PrivateMessage. Check if predicates are correct
+    let pm6: PrivateMessage = pm2; //OK
+    let pm7: PrivateMessage = pm3; //ERROR
+        ~~~
+!!! error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage'.
+!!! error TS2322:   Invalid assignment of type PrivateMessage3 tot type PrivateMessage. Check if predicates are correct
+    
+    let pm8: PrivateMessage1 = pm0; //ERROR
+        ~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type 'PrivateMessage1'.
+!!! error TS2322:   Invalid assignment of type PrivateMessage tot type PrivateMessage1. Check if predicates are correct
+    let pm9: PrivateMessage1 = pm1; //OK
+    let pm10: PrivateMessage1 = pm2; //ERROR
+        ~~~~
+!!! error TS2322: Type 'PrivateMessage2' is not assignable to type 'PrivateMessage1'.
+!!! error TS2322:   Invalid assignment of type PrivateMessage2 tot type PrivateMessage1. Check if predicates are correct
+    let pm11: PrivateMessage1 = pm3; //ERROR
+        ~~~~
+!!! error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage1'.
+!!! error TS2322:   Invalid assignment of type PrivateMessage3 tot type PrivateMessage1. Check if predicates are correct
+    
+    let pm12: PrivateMessage2 = pm0; //ERROR
+        ~~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type 'PrivateMessage2'.
+!!! error TS2322:   Invalid assignment of type PrivateMessage tot type PrivateMessage2. Check if predicates are correct
+    let pm13: PrivateMessage2 = pm1; //ERROR
+        ~~~~
+!!! error TS2322: Type 'PrivateMessage1' is not assignable to type 'PrivateMessage2'.
+!!! error TS2322:   Invalid assignment of type PrivateMessage1 tot type PrivateMessage2. Check if predicates are correct
+    let pm14: PrivateMessage2 = pm2; //OK
+    let pm15: PrivateMessage2 = pm3; //ERROR
+        ~~~~
+!!! error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage2'.
+!!! error TS2322:   Invalid assignment of type PrivateMessage3 tot type PrivateMessage2. Check if predicates are correct
+    
+    let pm16: PrivateMessage3 = pm0; //OK
+    let pm17: PrivateMessage3 = pm1; //OK
+    let pm18: PrivateMessage3 = pm2; //OK
+    let pm19: PrivateMessage3 = pm3; //OK
+    
+    if (pm3.userid) {
+        let pm20: PrivateMessage = pm3; //ERROR
+            ~~~~
+!!! error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage'.
+!!! error TS2322:   Invalid assignment of type PrivateMessage3 tot type PrivateMessage. Check if predicates are correct
+        let pm21: PrivateMessage1 = pm3; //ERROR
+            ~~~~
+!!! error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage1'.
+!!! error TS2322:   Invalid assignment of type PrivateMessage3 tot type PrivateMessage1. Check if predicates are correct
+        let pm22: PrivateMessage2 = pm3; //ERROR
+            ~~~~
+!!! error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage2'.
+!!! error TS2322:   Invalid assignment of type PrivateMessage3 tot type PrivateMessage2. Check if predicates are correct
+        if (pm3.screenname) {
+            let pm23: PrivateMessage = pm3; //ERROR
+                ~~~~
+!!! error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage'.
+!!! error TS2322:   Invalid assignment of type PrivateMessage3 tot type PrivateMessage. Check if predicates are correct
+            let pm24: PrivateMessage1 = pm3; //OK
+            let pm25: PrivateMessage2 = pm3; //ERROR
+                ~~~~
+!!! error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage2'.
+!!! error TS2322:   Invalid assignment of type PrivateMessage3 tot type PrivateMessage2. Check if predicates are correct
+        } else {
+            let pm26: PrivateMessage = pm3; //OK
+            let pm27: PrivateMessage1 = pm3; //ERROR
+                ~~~~
+!!! error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage1'.
+!!! error TS2322:   Invalid assignment of type PrivateMessage3 tot type PrivateMessage1. Check if predicates are correct
+            let pm28: PrivateMessage2 = pm3; //OK
+        }
+    }
+    
+    if (pm0.userid) {
+        let pm29: PrivateMessage2 = pm0; //OK
+    }
+    
+    let pm30: PrivateMessage = pm1; //ERROR
+        ~~~~
+!!! error TS2322: Type 'PrivateMessage1' is not assignable to type 'PrivateMessage'.
+!!! error TS2322:   Invalid assignment of type PrivateMessage1 tot type PrivateMessage. Check if predicates are correct
+    let pm31: PrivateMessage = pm2; //OK
+    let pm32: PrivateMessage = pm3; //ERROR
+        ~~~~
+!!! error TS2322: Type 'PrivateMessage3' is not assignable to type 'PrivateMessage'.
+!!! error TS2322:   Invalid assignment of type PrivateMessage3 tot type PrivateMessage. Check if predicates are correct
+    
+    //Interface to Object Assignment
+    let pm: PrivateMessage = {text: "Hallo", screenname: "Alice"}; //OK
+    let obj1: {text: string, screenname: string} = pm; //ERROR
+        ~~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: string; }'.
+!!! error TS2322:   Property 'screenname' is not present in type 'PrivateMessage'.
+    let obj2: {text: string, screenname?: string} = pm; //OK
+    let obj3: {text: string, screenname: undefined, userid: number} = pm; //ERROR
+        ~~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: undefined; userid: number; }'.
+!!! error TS2322:   Property 'screenname' is not absent in type 'PrivateMessage'
+    let obj4: {text: string, screenname?: string, userid?: number} = pm; //OK
+    let obj5: {text: string, screenname?: boolean, userid?: boolean} = pm; //ERROR
+        ~~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname?: boolean | undefined; userid?: boolean | undefined; }'.
+!!! error TS2322:   Type 'number' is not assignable to type 'boolean'.
+    let obj6: {text: string, unknownProperty?: number} = pm; //ERROR
+        ~~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; unknownProperty?: number | undefined; }'.
+!!! error TS2322:   Property 'unknownProperty' of type '{ text: string; unknownProperty?: number | undefined; }' is unknown in type 'PrivateMessage'
+    let obj7: {text: string, unknownProperty: number} = pm; //ERROR
+        ~~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; unknownProperty: number; }'.
+!!! error TS2322:   Property 'unknownProperty' is not present in type 'PrivateMessage'.
+    let obj8: {text:string, screenname: string, userid: undefined} = pm; //ERROR
+        ~~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: string; userid: undefined; }'.
+!!! error TS2322:   Property 'screenname' is not present in type 'PrivateMessage'.
+    
+    if (pm.screenname) {
+        let obj9: {screenname: string} = pm; //OK
+        let obj15: {userid: number} = pm; //ERROR
+            ~~~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ userid: number; }'.
+!!! error TS2322:   Property 'userid' is not present in type 'PrivateMessage'.
+        let obj10: {text: string, screenname: string} = pm; //OK
+        let obj11: {text: string, screenname: number} = pm; //ERROR
+            ~~~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: number; }'.
+!!! error TS2322:   Type 'string' is not assignable to type 'number'.
+        let obj12: {text: string, screenname?: string} = pm //OK
+        let obj13: {text:string, screenname: string, userid: undefined} = pm; //OK
+        let obj14: {text:string, screenname: undefined, userid: number} = pm; //ERROR
+            ~~~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: undefined; userid: number; }'.
+!!! error TS2322:   Property 'screenname' is not absent in type 'PrivateMessage'
+    } else {
+        let obj16: {screenname: string} = pm; //ERROR
+            ~~~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ screenname: string; }'.
+!!! error TS2322:   Property 'screenname' is not present in type 'PrivateMessage'.
+        let obj17: {userid: number} = pm; //OK
+        let obj18: {text: string, screenname: string} = pm; //ERROR
+            ~~~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: string; }'.
+!!! error TS2322:   Property 'screenname' is not present in type 'PrivateMessage'.
+        let obj19: {text: string, userid: number} = pm; //OK
+        let obj21: {text:string, screenname: string, userid: undefined} = pm; //ERROR
+            ~~~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: string; userid: undefined; }'.
+!!! error TS2322:   Property 'screenname' is not present in type 'PrivateMessage'.
+        let obj22: {text:string, screenname: undefined, userid: number} = pm; //OK
+    }
+    
+    let obj25: {text: string, screenname: string} = pm; //ERROR
+        ~~~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: string; }'.
+!!! error TS2322:   Property 'screenname' is not present in type 'PrivateMessage'.
+    let obj27: {text: string, userid: number} = pm; //ERROR
+        ~~~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; userid: number; }'.
+!!! error TS2322:   Property 'userid' is not present in type 'PrivateMessage'.
+    let obj23: {text:string, screenname: string, userid: undefined} = pm; //ERROR
+        ~~~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: string; userid: undefined; }'.
+!!! error TS2322:   Property 'screenname' is not present in type 'PrivateMessage'.
+    let obj24: {text:string, screenname: undefined, userid: number} = pm; //ERROR
+        ~~~~~
+!!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: string; screenname: undefined; userid: number; }'.
+!!! error TS2322:   Property 'screenname' is not absent in type 'PrivateMessage'
+    let obj26: {text:string} = pm; //OK
+    

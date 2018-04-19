@@ -1,0 +1,36 @@
+=== tests/cases/compiler/definitions.ts ===
+interface PrivateMessage {
+>PrivateMessage : PrivateMessage
+
+  text?: string;
+>text : string | undefined
+
+  userid?: number;
+>userid : number | undefined
+
+  screenname?: string;
+>screenname : string | undefined
+
+} constrains {
+  present(text);
+>present : any
+>text : any
+
+  or(and(present(userid), not(present(screenname))),
+>or : any
+>and : any
+>present : any
+>userid : any
+>not : any
+>present : any
+>screenname : any
+
+     and(not(present(userid)), present(screenname)));
+>and : any
+>not : any
+>present : any
+>userid : any
+>present : any
+>screenname : any
+}
+

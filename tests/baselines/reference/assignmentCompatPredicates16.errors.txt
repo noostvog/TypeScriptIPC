@@ -1,8 +1,9 @@
-tests/cases/compiler/assignmentCompatPredicates16.ts(11,5): error TS2322: Type '{ text: string; userid: undefined; screenname: undefined; }' is not assignable to type 'PrivateMessage'.
+tests/cases/compiler/assignmentCompatPredicates16.ts(12,5): error TS2322: Type '{ text: string; userid: undefined; screenname: undefined; }' is not assignable to type 'PrivateMessage'.
   Predicate or(and(present(userid),not(present(screenname))),and(not(present(userid)),present(screenname))) was not satisfied in type { text: string; userid: undefined; screenname: undefined; }
 
 
 ==== tests/cases/compiler/assignmentCompatPredicates16.ts (1 errors) ====
+    
     interface PrivateMessage {
         text?: string;
         userid?: number;

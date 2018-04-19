@@ -1,0 +1,68 @@
+=== tests/cases/compiler/definitions_extra_correct.ts ===
+/*Inter-property constraints are commonly found in web APIs and libraries of dynamic languages.
+For example, when the latitude and longitude properties are both optional, but should only occur together.*/
+interface Picture {
+>Picture : Symbol(Picture, Decl(definitions_extra_correct.ts, 0, 0))
+
+  caption?: string;
+>caption : Symbol(Picture.caption, Decl(definitions_extra_correct.ts, 2, 19))
+
+  picture?: string;
+>picture : Symbol(Picture.picture, Decl(definitions_extra_correct.ts, 3, 19))
+
+  lat?: number;
+>lat : Symbol(Picture.lat, Decl(definitions_extra_correct.ts, 4, 19))
+
+  long?: number;
+>long : Symbol(Picture.long, Decl(definitions_extra_correct.ts, 5, 15))
+
+} constrains {
+  present(caption);
+  implic(present(lat), present(picture));
+  implic(present(long), present(picture));
+  iff(present(lat), present(long))
+}
+
+/*Inter-property constraints are also found in the Python standard library, where the function os.utime sets both the access and modification time of a file.
+The documentation describes that the function takes two optional parameters to set the time: times and ns, moreover it states that “It is an error to specify tuples for both times and ns ”.*/
+interface OSUTime {
+>OSUTime : Symbol(OSUTime, Decl(definitions_extra_correct.ts, 12, 1))
+
+  times?: number;
+>times : Symbol(OSUTime.times, Decl(definitions_extra_correct.ts, 16, 19))
+
+  ns?: number
+>ns : Symbol(OSUTime.ns, Decl(definitions_extra_correct.ts, 17, 17))
+
+} constrains {
+  not(and(present(times),
+          present(ns)));
+}
+
+interface PrivateMessage {
+>PrivateMessage : Symbol(PrivateMessage, Decl(definitions_extra_correct.ts, 22, 1))
+
+  text?: string;
+>text : Symbol(PrivateMessage.text, Decl(definitions_extra_correct.ts, 24, 26))
+
+  userid?: number;
+>userid : Symbol(PrivateMessage.userid, Decl(definitions_extra_correct.ts, 25, 16))
+
+  screenname?: string;
+>screenname : Symbol(PrivateMessage.screenname, Decl(definitions_extra_correct.ts, 26, 18))
+
+} constrains {
+  present(text);
+  or(and(present(userid), not(present(screenname))),
+     and(not(present(userid)), present(screenname)));
+}
+
+interface PrivateMessageStrict extends PrivateMessage {
+>PrivateMessageStrict : Symbol(PrivateMessageStrict, Decl(definitions_extra_correct.ts, 32, 1))
+>PrivateMessage : Symbol(PrivateMessage, Decl(definitions_extra_correct.ts, 22, 1))
+
+  //inherit properties
+} constrains {
+  present(screenname);
+}
+

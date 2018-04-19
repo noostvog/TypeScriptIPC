@@ -1,0 +1,64 @@
+tests/cases/compiler/object_creation_extra_incorrect.ts(21,5): error TS2322: Type '{}' is not assignable to type 'Picture'.
+  Predicate present(caption) was not satisfied in type {}
+    Property 'caption' is missing in type '{}'.
+tests/cases/compiler/object_creation_extra_incorrect.ts(22,5): error TS2322: Type '{ caption: string; lat: number; long: number; }' is not assignable to type 'Picture'.
+  Predicate implic(present(lat),present(picture)) was not satisfied in type { caption: string; lat: number; long: number; }
+tests/cases/compiler/object_creation_extra_incorrect.ts(23,5): error TS2322: Type '{ lat: number; long: number; picture: string; }' is not assignable to type 'Picture'.
+  Predicate present(caption) was not satisfied in type { lat: number; long: number; picture: string; }
+    Property 'caption' is missing in type '{ lat: number; long: number; picture: string; }'.
+tests/cases/compiler/object_creation_extra_incorrect.ts(24,5): error TS2322: Type '{ caption: string; lat: number; picture: string; }' is not assignable to type 'Picture'.
+  Predicate iff(present(lat),present(long)) was not satisfied in type { caption: string; lat: number; picture: string; }
+tests/cases/compiler/object_creation_extra_incorrect.ts(25,5): error TS2322: Type '{ caption: string; long: number; picture: string; }' is not assignable to type 'Picture'.
+  Predicate iff(present(lat),present(long)) was not satisfied in type { caption: string; long: number; picture: string; }
+tests/cases/compiler/object_creation_extra_incorrect.ts(26,5): error TS2322: Type '{ times: number; ns: number; }' is not assignable to type 'OSUTime'.
+  Predicate not(and(present(times),present(ns))) was not satisfied in type { times: number; ns: number; }
+
+
+==== tests/cases/compiler/object_creation_extra_incorrect.ts (6 errors) ====
+    interface Picture {
+      caption?: string;
+      picture?: string;
+      lat?: number;
+      long?: number;
+    } constrains {
+      present(caption);
+      implic(present(lat), present(picture));
+      implic(present(long), present(picture));
+      iff(present(lat), present(long))
+    }
+    
+    interface OSUTime {
+      times?: number;
+      ns?: number
+    } constrains {
+      not(and(present(times),
+              present(ns)));
+    }
+    
+    let pic1: Picture = {}; //ERROR
+        ~~~~
+!!! error TS2322: Type '{}' is not assignable to type 'Picture'.
+!!! error TS2322:   Predicate present(caption) was not satisfied in type {}
+!!! error TS2322:     Property 'caption' is missing in type '{}'.
+    let pic2: Picture = {caption: "On holiday", lat: 5, long: 6}; //ERROR
+        ~~~~
+!!! error TS2322: Type '{ caption: string; lat: number; long: number; }' is not assignable to type 'Picture'.
+!!! error TS2322:   Predicate implic(present(lat),present(picture)) was not satisfied in type { caption: string; lat: number; long: number; }
+    let pic3: Picture = {lat: 5, long: 6, picture: "path"}; //ERROR
+        ~~~~
+!!! error TS2322: Type '{ lat: number; long: number; picture: string; }' is not assignable to type 'Picture'.
+!!! error TS2322:   Predicate present(caption) was not satisfied in type { lat: number; long: number; picture: string; }
+!!! error TS2322:     Property 'caption' is missing in type '{ lat: number; long: number; picture: string; }'.
+    let pic4: Picture = {caption: "On holiday", lat: 6, picture: "path"}; //ERROR
+        ~~~~
+!!! error TS2322: Type '{ caption: string; lat: number; picture: string; }' is not assignable to type 'Picture'.
+!!! error TS2322:   Predicate iff(present(lat),present(long)) was not satisfied in type { caption: string; lat: number; picture: string; }
+    let pic5: Picture = {caption: "On holiday", long: 6, picture: "path"}; //ERROR
+        ~~~~
+!!! error TS2322: Type '{ caption: string; long: number; picture: string; }' is not assignable to type 'Picture'.
+!!! error TS2322:   Predicate iff(present(lat),present(long)) was not satisfied in type { caption: string; long: number; picture: string; }
+    let time: OSUTime = {times: 5, ns: 6}; //ERROR
+        ~~~~
+!!! error TS2322: Type '{ times: number; ns: number; }' is not assignable to type 'OSUTime'.
+!!! error TS2322:   Predicate not(and(present(times),present(ns))) was not satisfied in type { times: number; ns: number; }
+    

@@ -1,6 +1,5 @@
 tests/cases/compiler/assignmentCompatPredicates14.ts(15,5): error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: number; }'.
   Type 'string' is not assignable to type 'number'.
-    Type 'string' is not assignable to type 'number'.
 
 
 ==== tests/cases/compiler/assignmentCompatPredicates14.ts (1 errors) ====
@@ -22,5 +21,4 @@ tests/cases/compiler/assignmentCompatPredicates14.ts(15,5): error TS2322: Type '
         ~~~
 !!! error TS2322: Type 'PrivateMessage' is not assignable to type '{ text: number; }'.
 !!! error TS2322:   Type 'string' is not assignable to type 'number'.
-!!! error TS2322:     Type 'string' is not assignable to type 'number'.
     

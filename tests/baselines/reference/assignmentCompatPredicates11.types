@@ -4,16 +4,16 @@ interface PrivateMessage {
 >PrivateMessage : PrivateMessage
 
     text?: string;
->text : string
+>text : string | undefined
 
     userid?: number;
->userid : number
+>userid : number | undefined
 
     screenname?: string;
->screenname : string
+>screenname : string | undefined
 
     smthg?: number;
->smthg : number
+>smthg : number | undefined
 
 } constrains {
     present(text);
@@ -53,8 +53,8 @@ let pm1: PrivateMessage = {text: "Hi!", userid: 42};
 >42 : 42
 
 let obj2: {text: string, userid?: number} = pm1;
->obj2 : { text: string; userid?: number; }
+>obj2 : { text: string; userid?: number | undefined; }
 >text : string
->userid : number
+>userid : number | undefined
 >pm1 : PrivateMessage
 

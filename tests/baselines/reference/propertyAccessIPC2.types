@@ -3,13 +3,13 @@ interface PrivateMessage {
 >PrivateMessage : PrivateMessage
 
     text?: string;
->text : string
+>text : string | undefined
 
     userid?: number;
->userid : number
+>userid : number | undefined
 
     screenname?: string;
->screenname : string
+>screenname : string | undefined
 
 } constrains {
     present(text);

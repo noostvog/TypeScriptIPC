@@ -1,0 +1,114 @@
+=== tests/cases/compiler/definitions_extra_correct.ts ===
+/*Inter-property constraints are commonly found in web APIs and libraries of dynamic languages.
+For example, when the latitude and longitude properties are both optional, but should only occur together.*/
+interface Picture {
+>Picture : Picture
+
+  caption?: string;
+>caption : string | undefined
+
+  picture?: string;
+>picture : string | undefined
+
+  lat?: number;
+>lat : number | undefined
+
+  long?: number;
+>long : number | undefined
+
+} constrains {
+  present(caption);
+>present : any
+>caption : any
+
+  implic(present(lat), present(picture));
+>implic : any
+>present : any
+>lat : any
+>present : any
+>picture : any
+
+  implic(present(long), present(picture));
+>implic : any
+>present : any
+>long : any
+>present : any
+>picture : any
+
+  iff(present(lat), present(long))
+>iff : any
+>present : any
+>lat : any
+>present : any
+>long : any
+}
+
+/*Inter-property constraints are also found in the Python standard library, where the function os.utime sets both the access and modification time of a file.
+The documentation describes that the function takes two optional parameters to set the time: times and ns, moreover it states that “It is an error to specify tuples for both times and ns ”.*/
+interface OSUTime {
+>OSUTime : OSUTime
+
+  times?: number;
+>times : number | undefined
+
+  ns?: number
+>ns : number | undefined
+
+} constrains {
+  not(and(present(times),
+>not : any
+>and : any
+>present : any
+>times : any
+
+          present(ns)));
+>present : any
+>ns : any
+}
+
+interface PrivateMessage {
+>PrivateMessage : PrivateMessage
+
+  text?: string;
+>text : string | undefined
+
+  userid?: number;
+>userid : number | undefined
+
+  screenname?: string;
+>screenname : string | undefined
+
+} constrains {
+  present(text);
+>present : any
+>text : any
+
+  or(and(present(userid), not(present(screenname))),
+>or : any
+>and : any
+>present : any
+>userid : any
+>not : any
+>present : any
+>screenname : any
+
+     and(not(present(userid)), present(screenname)));
+>and : any
+>not : any
+>present : any
+>userid : any
+>present : any
+>screenname : any
+}
+
+interface PrivateMessageStrict extends PrivateMessage {
+>PrivateMessageStrict : PrivateMessageStrict
+>PrivateMessage : PrivateMessage
+
+  //inherit properties
+} constrains {
+  present(screenname);
+>present : any
+>screenname : any
+}
+

@@ -1,0 +1,103 @@
+=== tests/cases/compiler/object_creation_extra_correct.ts ===
+interface Picture {
+>Picture : Picture
+
+  caption?: string;
+>caption : string | undefined
+
+  picture?: string;
+>picture : string | undefined
+
+  lat?: number;
+>lat : number | undefined
+
+  long?: number;
+>long : number | undefined
+
+} constrains {
+  present(caption);
+>present : any
+>caption : any
+
+  implic(present(lat), present(picture));
+>implic : any
+>present : any
+>lat : any
+>present : any
+>picture : any
+
+  implic(present(long), present(picture));
+>implic : any
+>present : any
+>long : any
+>present : any
+>picture : any
+
+  iff(present(lat), present(long))
+>iff : any
+>present : any
+>lat : any
+>present : any
+>long : any
+}
+
+interface OSUTime {
+>OSUTime : OSUTime
+
+  times?: number;
+>times : number | undefined
+
+  ns?: number
+>ns : number | undefined
+
+} constrains {
+  not(and(present(times),
+>not : any
+>and : any
+>present : any
+>times : any
+
+          present(ns)));
+>present : any
+>ns : any
+}
+
+let pic1: Picture = {caption: "On holiday"}; //OK
+>pic1 : Picture
+>Picture : Picture
+>{caption: "On holiday"} : { caption: string; }
+>caption : string
+>"On holiday" : "On holiday"
+
+let pic2: Picture = {caption: "On holiday", lat: 5, long: 6, picture: "path"}; //OK
+>pic2 : Picture
+>Picture : Picture
+>{caption: "On holiday", lat: 5, long: 6, picture: "path"} : { caption: string; lat: number; long: number; picture: string; }
+>caption : string
+>"On holiday" : "On holiday"
+>lat : number
+>5 : 5
+>long : number
+>6 : 6
+>picture : string
+>"path" : "path"
+
+let time1: OSUTime = {}; //OK
+>time1 : OSUTime
+>OSUTime : OSUTime
+>{} : {}
+
+let time2: OSUTime = {times: 5}; //OK
+>time2 : OSUTime
+>OSUTime : OSUTime
+>{times: 5} : { times: number; }
+>times : number
+>5 : 5
+
+let time3: OSUTime = {ns: 6}; //OK
+>time3 : OSUTime
+>OSUTime : OSUTime
+>{ns: 6} : { ns: number; }
+>ns : number
+>6 : 6
+

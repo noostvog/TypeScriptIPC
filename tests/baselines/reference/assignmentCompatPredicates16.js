@@ -1,4 +1,5 @@
 //// [assignmentCompatPredicates16.ts]
+
 interface PrivateMessage {
     text?: string;
     userid?: number;

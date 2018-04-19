@@ -1,0 +1,243 @@
+tests/cases/compiler/property_assign_extra_incorrect.ts(57,6): error TS2345: Argument of type 'Picture2' is not assignable to parameter of type 'Picture'.
+  Invalid assignment of type Picture2 tot type Picture. Check if predicates are correct
+tests/cases/compiler/property_assign_extra_incorrect.ts(58,6): error TS2345: Argument of type 'Picture' is not assignable to parameter of type 'Picture1'.
+  Invalid assignment of type Picture tot type Picture1. Check if predicates are correct
+tests/cases/compiler/property_assign_extra_incorrect.ts(59,6): error TS2345: Argument of type 'Picture2' is not assignable to parameter of type 'Picture1'.
+  Invalid assignment of type Picture2 tot type Picture1. Check if predicates are correct
+tests/cases/compiler/property_assign_extra_incorrect.ts(67,7): error TS2345: Argument of type 'OSUTime' is not assignable to parameter of type 'OSUTime2'.
+  Invalid assignment of type OSUTime tot type OSUTime2. Check if predicates are correct
+tests/cases/compiler/property_assign_extra_incorrect.ts(68,7): error TS2345: Argument of type 'OSUTime1' is not assignable to parameter of type 'OSUTime2'.
+  Invalid assignment of type OSUTime1 tot type OSUTime2. Check if predicates are correct
+tests/cases/compiler/property_assign_extra_incorrect.ts(69,7): error TS2345: Argument of type 'OSUTime1' is not assignable to parameter of type 'OSUTime'.
+  Invalid assignment of type OSUTime1 tot type OSUTime. Check if predicates are correct
+tests/cases/compiler/property_assign_extra_incorrect.ts(70,7): error TS2345: Argument of type 'OSUTime' is not assignable to parameter of type 'OSUTime1'.
+  Invalid assignment of type OSUTime tot type OSUTime1. Check if predicates are correct
+tests/cases/compiler/property_assign_extra_incorrect.ts(76,11): error TS2345: Argument of type 'OSUTime' is not assignable to parameter of type 'OSUTime2'.
+  Invalid assignment of type OSUTime tot type OSUTime2. Check if predicates are correct
+tests/cases/compiler/property_assign_extra_incorrect.ts(81,5): error TS2322: Type 'Picture' is not assignable to type '{ caption: string; picture: string; }'.
+  Property 'picture' is not present in type 'Picture'.
+tests/cases/compiler/property_assign_extra_incorrect.ts(82,5): error TS2322: Type 'Picture' is not assignable to type '{ caption: string; picture: string; lat: number; long: number; }'.
+  Property 'picture' is not present in type 'Picture'.
+tests/cases/compiler/property_assign_extra_incorrect.ts(83,5): error TS2322: Type 'Picture' is not assignable to type '{ lat: number; long: number; }'.
+  Property 'lat' is not present in type 'Picture'.
+tests/cases/compiler/property_assign_extra_incorrect.ts(84,5): error TS2322: Type 'Picture' is not assignable to type '{ something: number; }'.
+  Property 'something' is not present in type 'Picture'.
+tests/cases/compiler/property_assign_extra_incorrect.ts(85,5): error TS2322: Type 'Picture' is not assignable to type '{ caption: string; lat: number; long: number; }'.
+  Property 'lat' is not present in type 'Picture'.
+tests/cases/compiler/property_assign_extra_incorrect.ts(88,9): error TS2322: Type 'Picture' is not assignable to type '{ caption: string; picture: undefined; }'.
+  Property 'picture' is not absent in type 'Picture'
+tests/cases/compiler/property_assign_extra_incorrect.ts(90,9): error TS2322: Type 'Picture' is not assignable to type '{ caption: string; picture: string; lat: number; long: number; }'.
+  Property 'lat' is not present in type 'Picture'.
+tests/cases/compiler/property_assign_extra_incorrect.ts(94,5): error TS2322: Type 'OSUTime' is not assignable to type '{ times: number; }'.
+  Property 'times' is not present in type 'OSUTime'.
+tests/cases/compiler/property_assign_extra_incorrect.ts(95,5): error TS2322: Type 'OSUTime' is not assignable to type '{ ns: number; }'.
+  Property 'ns' is not present in type 'OSUTime'.
+tests/cases/compiler/property_assign_extra_incorrect.ts(96,5): error TS2322: Type 'OSUTime' is not assignable to type '{ times: number; ns: number; }'.
+  Property 'times' is not present in type 'OSUTime'.
+tests/cases/compiler/property_assign_extra_incorrect.ts(97,5): error TS2322: Type 'OSUTime' is not assignable to type '{ times?: number | undefined; ns: number; }'.
+  Property 'ns' is not present in type 'OSUTime'.
+tests/cases/compiler/property_assign_extra_incorrect.ts(98,5): error TS2322: Type 'OSUTime' is not assignable to type '{ times: number; ns?: number | undefined; }'.
+  Property 'times' is not present in type 'OSUTime'.
+tests/cases/compiler/property_assign_extra_incorrect.ts(101,9): error TS2322: Type 'OSUTime' is not assignable to type '{ ns: undefined; }'.
+  Property 'ns' is not absent in type 'OSUTime'
+tests/cases/compiler/property_assign_extra_incorrect.ts(103,9): error TS95025: Predicates in true or else branch of if statement are unsatisfiable because of extra knowledge from the if condition
+tests/cases/compiler/property_assign_extra_incorrect.ts(105,13): error TS2322: Type 'OSUTime' is not assignable to type '{ ns: undefined; times: number; }'.
+  Property 'ns' is not absent in type 'OSUTime'
+tests/cases/compiler/property_assign_extra_incorrect.ts(108,9): error TS2322: Type 'OSUTime' is not assignable to type '{ times: undefined; }'.
+  Property 'times' is not absent in type 'OSUTime'
+tests/cases/compiler/property_assign_extra_incorrect.ts(109,9): error TS2322: Type 'OSUTime' is not assignable to type '{ ns: number; }'.
+  Property 'ns' is not present in type 'OSUTime'.
+tests/cases/compiler/property_assign_extra_incorrect.ts(111,9): error TS2322: Type 'OSUTime' is not assignable to type '{ times: number; }'.
+  Property 'times' is not present in type 'OSUTime'.
+
+
+==== tests/cases/compiler/property_assign_extra_incorrect.ts (26 errors) ====
+    interface Picture {
+        caption?: string;
+        picture?: string;
+        lat?: number;
+        long?: number;
+    } constrains {
+        present(caption);
+        implic(present(lat), present(picture));
+        implic(present(long), present(picture));
+        iff(present(long), present(lat));
+    }
+    
+    interface Picture1 {
+        caption?: string;
+        picture?: string;
+    } constrains {
+        present(caption);
+    }
+    
+    interface Picture2 {
+        caption?: string;
+        picture?: string;
+        lat?: number;
+        long?: number;
+    } constrains {
+        present(caption);
+        iff(present(lat), present(long));
+    }
+    
+    interface OSUTime {
+        times?: number;
+        ns?: number
+    } constrains {
+        not(and(present(times),
+            present(ns)));
+    }
+    interface OSUTime1 {
+        times?: number;
+        ns?: number;
+    } constrains {
+        or(present(times), present(ns));
+    }
+    
+    interface OSUTime2 {
+        times?: number;
+        ns?: number;
+    } constrains {
+        or(and(present(times), not(present(ns))),
+            and(not(present(times)), present(ns)));
+    }
+    //Interface to Interface Assignment
+    let p0: Picture = {caption: "Holiday"};
+    let p1: Picture1 = {caption: "Holiday"};
+    let p2: Picture2 = {caption: "Holiday"};
+    function pic0(arg: Picture) { arg };
+    function pic1(arg: Picture1) { arg };
+    pic0(p2); //ERROR
+         ~~
+!!! error TS2345: Argument of type 'Picture2' is not assignable to parameter of type 'Picture'.
+!!! error TS2345:   Invalid assignment of type Picture2 tot type Picture. Check if predicates are correct
+    pic1(p0); //ERROR
+         ~~
+!!! error TS2345: Argument of type 'Picture' is not assignable to parameter of type 'Picture1'.
+!!! error TS2345:   Invalid assignment of type Picture tot type Picture1. Check if predicates are correct
+    pic1(p2); //ERROR
+         ~~
+!!! error TS2345: Argument of type 'Picture2' is not assignable to parameter of type 'Picture1'.
+!!! error TS2345:   Invalid assignment of type Picture2 tot type Picture1. Check if predicates are correct
+    
+    let var0: OSUTime = {times: 5};
+    let var1: OSUTime1 = {times: 5};
+    let var2: OSUTime2 = {times: 5};
+    function time0(arg: OSUTime) { arg };
+    function time1(arg: OSUTime1) { arg };
+    function time2(arg: OSUTime2) { arg };
+    time2(var0); //ERROR
+          ~~~~
+!!! error TS2345: Argument of type 'OSUTime' is not assignable to parameter of type 'OSUTime2'.
+!!! error TS2345:   Invalid assignment of type OSUTime tot type OSUTime2. Check if predicates are correct
+    time2(var1); //ERROR
+          ~~~~
+!!! error TS2345: Argument of type 'OSUTime1' is not assignable to parameter of type 'OSUTime2'.
+!!! error TS2345:   Invalid assignment of type OSUTime1 tot type OSUTime2. Check if predicates are correct
+    time0(var1); //ERROR
+          ~~~~
+!!! error TS2345: Argument of type 'OSUTime1' is not assignable to parameter of type 'OSUTime'.
+!!! error TS2345:   Invalid assignment of type OSUTime1 tot type OSUTime. Check if predicates are correct
+    time1(var0); //ERROR
+          ~~~~
+!!! error TS2345: Argument of type 'OSUTime' is not assignable to parameter of type 'OSUTime1'.
+!!! error TS2345:   Invalid assignment of type OSUTime tot type OSUTime1. Check if predicates are correct
+    if (var0.ns) {
+    
+    } else if (var0.times) {
+    
+    } else {
+        time2(var0); //ERROR
+              ~~~~
+!!! error TS2345: Argument of type 'OSUTime' is not assignable to parameter of type 'OSUTime2'.
+!!! error TS2345:   Invalid assignment of type OSUTime tot type OSUTime2. Check if predicates are correct
+    }
+    
+    //Interface to Object Assignment
+    let pic:Picture = {caption: "Holiday", picture: "path"}; //OK
+    let obj2:{caption: string, picture: string} = pic; //ERROR
+        ~~~~
+!!! error TS2322: Type 'Picture' is not assignable to type '{ caption: string; picture: string; }'.
+!!! error TS2322:   Property 'picture' is not present in type 'Picture'.
+    let obj4:{caption: string, picture: string, lat: number, long: number} = pic; //ERROR
+        ~~~~
+!!! error TS2322: Type 'Picture' is not assignable to type '{ caption: string; picture: string; lat: number; long: number; }'.
+!!! error TS2322:   Property 'picture' is not present in type 'Picture'.
+    let obj5:{lat: number, long: number} = pic; //ERROR
+        ~~~~
+!!! error TS2322: Type 'Picture' is not assignable to type '{ lat: number; long: number; }'.
+!!! error TS2322:   Property 'lat' is not present in type 'Picture'.
+    let obj7:{something: number} = pic; //ERROR
+        ~~~~
+!!! error TS2322: Type 'Picture' is not assignable to type '{ something: number; }'.
+!!! error TS2322:   Property 'something' is not present in type 'Picture'.
+    let obj19:{caption: string, lat: number, long: number} = pic; //ERROR
+        ~~~~~
+!!! error TS2322: Type 'Picture' is not assignable to type '{ caption: string; lat: number; long: number; }'.
+!!! error TS2322:   Property 'lat' is not present in type 'Picture'.
+    
+    if (pic.long) {
+        let obj9:{caption: string, picture: undefined} = pic; //ERROR
+            ~~~~
+!!! error TS2322: Type 'Picture' is not assignable to type '{ caption: string; picture: undefined; }'.
+!!! error TS2322:   Property 'picture' is not absent in type 'Picture'
+    } else if (pic.picture) {
+        let obj8:{caption: string, picture: string, lat: number, long: number} = pic; //ERROR
+            ~~~~
+!!! error TS2322: Type 'Picture' is not assignable to type '{ caption: string; picture: string; lat: number; long: number; }'.
+!!! error TS2322:   Property 'lat' is not present in type 'Picture'.
+    }
+    
+    let time:OSUTime = {times: 5}; //OK
+    let obj10:{times: number} = time; //ERROR
+        ~~~~~
+!!! error TS2322: Type 'OSUTime' is not assignable to type '{ times: number; }'.
+!!! error TS2322:   Property 'times' is not present in type 'OSUTime'.
+    let obj11:{ns: number} = time; //ERROR
+        ~~~~~
+!!! error TS2322: Type 'OSUTime' is not assignable to type '{ ns: number; }'.
+!!! error TS2322:   Property 'ns' is not present in type 'OSUTime'.
+    let obj12:{times: number, ns: number} = time; //ERROR
+        ~~~~~
+!!! error TS2322: Type 'OSUTime' is not assignable to type '{ times: number; ns: number; }'.
+!!! error TS2322:   Property 'times' is not present in type 'OSUTime'.
+    let obj13:{times?: number, ns: number} = time; //ERROR geeft geen fout...
+        ~~~~~
+!!! error TS2322: Type 'OSUTime' is not assignable to type '{ times?: number | undefined; ns: number; }'.
+!!! error TS2322:   Property 'ns' is not present in type 'OSUTime'.
+    let obj14:{times: number, ns?: number} = time; //ERROR
+        ~~~~~
+!!! error TS2322: Type 'OSUTime' is not assignable to type '{ times: number; ns?: number | undefined; }'.
+!!! error TS2322:   Property 'times' is not present in type 'OSUTime'.
+    
+    if (time.ns) {
+        let obj14:{ns: undefined} = time; //ERROR
+            ~~~~~
+!!! error TS2322: Type 'OSUTime' is not assignable to type '{ ns: undefined; }'.
+!!! error TS2322:   Property 'ns' is not absent in type 'OSUTime'
+        if (time.times) {
+            time; //unsatisfiable
+            ~~~~
+!!! error TS95025: Predicates in true or else branch of if statement are unsatisfiable because of extra knowledge from the if condition
+        } else {
+            let obj17:{ns: undefined, times: number} = time; //ERROR
+                ~~~~~
+!!! error TS2322: Type 'OSUTime' is not assignable to type '{ ns: undefined; times: number; }'.
+!!! error TS2322:   Property 'ns' is not absent in type 'OSUTime'
+        }
+    } else if (time.times) {
+        let obj15:{times: undefined} = time; //ERROR
+            ~~~~~
+!!! error TS2322: Type 'OSUTime' is not assignable to type '{ times: undefined; }'.
+!!! error TS2322:   Property 'times' is not absent in type 'OSUTime'
+        let obj16:{ns: number} = time; //ERROR
+            ~~~~~
+!!! error TS2322: Type 'OSUTime' is not assignable to type '{ ns: number; }'.
+!!! error TS2322:   Property 'ns' is not present in type 'OSUTime'.
+    } else {
+        let obj16:{times: number} = time; //ERROR
+            ~~~~~
+!!! error TS2322: Type 'OSUTime' is not assignable to type '{ times: number; }'.
+!!! error TS2322:   Property 'times' is not present in type 'OSUTime'.
+    }

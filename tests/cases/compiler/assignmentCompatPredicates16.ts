@@ -1,3 +1,5 @@
+// @strictNullChecks: true
+
 interface PrivateMessage {
     text?: string;
     userid?: number;

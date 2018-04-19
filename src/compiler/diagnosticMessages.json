@@ -3346,5 +3346,9 @@
     "Predicates in {0} branch of if statement are unsatisfiable because of extra knowledge from the if condition": {
         "category": "Error",
         "code": 95025
+    },
+    "Interfaces with constraints may only be used in strict null checking mode": {
+        "category": "Error",
+        "code": 95026
     }
 }

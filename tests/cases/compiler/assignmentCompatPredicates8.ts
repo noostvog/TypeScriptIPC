@@ -1,3 +1,5 @@
+// @strictNullChecks: true
+
 interface PrivateMessage {
     text?: string;
     userid?: number;
@@ -10,5 +12,5 @@ or(and(present(userid), not(present(screenname))),
 not(present(smthg));
 }
 
-let obj: {text: "Hi!", userid: 42}
+let obj: {text: string, userid: number} = {text: "Hi!", userid: 42}
 let pm1: PrivateMessage = obj;

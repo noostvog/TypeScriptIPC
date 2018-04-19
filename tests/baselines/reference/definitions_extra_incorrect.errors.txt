@@ -1,0 +1,54 @@
+tests/cases/compiler/definitions_extra_incorrect.ts(1,11): error TS95024: Predicates of interface 'Unsatisfiable' have to be satisfiable
+tests/cases/compiler/definitions_extra_incorrect.ts(10,11): error TS95023: Property MustBeOptional has to be an optional property, as it is part of an interface with predicates
+tests/cases/compiler/definitions_extra_incorrect.ts(17,11): error TS95022: Property NotUndefined may not have type 'undefined', as it is part of an interface with predicates
+tests/cases/compiler/definitions_extra_incorrect.ts(34,11): error TS95024: Predicates of interface 'IncorrectExtended' have to be satisfiable
+
+
+==== tests/cases/compiler/definitions_extra_incorrect.ts (4 errors) ====
+    interface Unsatisfiable {
+              ~~~~~~~~~~~~~
+!!! error TS95024: Predicates of interface 'Unsatisfiable' have to be satisfiable
+      a?: string;
+      b?: string;
+    } constrains {
+      implic(present(a), not(present(b)));
+      implic(present(b), present(a));
+      present(b);
+    }
+    
+    interface MustBeOptional {
+              ~~~~~~~~~~~~~~
+!!! error TS95023: Property MustBeOptional has to be an optional property, as it is part of an interface with predicates
+      a: string;
+      b: string;
+    } constrains {
+      or(present(a), present(b));
+    }
+    
+    interface NotUndefined {
+              ~~~~~~~~~~~~
+!!! error TS95022: Property NotUndefined may not have type 'undefined', as it is part of an interface with predicates
+      a?: string;
+      b?: undefined;
+    } constrains {
+      or(present(a), present(b));
+    }
+    
+    interface PrivateMessage {
+      text?: string;
+      userid?: number;
+      screenname?: string;
+    } constrains {
+      present(text);
+      or(and(present(userid), not(present(screenname))),
+         and(not(present(userid)), present(screenname)));
+    }
+    
+    interface IncorrectExtended extends PrivateMessage {
+              ~~~~~~~~~~~~~~~~~
+!!! error TS95024: Predicates of interface 'IncorrectExtended' have to be satisfiable
+      //inherit all properties
+    } constrains {
+      not(present(text));
+    }
+    

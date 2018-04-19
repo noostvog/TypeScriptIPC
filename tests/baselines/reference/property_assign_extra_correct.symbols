@@ -1,0 +1,351 @@
+=== tests/cases/compiler/property_assign_extra_correct.ts ===
+interface Picture {
+>Picture : Symbol(Picture, Decl(property_assign_extra_correct.ts, 0, 0))
+
+    caption?: string;
+>caption : Symbol(Picture.caption, Decl(property_assign_extra_correct.ts, 0, 19))
+
+    picture?: string;
+>picture : Symbol(Picture.picture, Decl(property_assign_extra_correct.ts, 1, 21))
+
+    lat?: number;
+>lat : Symbol(Picture.lat, Decl(property_assign_extra_correct.ts, 2, 21))
+
+    long?: number;
+>long : Symbol(Picture.long, Decl(property_assign_extra_correct.ts, 3, 17))
+
+} constrains {
+    present(caption);
+    implic(present(lat), present(picture));
+    implic(present(long), present(picture));
+    iff(present(long), present(lat));
+}
+interface Picture1 {
+>Picture1 : Symbol(Picture1, Decl(property_assign_extra_correct.ts, 10, 1))
+
+    caption?: string;
+>caption : Symbol(Picture1.caption, Decl(property_assign_extra_correct.ts, 11, 20))
+
+    picture?: string;
+>picture : Symbol(Picture1.picture, Decl(property_assign_extra_correct.ts, 12, 21))
+
+} constrains {
+    present(caption);
+}
+
+interface Picture2 {
+>Picture2 : Symbol(Picture2, Decl(property_assign_extra_correct.ts, 16, 1))
+
+    caption?: string;
+>caption : Symbol(Picture2.caption, Decl(property_assign_extra_correct.ts, 18, 20))
+
+    picture?: string;
+>picture : Symbol(Picture2.picture, Decl(property_assign_extra_correct.ts, 19, 21))
+
+    lat?: number;
+>lat : Symbol(Picture2.lat, Decl(property_assign_extra_correct.ts, 20, 21))
+
+    long?: number;
+>long : Symbol(Picture2.long, Decl(property_assign_extra_correct.ts, 21, 17))
+
+} constrains {
+    present(caption);
+    iff(present(lat), present(long));
+}
+interface OSUTime {
+>OSUTime : Symbol(OSUTime, Decl(property_assign_extra_correct.ts, 26, 1))
+
+    times?: number;
+>times : Symbol(OSUTime.times, Decl(property_assign_extra_correct.ts, 27, 19))
+
+    ns?: number
+>ns : Symbol(OSUTime.ns, Decl(property_assign_extra_correct.ts, 28, 19))
+
+} constrains {
+    not(and(present(times),
+        present(ns)));
+}
+
+interface OSUTime1 {
+>OSUTime1 : Symbol(OSUTime1, Decl(property_assign_extra_correct.ts, 33, 1))
+
+    times?: number;
+>times : Symbol(OSUTime1.times, Decl(property_assign_extra_correct.ts, 35, 20))
+
+    ns?: number;
+>ns : Symbol(OSUTime1.ns, Decl(property_assign_extra_correct.ts, 36, 19))
+
+} constrains {
+    or(present(times), present(ns));
+}
+
+interface OSUTime2 {
+>OSUTime2 : Symbol(OSUTime2, Decl(property_assign_extra_correct.ts, 40, 1))
+
+    times?: number;
+>times : Symbol(OSUTime2.times, Decl(property_assign_extra_correct.ts, 42, 20))
+
+    ns?: number;
+>ns : Symbol(OSUTime2.ns, Decl(property_assign_extra_correct.ts, 43, 19))
+
+} constrains {
+    or(and(present(times), not(present(ns))),
+        and(not(present(times)), present(ns)));
+}
+//Interface to Interface Assignment
+let p0: Picture = {caption: "Holiday"};
+>p0 : Symbol(p0, Decl(property_assign_extra_correct.ts, 50, 3))
+>Picture : Symbol(Picture, Decl(property_assign_extra_correct.ts, 0, 0))
+>caption : Symbol(caption, Decl(property_assign_extra_correct.ts, 50, 19))
+
+let p1: Picture1 = {caption: "Holiday"};
+>p1 : Symbol(p1, Decl(property_assign_extra_correct.ts, 51, 3))
+>Picture1 : Symbol(Picture1, Decl(property_assign_extra_correct.ts, 10, 1))
+>caption : Symbol(caption, Decl(property_assign_extra_correct.ts, 51, 20))
+
+let p2: Picture2 = {caption: "Holiday"};
+>p2 : Symbol(p2, Decl(property_assign_extra_correct.ts, 52, 3))
+>Picture2 : Symbol(Picture2, Decl(property_assign_extra_correct.ts, 16, 1))
+>caption : Symbol(caption, Decl(property_assign_extra_correct.ts, 52, 20))
+
+function pic0(arg: Picture) { arg };
+>pic0 : Symbol(pic0, Decl(property_assign_extra_correct.ts, 52, 40))
+>arg : Symbol(arg, Decl(property_assign_extra_correct.ts, 53, 14))
+>Picture : Symbol(Picture, Decl(property_assign_extra_correct.ts, 0, 0))
+>arg : Symbol(arg, Decl(property_assign_extra_correct.ts, 53, 14))
+
+function pic2(arg: Picture2) { arg };
+>pic2 : Symbol(pic2, Decl(property_assign_extra_correct.ts, 53, 36))
+>arg : Symbol(arg, Decl(property_assign_extra_correct.ts, 54, 14))
+>Picture2 : Symbol(Picture2, Decl(property_assign_extra_correct.ts, 16, 1))
+>arg : Symbol(arg, Decl(property_assign_extra_correct.ts, 54, 14))
+
+pic0(p1); //OK
+>pic0 : Symbol(pic0, Decl(property_assign_extra_correct.ts, 52, 40))
+>p1 : Symbol(p1, Decl(property_assign_extra_correct.ts, 51, 3))
+
+pic2(p0); //OK
+>pic2 : Symbol(pic2, Decl(property_assign_extra_correct.ts, 53, 36))
+>p0 : Symbol(p0, Decl(property_assign_extra_correct.ts, 50, 3))
+
+pic2(p1); //OK
+>pic2 : Symbol(pic2, Decl(property_assign_extra_correct.ts, 53, 36))
+>p1 : Symbol(p1, Decl(property_assign_extra_correct.ts, 51, 3))
+
+let var0: OSUTime = {times: 5};
+>var0 : Symbol(var0, Decl(property_assign_extra_correct.ts, 59, 3))
+>OSUTime : Symbol(OSUTime, Decl(property_assign_extra_correct.ts, 26, 1))
+>times : Symbol(times, Decl(property_assign_extra_correct.ts, 59, 21))
+
+let var1: OSUTime1 = {times: 5};
+>var1 : Symbol(var1, Decl(property_assign_extra_correct.ts, 60, 3))
+>OSUTime1 : Symbol(OSUTime1, Decl(property_assign_extra_correct.ts, 33, 1))
+>times : Symbol(times, Decl(property_assign_extra_correct.ts, 60, 22))
+
+let var2: OSUTime2 = {times: 5};
+>var2 : Symbol(var2, Decl(property_assign_extra_correct.ts, 61, 3))
+>OSUTime2 : Symbol(OSUTime2, Decl(property_assign_extra_correct.ts, 40, 1))
+>times : Symbol(times, Decl(property_assign_extra_correct.ts, 61, 22))
+
+function time0(arg: OSUTime) { arg };
+>time0 : Symbol(time0, Decl(property_assign_extra_correct.ts, 61, 32))
+>arg : Symbol(arg, Decl(property_assign_extra_correct.ts, 62, 15))
+>OSUTime : Symbol(OSUTime, Decl(property_assign_extra_correct.ts, 26, 1))
+>arg : Symbol(arg, Decl(property_assign_extra_correct.ts, 62, 15))
+
+function time1(arg: OSUTime1) { arg };
+>time1 : Symbol(time1, Decl(property_assign_extra_correct.ts, 62, 37))
+>arg : Symbol(arg, Decl(property_assign_extra_correct.ts, 63, 15))
+>OSUTime1 : Symbol(OSUTime1, Decl(property_assign_extra_correct.ts, 33, 1))
+>arg : Symbol(arg, Decl(property_assign_extra_correct.ts, 63, 15))
+
+function time2(arg: OSUTime2) { arg };
+>time2 : Symbol(time2, Decl(property_assign_extra_correct.ts, 63, 38))
+>arg : Symbol(arg, Decl(property_assign_extra_correct.ts, 64, 15))
+>OSUTime2 : Symbol(OSUTime2, Decl(property_assign_extra_correct.ts, 40, 1))
+>arg : Symbol(arg, Decl(property_assign_extra_correct.ts, 64, 15))
+
+time0(var2); //OK
+>time0 : Symbol(time0, Decl(property_assign_extra_correct.ts, 61, 32))
+>var2 : Symbol(var2, Decl(property_assign_extra_correct.ts, 61, 3))
+
+time1(var2); //OK
+>time1 : Symbol(time1, Decl(property_assign_extra_correct.ts, 62, 37))
+>var2 : Symbol(var2, Decl(property_assign_extra_correct.ts, 61, 3))
+
+if (var0.ns) {
+>var0.ns : Symbol(OSUTime.ns, Decl(property_assign_extra_correct.ts, 28, 19))
+>var0 : Symbol(var0, Decl(property_assign_extra_correct.ts, 59, 3))
+>ns : Symbol(OSUTime.ns, Decl(property_assign_extra_correct.ts, 28, 19))
+
+    time2(var0); //OK
+>time2 : Symbol(time2, Decl(property_assign_extra_correct.ts, 63, 38))
+>var0 : Symbol(var0, Decl(property_assign_extra_correct.ts, 59, 3))
+
+} else if (var0.times) {
+>var0.times : Symbol(OSUTime.times, Decl(property_assign_extra_correct.ts, 27, 19))
+>var0 : Symbol(var0, Decl(property_assign_extra_correct.ts, 59, 3))
+>times : Symbol(OSUTime.times, Decl(property_assign_extra_correct.ts, 27, 19))
+
+    time2(var0); //OK
+>time2 : Symbol(time2, Decl(property_assign_extra_correct.ts, 63, 38))
+>var0 : Symbol(var0, Decl(property_assign_extra_correct.ts, 59, 3))
+}
+
+//Interface to Object Assignment
+let pic:Picture = {caption: "Holiday", picture: "path"}; //OK
+>pic : Symbol(pic, Decl(property_assign_extra_correct.ts, 74, 3))
+>Picture : Symbol(Picture, Decl(property_assign_extra_correct.ts, 0, 0))
+>caption : Symbol(caption, Decl(property_assign_extra_correct.ts, 74, 19))
+>picture : Symbol(picture, Decl(property_assign_extra_correct.ts, 74, 38))
+
+let obj0:{} = pic; //OK
+>obj0 : Symbol(obj0, Decl(property_assign_extra_correct.ts, 75, 3))
+>pic : Symbol(pic, Decl(property_assign_extra_correct.ts, 74, 3))
+
+let obj1:{caption: string} = pic; //OK
+>obj1 : Symbol(obj1, Decl(property_assign_extra_correct.ts, 76, 3))
+>caption : Symbol(caption, Decl(property_assign_extra_correct.ts, 76, 10))
+>pic : Symbol(pic, Decl(property_assign_extra_correct.ts, 74, 3))
+
+let obj2:{caption: string, picture?: string} = pic; //OK
+>obj2 : Symbol(obj2, Decl(property_assign_extra_correct.ts, 77, 3))
+>caption : Symbol(caption, Decl(property_assign_extra_correct.ts, 77, 10))
+>picture : Symbol(picture, Decl(property_assign_extra_correct.ts, 77, 26))
+>pic : Symbol(pic, Decl(property_assign_extra_correct.ts, 74, 3))
+
+let obj3:{caption: string, picture?: string, lat?: number, long?: number} = pic; //OK
+>obj3 : Symbol(obj3, Decl(property_assign_extra_correct.ts, 78, 3))
+>caption : Symbol(caption, Decl(property_assign_extra_correct.ts, 78, 10))
+>picture : Symbol(picture, Decl(property_assign_extra_correct.ts, 78, 26))
+>lat : Symbol(lat, Decl(property_assign_extra_correct.ts, 78, 44))
+>long : Symbol(long, Decl(property_assign_extra_correct.ts, 78, 58))
+>pic : Symbol(pic, Decl(property_assign_extra_correct.ts, 74, 3))
+
+let obj4:{caption: string, lat?: number, long?: number} = pic; //OK
+>obj4 : Symbol(obj4, Decl(property_assign_extra_correct.ts, 79, 3))
+>caption : Symbol(caption, Decl(property_assign_extra_correct.ts, 79, 10))
+>lat : Symbol(lat, Decl(property_assign_extra_correct.ts, 79, 26))
+>long : Symbol(long, Decl(property_assign_extra_correct.ts, 79, 40))
+>pic : Symbol(pic, Decl(property_assign_extra_correct.ts, 74, 3))
+
+let obj16:{lat?: number, long?: number} = pic; //ERROR
+>obj16 : Symbol(obj16, Decl(property_assign_extra_correct.ts, 80, 3))
+>lat : Symbol(lat, Decl(property_assign_extra_correct.ts, 80, 11))
+>long : Symbol(long, Decl(property_assign_extra_correct.ts, 80, 24))
+>pic : Symbol(pic, Decl(property_assign_extra_correct.ts, 74, 3))
+
+if (pic.lat) {
+>pic.lat : Symbol(Picture.lat, Decl(property_assign_extra_correct.ts, 2, 21))
+>pic : Symbol(pic, Decl(property_assign_extra_correct.ts, 74, 3))
+>lat : Symbol(Picture.lat, Decl(property_assign_extra_correct.ts, 2, 21))
+
+    let obj5:{caption: string, picture: string} = pic; //OK
+>obj5 : Symbol(obj5, Decl(property_assign_extra_correct.ts, 83, 7))
+>caption : Symbol(caption, Decl(property_assign_extra_correct.ts, 83, 14))
+>picture : Symbol(picture, Decl(property_assign_extra_correct.ts, 83, 30))
+>pic : Symbol(pic, Decl(property_assign_extra_correct.ts, 74, 3))
+
+    let obj6:{caption: string, picture: string, lat: number, long: number} = pic; //OK
+>obj6 : Symbol(obj6, Decl(property_assign_extra_correct.ts, 84, 7))
+>caption : Symbol(caption, Decl(property_assign_extra_correct.ts, 84, 14))
+>picture : Symbol(picture, Decl(property_assign_extra_correct.ts, 84, 30))
+>lat : Symbol(lat, Decl(property_assign_extra_correct.ts, 84, 47))
+>long : Symbol(long, Decl(property_assign_extra_correct.ts, 84, 60))
+>pic : Symbol(pic, Decl(property_assign_extra_correct.ts, 74, 3))
+
+} else if (pic.picture) {
+>pic.picture : Symbol(Picture.picture, Decl(property_assign_extra_correct.ts, 1, 21))
+>pic : Symbol(pic, Decl(property_assign_extra_correct.ts, 74, 3))
+>picture : Symbol(Picture.picture, Decl(property_assign_extra_correct.ts, 1, 21))
+
+    let obj7:{caption: string, picture: string} = pic; //OK
+>obj7 : Symbol(obj7, Decl(property_assign_extra_correct.ts, 86, 7))
+>caption : Symbol(caption, Decl(property_assign_extra_correct.ts, 86, 14))
+>picture : Symbol(picture, Decl(property_assign_extra_correct.ts, 86, 30))
+>pic : Symbol(pic, Decl(property_assign_extra_correct.ts, 74, 3))
+
+    let obj8:{caption: string, picture: string, lat?: number, long?: number} = pic; //OK
+>obj8 : Symbol(obj8, Decl(property_assign_extra_correct.ts, 87, 7))
+>caption : Symbol(caption, Decl(property_assign_extra_correct.ts, 87, 14))
+>picture : Symbol(picture, Decl(property_assign_extra_correct.ts, 87, 30))
+>lat : Symbol(lat, Decl(property_assign_extra_correct.ts, 87, 47))
+>long : Symbol(long, Decl(property_assign_extra_correct.ts, 87, 61))
+>pic : Symbol(pic, Decl(property_assign_extra_correct.ts, 74, 3))
+}
+
+let time:OSUTime = {times: 5};
+>time : Symbol(time, Decl(property_assign_extra_correct.ts, 90, 3))
+>OSUTime : Symbol(OSUTime, Decl(property_assign_extra_correct.ts, 26, 1))
+>times : Symbol(times, Decl(property_assign_extra_correct.ts, 90, 20))
+
+let obj10:{} = time; //OK
+>obj10 : Symbol(obj10, Decl(property_assign_extra_correct.ts, 91, 3))
+>time : Symbol(time, Decl(property_assign_extra_correct.ts, 90, 3))
+
+let obj11:{times?: number} = time; //OK
+>obj11 : Symbol(obj11, Decl(property_assign_extra_correct.ts, 92, 3))
+>times : Symbol(times, Decl(property_assign_extra_correct.ts, 92, 11))
+>time : Symbol(time, Decl(property_assign_extra_correct.ts, 90, 3))
+
+let obj12:{ns?: number} = time; //OK
+>obj12 : Symbol(obj12, Decl(property_assign_extra_correct.ts, 93, 3))
+>ns : Symbol(ns, Decl(property_assign_extra_correct.ts, 93, 11))
+>time : Symbol(time, Decl(property_assign_extra_correct.ts, 90, 3))
+
+let obj13:{times?: number, ns?: number} = time; //OK
+>obj13 : Symbol(obj13, Decl(property_assign_extra_correct.ts, 94, 3))
+>times : Symbol(times, Decl(property_assign_extra_correct.ts, 94, 11))
+>ns : Symbol(ns, Decl(property_assign_extra_correct.ts, 94, 26))
+>time : Symbol(time, Decl(property_assign_extra_correct.ts, 90, 3))
+
+if (time.ns) {
+>time.ns : Symbol(OSUTime.ns, Decl(property_assign_extra_correct.ts, 28, 19))
+>time : Symbol(time, Decl(property_assign_extra_correct.ts, 90, 3))
+>ns : Symbol(OSUTime.ns, Decl(property_assign_extra_correct.ts, 28, 19))
+
+    let obj14:{ns: number} = time; //OK
+>obj14 : Symbol(obj14, Decl(property_assign_extra_correct.ts, 97, 7))
+>ns : Symbol(ns, Decl(property_assign_extra_correct.ts, 97, 15))
+>time : Symbol(time, Decl(property_assign_extra_correct.ts, 90, 3))
+
+    if (time.times) {
+>time.times : Symbol(OSUTime.times, Decl(property_assign_extra_correct.ts, 27, 19))
+>time : Symbol(time, Decl(property_assign_extra_correct.ts, 90, 3))
+>times : Symbol(OSUTime.times, Decl(property_assign_extra_correct.ts, 27, 19))
+
+        //nothing here
+    } else {
+        let obj17:{ns: number, times: undefined} = time; //OK
+>obj17 : Symbol(obj17, Decl(property_assign_extra_correct.ts, 101, 11))
+>ns : Symbol(ns, Decl(property_assign_extra_correct.ts, 101, 19))
+>times : Symbol(times, Decl(property_assign_extra_correct.ts, 101, 30))
+>time : Symbol(time, Decl(property_assign_extra_correct.ts, 90, 3))
+
+        let obj19:{ns: number} = time; //OK
+>obj19 : Symbol(obj19, Decl(property_assign_extra_correct.ts, 102, 11))
+>ns : Symbol(ns, Decl(property_assign_extra_correct.ts, 102, 19))
+>time : Symbol(time, Decl(property_assign_extra_correct.ts, 90, 3))
+    }
+} else if (time.times) {
+>time.times : Symbol(OSUTime.times, Decl(property_assign_extra_correct.ts, 27, 19))
+>time : Symbol(time, Decl(property_assign_extra_correct.ts, 90, 3))
+>times : Symbol(OSUTime.times, Decl(property_assign_extra_correct.ts, 27, 19))
+
+    let obj15:{times: number} = time; //OK
+>obj15 : Symbol(obj15, Decl(property_assign_extra_correct.ts, 105, 7))
+>times : Symbol(times, Decl(property_assign_extra_correct.ts, 105, 15))
+>time : Symbol(time, Decl(property_assign_extra_correct.ts, 90, 3))
+
+    let obj20:{ns: undefined} = time; //OK
+>obj20 : Symbol(obj20, Decl(property_assign_extra_correct.ts, 106, 7))
+>ns : Symbol(ns, Decl(property_assign_extra_correct.ts, 106, 15))
+>time : Symbol(time, Decl(property_assign_extra_correct.ts, 90, 3))
+
+} else {
+    let obj18:{times: undefined, ns: undefined} = time; //OK
+>obj18 : Symbol(obj18, Decl(property_assign_extra_correct.ts, 108, 7))
+>times : Symbol(times, Decl(property_assign_extra_correct.ts, 108, 15))
+>ns : Symbol(ns, Decl(property_assign_extra_correct.ts, 108, 32))
+>time : Symbol(time, Decl(property_assign_extra_correct.ts, 90, 3))
+}

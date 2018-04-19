@@ -1,0 +1,178 @@
+=== tests/cases/compiler/property_access_update_extra_correct.ts ===
+interface Picture {
+>Picture : Symbol(Picture, Decl(property_access_update_extra_correct.ts, 0, 0))
+
+  caption?: string;
+>caption : Symbol(Picture.caption, Decl(property_access_update_extra_correct.ts, 0, 19))
+
+  picture?: string;
+>picture : Symbol(Picture.picture, Decl(property_access_update_extra_correct.ts, 1, 19))
+
+  lat?: number;
+>lat : Symbol(Picture.lat, Decl(property_access_update_extra_correct.ts, 2, 19))
+
+  long?: number;
+>long : Symbol(Picture.long, Decl(property_access_update_extra_correct.ts, 3, 15))
+
+} constrains {
+  present(caption);
+  implic(present(lat), present(picture));
+  implic(present(long), present(picture));
+  iff(present(long), present(lat));
+}
+
+interface OSUTime {
+>OSUTime : Symbol(OSUTime, Decl(property_access_update_extra_correct.ts, 10, 1))
+
+  times?: number;
+>times : Symbol(OSUTime.times, Decl(property_access_update_extra_correct.ts, 12, 19))
+
+  ns?: number
+>ns : Symbol(OSUTime.ns, Decl(property_access_update_extra_correct.ts, 13, 17))
+
+} constrains {
+  not(and(present(times),
+          present(ns)));
+}
+
+function updatePic(picture: Picture, newCap: string, newPic: string, newLat: number, newLong: number): Picture {
+>updatePic : Symbol(updatePic, Decl(property_access_update_extra_correct.ts, 18, 1))
+>picture : Symbol(picture, Decl(property_access_update_extra_correct.ts, 20, 19))
+>Picture : Symbol(Picture, Decl(property_access_update_extra_correct.ts, 0, 0))
+>newCap : Symbol(newCap, Decl(property_access_update_extra_correct.ts, 20, 36))
+>newPic : Symbol(newPic, Decl(property_access_update_extra_correct.ts, 20, 52))
+>newLat : Symbol(newLat, Decl(property_access_update_extra_correct.ts, 20, 68))
+>newLong : Symbol(newLong, Decl(property_access_update_extra_correct.ts, 20, 84))
+>Picture : Symbol(Picture, Decl(property_access_update_extra_correct.ts, 0, 0))
+
+  picture.caption = newCap;
+>picture.caption : Symbol(Picture.caption, Decl(property_access_update_extra_correct.ts, 0, 19))
+>picture : Symbol(picture, Decl(property_access_update_extra_correct.ts, 20, 19))
+>caption : Symbol(Picture.caption, Decl(property_access_update_extra_correct.ts, 0, 19))
+>newCap : Symbol(newCap, Decl(property_access_update_extra_correct.ts, 20, 36))
+
+  if (picture.long) {
+>picture.long : Symbol(Picture.long, Decl(property_access_update_extra_correct.ts, 3, 15))
+>picture : Symbol(picture, Decl(property_access_update_extra_correct.ts, 20, 19))
+>long : Symbol(Picture.long, Decl(property_access_update_extra_correct.ts, 3, 15))
+
+    picture.long = newLong;
+>picture.long : Symbol(Picture.long, Decl(property_access_update_extra_correct.ts, 3, 15))
+>picture : Symbol(picture, Decl(property_access_update_extra_correct.ts, 20, 19))
+>long : Symbol(Picture.long, Decl(property_access_update_extra_correct.ts, 3, 15))
+>newLong : Symbol(newLong, Decl(property_access_update_extra_correct.ts, 20, 84))
+
+    picture.lat = newLat;
+>picture.lat : Symbol(Picture.lat, Decl(property_access_update_extra_correct.ts, 2, 19))
+>picture : Symbol(picture, Decl(property_access_update_extra_correct.ts, 20, 19))
+>lat : Symbol(Picture.lat, Decl(property_access_update_extra_correct.ts, 2, 19))
+>newLat : Symbol(newLat, Decl(property_access_update_extra_correct.ts, 20, 68))
+
+    picture.picture = newPic; //bonus
+>picture.picture : Symbol(Picture.picture, Decl(property_access_update_extra_correct.ts, 1, 19))
+>picture : Symbol(picture, Decl(property_access_update_extra_correct.ts, 20, 19))
+>picture : Symbol(Picture.picture, Decl(property_access_update_extra_correct.ts, 1, 19))
+>newPic : Symbol(newPic, Decl(property_access_update_extra_correct.ts, 20, 52))
+
+  } else if (picture.picture) {
+>picture.picture : Symbol(Picture.picture, Decl(property_access_update_extra_correct.ts, 1, 19))
+>picture : Symbol(picture, Decl(property_access_update_extra_correct.ts, 20, 19))
+>picture : Symbol(Picture.picture, Decl(property_access_update_extra_correct.ts, 1, 19))
+
+    picture.picture = newPic;
+>picture.picture : Symbol(Picture.picture, Decl(property_access_update_extra_correct.ts, 1, 19))
+>picture : Symbol(picture, Decl(property_access_update_extra_correct.ts, 20, 19))
+>picture : Symbol(Picture.picture, Decl(property_access_update_extra_correct.ts, 1, 19))
+>newPic : Symbol(newPic, Decl(property_access_update_extra_correct.ts, 20, 52))
+  }
+  return picture;
+>picture : Symbol(picture, Decl(property_access_update_extra_correct.ts, 20, 19))
+}
+
+function correctLocation(pic: Picture, extra_lat: number, extra_long: number) {
+>correctLocation : Symbol(correctLocation, Decl(property_access_update_extra_correct.ts, 30, 1))
+>pic : Symbol(pic, Decl(property_access_update_extra_correct.ts, 32, 25))
+>Picture : Symbol(Picture, Decl(property_access_update_extra_correct.ts, 0, 0))
+>extra_lat : Symbol(extra_lat, Decl(property_access_update_extra_correct.ts, 32, 38))
+>extra_long : Symbol(extra_long, Decl(property_access_update_extra_correct.ts, 32, 57))
+
+  if (pic.lat) {
+>pic.lat : Symbol(Picture.lat, Decl(property_access_update_extra_correct.ts, 2, 19))
+>pic : Symbol(pic, Decl(property_access_update_extra_correct.ts, 32, 25))
+>lat : Symbol(Picture.lat, Decl(property_access_update_extra_correct.ts, 2, 19))
+
+    pic.long;
+>pic.long : Symbol(Picture.long, Decl(property_access_update_extra_correct.ts, 3, 15))
+>pic : Symbol(pic, Decl(property_access_update_extra_correct.ts, 32, 25))
+>long : Symbol(Picture.long, Decl(property_access_update_extra_correct.ts, 3, 15))
+
+    return objupdate(pic, {picture: pic.picture, lat: pic.lat + extra_lat, long: pic.long + extra_long});
+>picture : Symbol(picture, Decl(property_access_update_extra_correct.ts, 35, 27))
+>pic.picture : Symbol(Picture.picture, Decl(property_access_update_extra_correct.ts, 1, 19))
+>pic : Symbol(pic, Decl(property_access_update_extra_correct.ts, 32, 25))
+>picture : Symbol(Picture.picture, Decl(property_access_update_extra_correct.ts, 1, 19))
+>lat : Symbol(lat, Decl(property_access_update_extra_correct.ts, 35, 48))
+>pic.lat : Symbol(Picture.lat, Decl(property_access_update_extra_correct.ts, 2, 19))
+>pic : Symbol(pic, Decl(property_access_update_extra_correct.ts, 32, 25))
+>lat : Symbol(Picture.lat, Decl(property_access_update_extra_correct.ts, 2, 19))
+>extra_lat : Symbol(extra_lat, Decl(property_access_update_extra_correct.ts, 32, 38))
+>long : Symbol(long, Decl(property_access_update_extra_correct.ts, 35, 74))
+>pic.long : Symbol(Picture.long, Decl(property_access_update_extra_correct.ts, 3, 15))
+>pic : Symbol(pic, Decl(property_access_update_extra_correct.ts, 32, 25))
+>long : Symbol(Picture.long, Decl(property_access_update_extra_correct.ts, 3, 15))
+>extra_long : Symbol(extra_long, Decl(property_access_update_extra_correct.ts, 32, 57))
+  }
+}
+
+function deleteTime(time: OSUTime): OSUTime {
+>deleteTime : Symbol(deleteTime, Decl(property_access_update_extra_correct.ts, 37, 1))
+>time : Symbol(time, Decl(property_access_update_extra_correct.ts, 39, 20))
+>OSUTime : Symbol(OSUTime, Decl(property_access_update_extra_correct.ts, 10, 1))
+>OSUTime : Symbol(OSUTime, Decl(property_access_update_extra_correct.ts, 10, 1))
+
+  return objupdate(time, {ns: undefined, times: undefined});
+>ns : Symbol(ns, Decl(property_access_update_extra_correct.ts, 40, 26))
+>undefined : Symbol(undefined)
+>times : Symbol(times, Decl(property_access_update_extra_correct.ts, 40, 40))
+>undefined : Symbol(undefined)
+}
+
+function switchToNS(time: OSUTime, ns: number): OSUTime {
+>switchToNS : Symbol(switchToNS, Decl(property_access_update_extra_correct.ts, 41, 1))
+>time : Symbol(time, Decl(property_access_update_extra_correct.ts, 43, 20))
+>OSUTime : Symbol(OSUTime, Decl(property_access_update_extra_correct.ts, 10, 1))
+>ns : Symbol(ns, Decl(property_access_update_extra_correct.ts, 43, 34))
+>OSUTime : Symbol(OSUTime, Decl(property_access_update_extra_correct.ts, 10, 1))
+
+  if(time.ns) {
+>time.ns : Symbol(OSUTime.ns, Decl(property_access_update_extra_correct.ts, 13, 17))
+>time : Symbol(time, Decl(property_access_update_extra_correct.ts, 43, 20))
+>ns : Symbol(OSUTime.ns, Decl(property_access_update_extra_correct.ts, 13, 17))
+
+    time.ns = ns;
+>time.ns : Symbol(OSUTime.ns, Decl(property_access_update_extra_correct.ts, 13, 17))
+>time : Symbol(time, Decl(property_access_update_extra_correct.ts, 43, 20))
+>ns : Symbol(OSUTime.ns, Decl(property_access_update_extra_correct.ts, 13, 17))
+>ns : Symbol(ns, Decl(property_access_update_extra_correct.ts, 43, 34))
+
+  } else if (time.times) {
+>time.times : Symbol(OSUTime.times, Decl(property_access_update_extra_correct.ts, 12, 19))
+>time : Symbol(time, Decl(property_access_update_extra_correct.ts, 43, 20))
+>times : Symbol(OSUTime.times, Decl(property_access_update_extra_correct.ts, 12, 19))
+
+    let tmp: OSUTime = time; //temporary variable is needed because the type of time is OSUTime + the present(times) constraint (which you do not want for the objupdate), so first cast back to original OSUTime interface
+>tmp : Symbol(tmp, Decl(property_access_update_extra_correct.ts, 47, 7))
+>OSUTime : Symbol(OSUTime, Decl(property_access_update_extra_correct.ts, 10, 1))
+>time : Symbol(time, Decl(property_access_update_extra_correct.ts, 43, 20))
+
+    time = objupdate(tmp, {times: undefined, ns: ns});
+>time : Symbol(time, Decl(property_access_update_extra_correct.ts, 43, 20))
+>times : Symbol(times, Decl(property_access_update_extra_correct.ts, 48, 27))
+>undefined : Symbol(undefined)
+>ns : Symbol(ns, Decl(property_access_update_extra_correct.ts, 48, 44))
+>ns : Symbol(ns, Decl(property_access_update_extra_correct.ts, 43, 34))
+  }
+  return time;
+>time : Symbol(time, Decl(property_access_update_extra_correct.ts, 43, 20))
+}
+

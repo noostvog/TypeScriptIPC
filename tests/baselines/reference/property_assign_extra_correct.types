@@ -1,0 +1,431 @@
+=== tests/cases/compiler/property_assign_extra_correct.ts ===
+interface Picture {
+>Picture : Picture
+
+    caption?: string;
+>caption : string | undefined
+
+    picture?: string;
+>picture : string | undefined
+
+    lat?: number;
+>lat : number | undefined
+
+    long?: number;
+>long : number | undefined
+
+} constrains {
+    present(caption);
+>present : any
+>caption : any
+
+    implic(present(lat), present(picture));
+>implic : any
+>present : any
+>lat : any
+>present : any
+>picture : any
+
+    implic(present(long), present(picture));
+>implic : any
+>present : any
+>long : any
+>present : any
+>picture : any
+
+    iff(present(long), present(lat));
+>iff : any
+>present : any
+>long : any
+>present : any
+>lat : any
+}
+interface Picture1 {
+>Picture1 : Picture1
+
+    caption?: string;
+>caption : string | undefined
+
+    picture?: string;
+>picture : string | undefined
+
+} constrains {
+    present(caption);
+>present : any
+>caption : any
+}
+
+interface Picture2 {
+>Picture2 : Picture2
+
+    caption?: string;
+>caption : string | undefined
+
+    picture?: string;
+>picture : string | undefined
+
+    lat?: number;
+>lat : number | undefined
+
+    long?: number;
+>long : number | undefined
+
+} constrains {
+    present(caption);
+>present : any
+>caption : any
+
+    iff(present(lat), present(long));
+>iff : any
+>present : any
+>lat : any
+>present : any
+>long : any
+}
+interface OSUTime {
+>OSUTime : OSUTime
+
+    times?: number;
+>times : number | undefined
+
+    ns?: number
+>ns : number | undefined
+
+} constrains {
+    not(and(present(times),
+>not : any
+>and : any
+>present : any
+>times : any
+
+        present(ns)));
+>present : any
+>ns : any
+}
+
+interface OSUTime1 {
+>OSUTime1 : OSUTime1
+
+    times?: number;
+>times : number | undefined
+
+    ns?: number;
+>ns : number | undefined
+
+} constrains {
+    or(present(times), present(ns));
+>or : any
+>present : any
+>times : any
+>present : any
+>ns : any
+}
+
+interface OSUTime2 {
+>OSUTime2 : OSUTime2
+
+    times?: number;
+>times : number | undefined
+
+    ns?: number;
+>ns : number | undefined
+
+} constrains {
+    or(and(present(times), not(present(ns))),
+>or : any
+>and : any
+>present : any
+>times : any
+>not : any
+>present : any
+>ns : any
+
+        and(not(present(times)), present(ns)));
+>and : any
+>not : any
+>present : any
+>times : any
+>present : any
+>ns : any
+}
+//Interface to Interface Assignment
+let p0: Picture = {caption: "Holiday"};
+>p0 : Picture
+>Picture : Picture
+>{caption: "Holiday"} : { caption: string; }
+>caption : string
+>"Holiday" : "Holiday"
+
+let p1: Picture1 = {caption: "Holiday"};
+>p1 : Picture1
+>Picture1 : Picture1
+>{caption: "Holiday"} : { caption: string; }
+>caption : string
+>"Holiday" : "Holiday"
+
+let p2: Picture2 = {caption: "Holiday"};
+>p2 : Picture2
+>Picture2 : Picture2
+>{caption: "Holiday"} : { caption: string; }
+>caption : string
+>"Holiday" : "Holiday"
+
+function pic0(arg: Picture) { arg };
+>pic0 : (arg: Picture) => void
+>arg : Picture
+>Picture : Picture
+>arg : Picture
+
+function pic2(arg: Picture2) { arg };
+>pic2 : (arg: Picture2) => void
+>arg : Picture2
+>Picture2 : Picture2
+>arg : Picture2
+
+pic0(p1); //OK
+>pic0(p1) : void
+>pic0 : (arg: Picture) => void
+>p1 : Picture1
+
+pic2(p0); //OK
+>pic2(p0) : void
+>pic2 : (arg: Picture2) => void
+>p0 : Picture
+
+pic2(p1); //OK
+>pic2(p1) : void
+>pic2 : (arg: Picture2) => void
+>p1 : Picture1
+
+let var0: OSUTime = {times: 5};
+>var0 : OSUTime
+>OSUTime : OSUTime
+>{times: 5} : { times: number; }
+>times : number
+>5 : 5
+
+let var1: OSUTime1 = {times: 5};
+>var1 : OSUTime1
+>OSUTime1 : OSUTime1
+>{times: 5} : { times: number; }
+>times : number
+>5 : 5
+
+let var2: OSUTime2 = {times: 5};
+>var2 : OSUTime2
+>OSUTime2 : OSUTime2
+>{times: 5} : { times: number; }
+>times : number
+>5 : 5
+
+function time0(arg: OSUTime) { arg };
+>time0 : (arg: OSUTime) => void
+>arg : OSUTime
+>OSUTime : OSUTime
+>arg : OSUTime
+
+function time1(arg: OSUTime1) { arg };
+>time1 : (arg: OSUTime1) => void
+>arg : OSUTime1
+>OSUTime1 : OSUTime1
+>arg : OSUTime1
+
+function time2(arg: OSUTime2) { arg };
+>time2 : (arg: OSUTime2) => void
+>arg : OSUTime2
+>OSUTime2 : OSUTime2
+>arg : OSUTime2
+
+time0(var2); //OK
+>time0(var2) : void
+>time0 : (arg: OSUTime) => void
+>var2 : OSUTime2
+
+time1(var2); //OK
+>time1(var2) : void
+>time1 : (arg: OSUTime1) => void
+>var2 : OSUTime2
+
+if (var0.ns) {
+>var0.ns : any
+>var0 : OSUTime
+>ns : any
+
+    time2(var0); //OK
+>time2(var0) : void
+>time2 : (arg: OSUTime2) => void
+>var0 : OSUTime
+
+} else if (var0.times) {
+>var0.times : any
+>var0 : OSUTime
+>times : any
+
+    time2(var0); //OK
+>time2(var0) : void
+>time2 : (arg: OSUTime2) => void
+>var0 : OSUTime
+}
+
+//Interface to Object Assignment
+let pic:Picture = {caption: "Holiday", picture: "path"}; //OK
+>pic : Picture
+>Picture : Picture
+>{caption: "Holiday", picture: "path"} : { caption: string; picture: string; }
+>caption : string
+>"Holiday" : "Holiday"
+>picture : string
+>"path" : "path"
+
+let obj0:{} = pic; //OK
+>obj0 : {}
+>pic : Picture
+
+let obj1:{caption: string} = pic; //OK
+>obj1 : { caption: string; }
+>caption : string
+>pic : Picture
+
+let obj2:{caption: string, picture?: string} = pic; //OK
+>obj2 : { caption: string; picture?: string | undefined; }
+>caption : string
+>picture : string | undefined
+>pic : Picture
+
+let obj3:{caption: string, picture?: string, lat?: number, long?: number} = pic; //OK
+>obj3 : { caption: string; picture?: string | undefined; lat?: number | undefined; long?: number | undefined; }
+>caption : string
+>picture : string | undefined
+>lat : number | undefined
+>long : number | undefined
+>pic : Picture
+
+let obj4:{caption: string, lat?: number, long?: number} = pic; //OK
+>obj4 : { caption: string; lat?: number | undefined; long?: number | undefined; }
+>caption : string
+>lat : number | undefined
+>long : number | undefined
+>pic : Picture
+
+let obj16:{lat?: number, long?: number} = pic; //ERROR
+>obj16 : { lat?: number | undefined; long?: number | undefined; }
+>lat : number | undefined
+>long : number | undefined
+>pic : Picture
+
+if (pic.lat) {
+>pic.lat : any
+>pic : Picture
+>lat : any
+
+    let obj5:{caption: string, picture: string} = pic; //OK
+>obj5 : { caption: string; picture: string; }
+>caption : string
+>picture : string
+>pic : Picture
+
+    let obj6:{caption: string, picture: string, lat: number, long: number} = pic; //OK
+>obj6 : { caption: string; picture: string; lat: number; long: number; }
+>caption : string
+>picture : string
+>lat : number
+>long : number
+>pic : Picture
+
+} else if (pic.picture) {
+>pic.picture : any
+>pic : Picture
+>picture : any
+
+    let obj7:{caption: string, picture: string} = pic; //OK
+>obj7 : { caption: string; picture: string; }
+>caption : string
+>picture : string
+>pic : Picture
+
+    let obj8:{caption: string, picture: string, lat?: number, long?: number} = pic; //OK
+>obj8 : { caption: string; picture: string; lat?: number | undefined; long?: number | undefined; }
+>caption : string
+>picture : string
+>lat : number | undefined
+>long : number | undefined
+>pic : Picture
+}
+
+let time:OSUTime = {times: 5};
+>time : OSUTime
+>OSUTime : OSUTime
+>{times: 5} : { times: number; }
+>times : number
+>5 : 5
+
+let obj10:{} = time; //OK
+>obj10 : {}
+>time : OSUTime
+
+let obj11:{times?: number} = time; //OK
+>obj11 : { times?: number | undefined; }
+>times : number | undefined
+>time : OSUTime
+
+let obj12:{ns?: number} = time; //OK
+>obj12 : { ns?: number | undefined; }
+>ns : number | undefined
+>time : OSUTime
+
+let obj13:{times?: number, ns?: number} = time; //OK
+>obj13 : { times?: number | undefined; ns?: number | undefined; }
+>times : number | undefined
+>ns : number | undefined
+>time : OSUTime
+
+if (time.ns) {
+>time.ns : any
+>time : OSUTime
+>ns : any
+
+    let obj14:{ns: number} = time; //OK
+>obj14 : { ns: number; }
+>ns : number
+>time : OSUTime
+
+    if (time.times) {
+>time.times : undefined
+>time : OSUTime
+>times : undefined
+
+        //nothing here
+    } else {
+        let obj17:{ns: number, times: undefined} = time; //OK
+>obj17 : { ns: number; times: undefined; }
+>ns : number
+>times : undefined
+>time : OSUTime
+
+        let obj19:{ns: number} = time; //OK
+>obj19 : { ns: number; }
+>ns : number
+>time : OSUTime
+    }
+} else if (time.times) {
+>time.times : any
+>time : OSUTime
+>times : any
+
+    let obj15:{times: number} = time; //OK
+>obj15 : { times: number; }
+>times : number
+>time : OSUTime
+
+    let obj20:{ns: undefined} = time; //OK
+>obj20 : { ns: undefined; }
+>ns : undefined
+>time : OSUTime
+
+} else {
+    let obj18:{times: undefined, ns: undefined} = time; //OK
+>obj18 : { times: undefined; ns: undefined; }
+>times : undefined
+>ns : undefined
+>time : OSUTime
+}

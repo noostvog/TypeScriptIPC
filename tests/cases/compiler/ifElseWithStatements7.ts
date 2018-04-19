@@ -1,3 +1,4 @@
+// @strictNullChecks: true
 interface PM1 {
     text?: string;
 } constrains {

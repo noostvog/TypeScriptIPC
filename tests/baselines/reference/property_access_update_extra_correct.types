@@ -1,0 +1,220 @@
+=== tests/cases/compiler/property_access_update_extra_correct.ts ===
+interface Picture {
+>Picture : Picture
+
+  caption?: string;
+>caption : string | undefined
+
+  picture?: string;
+>picture : string | undefined
+
+  lat?: number;
+>lat : number | undefined
+
+  long?: number;
+>long : number | undefined
+
+} constrains {
+  present(caption);
+>present : any
+>caption : any
+
+  implic(present(lat), present(picture));
+>implic : any
+>present : any
+>lat : any
+>present : any
+>picture : any
+
+  implic(present(long), present(picture));
+>implic : any
+>present : any
+>long : any
+>present : any
+>picture : any
+
+  iff(present(long), present(lat));
+>iff : any
+>present : any
+>long : any
+>present : any
+>lat : any
+}
+
+interface OSUTime {
+>OSUTime : OSUTime
+
+  times?: number;
+>times : number | undefined
+
+  ns?: number
+>ns : number | undefined
+
+} constrains {
+  not(and(present(times),
+>not : any
+>and : any
+>present : any
+>times : any
+
+          present(ns)));
+>present : any
+>ns : any
+}
+
+function updatePic(picture: Picture, newCap: string, newPic: string, newLat: number, newLong: number): Picture {
+>updatePic : (picture: Picture, newCap: string, newPic: string, newLat: number, newLong: number) => Picture
+>picture : Picture
+>Picture : Picture
+>newCap : string
+>newPic : string
+>newLat : number
+>newLong : number
+>Picture : Picture
+
+  picture.caption = newCap;
+>picture.caption = newCap : string
+>picture.caption : string
+>picture : Picture
+>caption : string
+>newCap : string
+
+  if (picture.long) {
+>picture.long : any
+>picture : Picture
+>long : any
+
+    picture.long = newLong;
+>picture.long = newLong : number
+>picture.long : number
+>picture : Picture
+>long : number
+>newLong : number
+
+    picture.lat = newLat;
+>picture.lat = newLat : number
+>picture.lat : number
+>picture : Picture
+>lat : number
+>newLat : number
+
+    picture.picture = newPic; //bonus
+>picture.picture = newPic : string
+>picture.picture : string
+>picture : Picture
+>picture : string
+>newPic : string
+
+  } else if (picture.picture) {
+>picture.picture : any
+>picture : Picture
+>picture : any
+
+    picture.picture = newPic;
+>picture.picture = newPic : string
+>picture.picture : string
+>picture : Picture
+>picture : string
+>newPic : string
+  }
+  return picture;
+>picture : Picture
+}
+
+function correctLocation(pic: Picture, extra_lat: number, extra_long: number) {
+>correctLocation : (pic: Picture, extra_lat: number, extra_long: number) => Picture | undefined
+>pic : Picture
+>Picture : Picture
+>extra_lat : number
+>extra_long : number
+
+  if (pic.lat) {
+>pic.lat : any
+>pic : Picture
+>lat : any
+
+    pic.long;
+>pic.long : number
+>pic : Picture
+>long : number
+
+    return objupdate(pic, {picture: pic.picture, lat: pic.lat + extra_lat, long: pic.long + extra_long});
+>pic : any
+>{picture: pic.picture, lat: pic.lat + extra_lat, long: pic.long + extra_long} : { picture: string; lat: number; long: number; }
+>picture : string
+>pic.picture : string
+>pic : Picture
+>picture : string
+>lat : number
+>pic.lat + extra_lat : number
+>pic.lat : number
+>pic : Picture
+>lat : number
+>extra_lat : number
+>long : number
+>pic.long + extra_long : number
+>pic.long : number
+>pic : Picture
+>long : number
+>extra_long : number
+  }
+}
+
+function deleteTime(time: OSUTime): OSUTime {
+>deleteTime : (time: OSUTime) => OSUTime
+>time : OSUTime
+>OSUTime : OSUTime
+>OSUTime : OSUTime
+
+  return objupdate(time, {ns: undefined, times: undefined});
+>time : any
+>{ns: undefined, times: undefined} : { ns: undefined; times: undefined; }
+>ns : undefined
+>undefined : undefined
+>times : undefined
+>undefined : undefined
+}
+
+function switchToNS(time: OSUTime, ns: number): OSUTime {
+>switchToNS : (time: OSUTime, ns: number) => OSUTime
+>time : OSUTime
+>OSUTime : OSUTime
+>ns : number
+>OSUTime : OSUTime
+
+  if(time.ns) {
+>time.ns : any
+>time : OSUTime
+>ns : any
+
+    time.ns = ns;
+>time.ns = ns : number
+>time.ns : number
+>time : OSUTime
+>ns : number
+>ns : number
+
+  } else if (time.times) {
+>time.times : any
+>time : OSUTime
+>times : any
+
+    let tmp: OSUTime = time; //temporary variable is needed because the type of time is OSUTime + the present(times) constraint (which you do not want for the objupdate), so first cast back to original OSUTime interface
+>tmp : OSUTime
+>OSUTime : OSUTime
+>time : OSUTime
+
+    time = objupdate(tmp, {times: undefined, ns: ns});
+>time = objupdate(tmp, {times: undefined, ns: ns}) : OSUTime
+>time : OSUTime
+>tmp : any
+>{times: undefined, ns: ns} : { times: undefined; ns: number; }
+>times : undefined
+>undefined : undefined
+>ns : number
+>ns : number
+  }
+  return time;
+>time : OSUTime
+}
+
