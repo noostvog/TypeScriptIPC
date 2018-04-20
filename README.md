@@ -182,24 +182,24 @@ Extra info from if statements (I-IfPresenceInterface) | `checkIdentifier` + `che
 ## Running tests
 The test suite of TypeScriptIPC contains all TypeScript tests, but also contains extra tests to test all aspects of programming with interfaces.
 
-<!---
 To verify the correctness of all tutorial files, run the following commands:
 ```
 gulp tests
-gulpt runtests command for tutorial files
+gulpt runtests -t "tutorial" --lint=false
 ```
 
 To run all compiler tests of TypeScript, run the following commands: 
 ```
 gulp tests
-gulpt runtests command for tutorial files
+gulpt runtests -t "/compiler" --lint=false
 ```
---->
-When building (`gulp tests`) and running _all_ tests (`gulp runtests`), it is normal that some tests (unrelated to the correctness of the type system) fail. The first error happens when building TypeScript, but is also not related to the implementation of interfaces with inter-property constraints.
-
+When compiling the tests, the following error can occur while compiling TypeScript (several times). This is not caused by the changes made for TypeScript<sub>IPC</sub>, nor does it affect the execution of the tests afterwards.
 ```
 error TS1066: In ambient enum declarations member initializer must be constant expression.
+```
+When running _all_ tests (`gulp runtests`), it is normal that some tests fail. These tests are unrelated to the correctness of the type system. 
 
+```
   1) fourslash tests tests/cases/fourslash/commentsClassMembers.ts fourslash test commentsClassMembers.ts runs correctly:
        TypeError: undefined is not iterable
         at getJSDocTags
