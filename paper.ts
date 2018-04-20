@@ -1,3 +1,4 @@
+
 /* This file contains the code snippets from the paper. Error messages of TypeScriptIPC are shown for every error. */
 
 // Section 2.1: Definition of interfaces with constraints
