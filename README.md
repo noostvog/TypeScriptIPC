@@ -37,7 +37,7 @@ There are several `gulp` *shortcuts* for running files in TypeScript<sub>IPC</su
 To run a TypeScript<sub>IPC</sub>, use `gulp run --file yourfile.ts`, which is identical to the command above.
 
 ## Virtual Machine
-A virtual machine with a built version of TypeScript<sub>IPC</sub> can be found here: TODO. The username is `ecoop`, and the password is `ecoop` as well.
+A virtual machine with a built version of TypeScript<sub>IPC</sub> can be found here: [here](http://soft.vub.ac.be/~noostvog/typescriptipc/TypeScriptIPC.ova.zip) . The username is `ecoop`, and the password is `ecoop` as well.
 
 TypeScript<sub>IPC</sub> can be found in `Documents/TypeScriptIPC`.
 
