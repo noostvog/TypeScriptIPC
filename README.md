@@ -1,32 +1,44 @@
-# TypeScriptIPC
-TypeScriptIPC is a variant of TypeScript in which complex dependency constraints on properties of interfaces can be expressed.
+# TypeScript<sub>IPC</sub>
+TypeScript<sub>IPC</sub> is a variant of TypeScript in which complex dependency constraints on properties of interfaces can be expressed.
 
-## Getting and building TypeScriptIPC
-Before building TypeScriptIPC, make sure `node`, `npm` and `git` are installed.
+## Getting and building TypeScript<sub>IPC</sub>
+Before building TypeScript<sub>IPC</sub>, make sure `node`, `npm` (at least version 5.7.1, to support `npm ci`) and `git` are installed.
 
-Run the following commands to build TypeScriptIPC:
+Run the following commands to build TypeScript<sub>IPC</sub>:
 ```
 git clone -b aec https://github.com/noostvog/TypeScriptIPC.git
 cd TypeScriptIPC
 npm install -g gulp
-npm install
+npm ci
 gulp local
 ```
 
-## Running TypeScriptIPC
-To run TypeScriptIPC, use the following command. The file `paper.ts` contains all code examples from the paper.
+## Running TypeScript<sub>IPC</sub>
+To run a TypeScript<sub>IPC</sub> file, use the following command. 
 ```
-node built/local/tsc.js paper.ts —strictNullChecks
+node built/local/tsc.js yourfile.ts —strictNullChecks
 ```
+The file `paper.ts` contains all code examples from the paper. The file `examples/correct.ts` should type check without errors. In case of errors, it might help to run the command without relative paths (to avoid running with different versions of `node` and `npm` dependencies).
 
-The file `examples/correct.ts` should type check without errors. In case of errors, it might help to run the command without relative paths (to avoid running with different versions of `node` and `npm` dependencies).
+There are several `gulp` shortcuts for running files in TypeScript<sub>IPC</sub>: `gulp runpaper` runs TypeScript<sub>IPC</sub> with `paper.ts` and `gulp runcorrect` with `examples/correct.ts`.
+To run a TypeScript<sub>IPC</sub>, use `gulp run --file yourfile.ts`, which is identical to the command above.
+
+## Virtual Machine
+A virtual machine with a built version of TypeScript<sub>IPC</sub> can be found here: TODO. The username is `ecoop`, and the password is `ecoop` as well.
+
+TypeScript<sub>IPC</sub> can be found in `Documents/TypeScriptIPC`.
+TODO automatisch opstarten van command line
+
 ## Tutorial: programming with inter-property constraints
 TypeScript<sub>IPC</sub> allows programmers to express a dependency logic between het presence of properties, using propositional logic. Moreover, it enforces these enforcing complex dependency logic defined by the programmer when an object is created, accessed or modified.
+
+The `examples` directory contains all code snippets in this tutorial, as well as extra examples.
 ### Defining interfaces with constraints
 An interface is defined as shown below. This interface defines a PrivateMessage (https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/new-message).
 The first part of the interface is identical to the default TypeScript interface. The second part indicates the constraints on the presence of the properties. Constraints are composed using logical operators (and, or, not, implic, iff). Next to the message itself (which is a required field, cfr. the first constraint), the interface has two properties to indicate the receiver. However, only (and exactly) one of these two properties should be present. This is enforced using the second constraint.
 ```typescript
 //File: examples/definitions.ts
+//gulp runexample --example definitions.ts
 interface PrivateMessage {
   text?: string;
   userid?: number;
@@ -94,10 +106,10 @@ let msg7: PrivateMessage = objupdate(msg6, {userid: undefined, screenname: "Alic
 The files `examples/property_access_update_extra_correct.ts` and `examples/property_access_update_extra_correct.ts` contain examples of property updates for other interfaces.
 
 ### Assignment
-Next to assigning object literals to interfaces, it is of course also possible to assign objects with interface types to each other and to assign interface instances to object literal types. TypeScriptIPC ensures that no constraints are violated during these assignments. Examples can be found in `examples/property_assign.ts` (for `PrivateMessage` variants) and in `examples/property_assign_extra_correct.ts` and `examples/property_assign_extra_incorrect.ts` (for variants of other interfaces).
+Next to assigning object literals to interfaces, it is of course also possible to assign objects with interface types to each other and to assign interface instances to object literal types. TypeScript<sub>IPC</sub> ensures that no constraints are violated during these assignments. Examples can be found in `examples/property_assign.ts` (for `PrivateMessage` variants) and in `examples/property_assign_extra_correct.ts` and `examples/property_assign_extra_incorrect.ts` (for variants of other interfaces).
 
 ## Differences between the implementation and the formalisation
- Because TypeScriptIPC is implemented on top of a fairly recent version of TypeScript (2.1.6), there are some differences between the implementation and the formalisation.
+Because TypeScript<sub>IPC</sub> is implemented on top of a fairly recent version of TypeScript (2.1.6), there are some differences between the implementation and the formalisation.
 
 * In order to stay consistent with existing TypeScript programs, we did not replace the existing interface definition of TypeScript with the interface definitions from the paper. Instead, required and optional properties can still be expressed in this implementation. Constraints are an optional extension of interfaces, and should always be combined with properties which are all optional (required properties are not taken into consideration when there is a constraints section). Properties of interfaces with constraints should not have the type "undefined". The interface must contain at least one constraint for it to be considered an _interface with constrainst_ (if there are no presence constraints on any of the objects, this can be circumvented by adding an `or(present(x), not(present(x))))` constraint). For example, the running example from the paper should be defined as follows (underscores in property names are not supported yet):
 
@@ -137,7 +149,6 @@ Variables with interface types can only be assigned to each other if both have o
   ```
 
 * `objupdate` only accepts objects with special interface types
-* The file `paper.ts` contains an extended version of all the code snippets shown in the paper.
 
 ## Mapping of formalisation onto implementation
 The adaptations to the TypeScript type system are scattered throughout many files and code lines. The following table gives an overview of most of the changes to the type checker: 

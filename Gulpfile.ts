@@ -1040,3 +1040,37 @@ gulp.task("default", "Runs 'local'", ["local"]);
 gulp.task("watch", "Watches the src/ directory for changes and executes runtests-parallel.", [], () => {
     gulp.watch("src/**/*.*", ["runtests-parallel"]);
 });
+
+gulp.task("runcorrect", "Runs the `correct.ts` file", [], (done) => {
+        host = "node";
+        const args = ["built/local/tsc.js examples/correct.ts --strictNullChecks"];
+        exec(host, args, done, done);
+});
+
+gulp.task("runpaper", "Runs the `paper.ts` file", [], (done) => {
+    host = "node";
+    const args = ["built/local/tsc.js paper.ts --strictNullChecks"];
+    exec(host, args, done, done);
+});
+
+gulp.task("runexample", "Runs a file from the examples folder", [], (done) => {
+    host = "node";
+    const i = process.argv.indexOf("--example");
+    if(i>-1) {
+        const args = ["built/local/tsc.js examples/" + process.argv[i+1] + " --strictNullChecks"];
+        exec(host, args, done, done);
+    } else {
+        throw new Error(`Expected --examples argument`);
+    }
+});
+
+gulp.task("run", "Runs a TypeScript file", [], (done) => {
+    host = "node";
+    const i = process.argv.indexOf("--file");
+    if(i>-1) {
+        const args = ["built/local/tsc.js " + process.argv[i+1] + " --strictNullChecks"];
+        exec(host, args, done, done);
+    } else {
+        throw new Error(`Expected --file argument`);
+    }
+});
