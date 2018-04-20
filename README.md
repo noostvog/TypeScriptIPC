@@ -182,6 +182,7 @@ Extra info from if statements (I-IfPresenceInterface) | `checkIdentifier` + `che
 ## Running tests
 The test suite of TypeScriptIPC contains all TypeScript tests, but also contains extra tests to test all aspects of programming with interfaces.
 
+<!---
 To verify the correctness of all tutorial files, run the following commands:
 ```
 gulp tests
@@ -193,12 +194,8 @@ To run all compiler tests of TypeScript, run the following commands:
 gulp tests
 gulpt runtests command for tutorial files
 ```
-
-When running _all_ tests, it is normal that some tests (unrelated to the correctness of the type system) fail:
-```
-gulp tests
-gulpt runtests command for tutorial files
-```
+--->
+When building (`gulp tests`) and running _all_ tests (`gulp runtests`), it is normal that some tests (unrelated to the correctness of the type system) fail. The first error happens when building TypeScript, but is also not related to the implementation of interfaces with inter-property constraints.
 
 ```
 error TS1066: In ambient enum declarations member initializer must be constant expression.
