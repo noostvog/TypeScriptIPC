@@ -193,10 +193,7 @@ To run all compiler tests of TypeScript, run the following commands:
 gulp tests
 gulp runtests -t "/compiler" --lint=false
 ```
-When compiling the tests, the following error can occur while compiling TypeScript (several times). This is not caused by the changes made for TypeScript<sub>IPC</sub>, nor does it affect the execution of the tests afterwards.
-```
-error TS1066: In ambient enum declarations member initializer must be constant expression.
-```
+
 When running _all_ tests (`gulp runtests`), it is normal that some tests fail. These tests are unrelated to the correctness of the type system. 
 
 ```
