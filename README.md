@@ -185,13 +185,13 @@ The test suite of TypeScriptIPC contains all TypeScript tests, but also contains
 To verify the correctness of all tutorial files, run the following commands:
 ```
 gulp tests
-gulpt runtests -t "tutorial" --lint=false
+gulp runtests -t "tutorial" --lint=false
 ```
 
 To run all compiler tests of TypeScript, run the following commands: 
 ```
 gulp tests
-gulpt runtests -t "/compiler" --lint=false
+gulp runtests -t "/compiler" --lint=false
 ```
 When compiling the tests, the following error can occur while compiling TypeScript (several times). This is not caused by the changes made for TypeScript<sub>IPC</sub>, nor does it affect the execution of the tests afterwards.
 ```
