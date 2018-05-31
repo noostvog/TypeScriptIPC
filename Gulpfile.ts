@@ -1060,7 +1060,7 @@ gulp.task("runexample", "Runs a file from the examples folder", [], (done) => {
         const args = ["built/local/tsc.js examples/" + process.argv[i+1] + " --strictNullChecks"];
         exec(host, args, done, done);
     } else {
-        throw new Error(`Expected --examples argument`);
+        throw new Error(`Expected --example argument`);
     }
 });
 
