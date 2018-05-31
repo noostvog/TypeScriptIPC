@@ -87,10 +87,10 @@ function changeIdToName(msg: PrivateMessage, name: string): PrivateMessage {
 >name : string
 >PrivateMessage : PrivateMessage
 
-  if (msg.ruserid) {
->msg.ruserid : any
+  if (msg.userid) {
+>msg.userid : any
 >msg : PrivateMessage
->ruserid : any
+>userid : any
 
     let msg2: PrivateMessage = msg;
 >msg2 : PrivateMessage

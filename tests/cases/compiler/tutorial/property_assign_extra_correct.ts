@@ -79,7 +79,7 @@ let obj1:{caption: string} = pic; //OK
 let obj2:{caption: string, picture?: string} = pic; //OK
 let obj3:{caption: string, picture?: string, lat?: number, long?: number} = pic; //OK
 let obj4:{caption: string, lat?: number, long?: number} = pic; //OK
-let obj16:{lat?: number, long?: number} = pic; //ERROR
+let obj16:{lat?: number, long?: number} = pic; //OK
 
 if (pic.lat) {
     let obj5:{caption: string, picture: string} = pic; //OK

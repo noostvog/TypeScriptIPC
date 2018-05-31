@@ -1,8 +1,11 @@
 tests/cases/compiler/property_update.ts(14,3): error TS2322: Type 'undefined' is not assignable to type 'string'.
 tests/cases/compiler/property_update.ts(15,3): error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
+tests/cases/compiler/property_update.ts(27,5): error TS2322: Type '{ userid: undefined; screenname: string; }' is not assignable to type 'PrivateMessage'.
+  Predicate present(userid) was not satisfied in type { userid: undefined; screenname: string; }
+    Property 'userid' is missing in type '{ userid: undefined; screenname: string; }'.
 
 
-==== tests/cases/compiler/property_update.ts (2 errors) ====
+==== tests/cases/compiler/property_update.ts (3 errors) ====
     
     interface PrivateMessage {
       text?: string;
@@ -32,8 +35,12 @@ tests/cases/compiler/property_update.ts(15,3): error TS95009: Cannot access user
     let msg1: PrivateMessage = objupdate(msg, {userid: undefined, screenname: "Alice"});
     
     function changeIdToName(msg: PrivateMessage): PrivateMessage {
-      if (msg.ruserid) {
+      if (msg.userid) {
         objupdate(msg, {userid: undefined, screenname: "Alice"}); //ERROR
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS2322: Type '{ userid: undefined; screenname: string; }' is not assignable to type 'PrivateMessage'.
+!!! error TS2322:   Predicate present(userid) was not satisfied in type { userid: undefined; screenname: string; }
+!!! error TS2322:     Property 'userid' is missing in type '{ userid: undefined; screenname: string; }'.
         //The object msg contains an extra constraint inside this if statement
         //For the update to succeed, the first argument must be of the original type
         //So it is first casted back

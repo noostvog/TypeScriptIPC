@@ -116,7 +116,7 @@ namespace ts {
         CatchKeyword,
         ClassKeyword,
         ConstKeyword,
-        ConstrainsKeyword, //<Nathalie>
+        ConstrainsKeyword, //<IPC>
         ContinueKeyword,
         DebuggerKeyword,
         DefaultKeyword,
@@ -233,7 +233,7 @@ namespace ts {
         // Expression
         ArrayLiteralExpression,
         ObjectLiteralExpression,
-        ObjectUpdateExpression, //<nathalie>
+        ObjectUpdateExpression, //<IPC>
         PropertyAccessExpression,
         ElementAccessExpression,
         CallExpression,
@@ -1426,11 +1426,7 @@ namespace ts {
         expression: SuperExpression;
     }
 
-    // Interface predicates <nathalie>
-    // TODO: nog specifieker gaan dan dit? IPV PredicateCallExpression: PresentPredicateExpression, LogicalPredicateExpression,... TypePredicateExpression
-    // TODO niet te diep, dus niet OrPredicateExpression, AndPredicateExpression,...
-    // TODO wat te doen met "not"
-    // export type Predicate = NodeArray<PredicateExpression>;
+    // <IPC>
     export type PredicateExpression = PredicatePresentExpression | PredicateLogicalExpression | PredicateTypeExpression;
 
     export interface PredicatePresentExpression extends Node {
@@ -1454,7 +1450,7 @@ namespace ts {
         right: Identifier; // type
     }
 
-    // <!--einde interfaces-->
+    // <!--end of IPC-->
 
     export interface ExpressionWithTypeArguments extends TypeNode {
         kind: SyntaxKind.ExpressionWithTypeArguments;

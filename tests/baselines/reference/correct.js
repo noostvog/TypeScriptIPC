@@ -23,7 +23,7 @@ getUser(msg1);
 getUser({text: "Hello", screenname: "Alice"});
 
 function changeIdToName(msg: PrivateMessage, name: string): PrivateMessage {
-  if (msg.ruserid) {
+  if (msg.userid) {
     let msg2: PrivateMessage = msg;
     return objupdate(msg2, {userid: undefined, screenname: name});
   }
@@ -46,7 +46,7 @@ function getUser(msg) {
 getUser(msg1);
 getUser({ text: "Hello", screenname: "Alice" });
 function changeIdToName(msg, name) {
-    if (msg.ruserid) {
+    if (msg.userid) {
         var msg2 = msg;
         return { ...msg2, ...{ userid: undefined, screenname: name }};
     }

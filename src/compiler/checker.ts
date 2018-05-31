@@ -8038,7 +8038,7 @@ namespace ts {
 
                     if (!prove(predicateSourceStr + " > " + predicateTargetStr)) {
                         if (reportErrors) {
-                            reportError(Diagnostics.Invalid_assignment_of_type_0_tot_type_1_Check_if_predicates_are_correct, typeToString(source), typeToString(target));
+                            reportError(Diagnostics.Invalid_assignment_of_type_0_to_type_1_Check_if_predicates_are_correct, typeToString(source), typeToString(target));
                         }
                         return Ternary.False;
                     }
@@ -19274,9 +19274,6 @@ namespace ts {
         }
 
         function checkInterfaceDeclaration(node: InterfaceDeclaration) {
-            if (node.symbol.name == "Picture") {
-                true;
-            }
             // Grammar checking
             checkGrammarDecorators(node) || checkGrammarModifiers(node) || checkGrammarInterfaceDeclaration(node);
 

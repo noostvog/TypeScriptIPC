@@ -67,7 +67,7 @@ namespace ts {
         "class": SyntaxKind.ClassKeyword,
         "continue": SyntaxKind.ContinueKeyword,
         "const": SyntaxKind.ConstKeyword,
-        "constrains": SyntaxKind.ConstrainsKeyword,
+        "constrains": SyntaxKind.ConstrainsKeyword, //<IPC>
         "constructor": SyntaxKind.ConstructorKeyword,
         "debugger": SyntaxKind.DebuggerKeyword,
         "declare": SyntaxKind.DeclareKeyword,
@@ -82,7 +82,7 @@ namespace ts {
         "finally": SyntaxKind.FinallyKeyword,
         "for": SyntaxKind.ForKeyword,
 
-        //<Nathalie>
+        //<IPC>
         "objupdate": SyntaxKind.ObjectUpdateKeyword,
 
         "from": SyntaxKind.FromKeyword,

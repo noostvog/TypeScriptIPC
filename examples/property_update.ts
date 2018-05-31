@@ -24,7 +24,7 @@ let msg: PrivateMessage = {text: "Hello", userid: 42};
 let msg1: PrivateMessage = objupdate(msg, {userid: undefined, screenname: "Alice"});
 
 function changeIdToName(msg: PrivateMessage): PrivateMessage {
-  if (msg.ruserid) {
+  if (msg.userid) {
     objupdate(msg, {userid: undefined, screenname: "Alice"}); //ERROR
     //The object msg contains an extra constraint inside this if statement
     //For the update to succeed, the first argument must be of the original type

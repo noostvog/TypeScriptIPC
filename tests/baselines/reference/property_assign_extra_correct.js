@@ -79,7 +79,7 @@ let obj1:{caption: string} = pic; //OK
 let obj2:{caption: string, picture?: string} = pic; //OK
 let obj3:{caption: string, picture?: string, lat?: number, long?: number} = pic; //OK
 let obj4:{caption: string, lat?: number, long?: number} = pic; //OK
-let obj16:{lat?: number, long?: number} = pic; //ERROR
+let obj16:{lat?: number, long?: number} = pic; //OK
 
 if (pic.lat) {
     let obj5:{caption: string, picture: string} = pic; //OK
@@ -109,6 +109,7 @@ if (time.ns) {
 } else {
     let obj18:{times: undefined, ns: undefined} = time; //OK
 }
+
 
 //// [property_assign_extra_correct.js]
 //Interface to Interface Assignment
@@ -146,7 +147,7 @@ var obj1 = pic; //OK
 var obj2 = pic; //OK
 var obj3 = pic; //OK
 var obj4 = pic; //OK
-var obj16 = pic; //ERROR
+var obj16 = pic; //OK
 if (pic.lat) {
     var obj5 = pic; //OK
     var obj6 = pic; //OK

@@ -1,7 +1,7 @@
 tests/cases/compiler/ifElseWithStatements7.ts(16,5): error TS2345: Argument of type 'PM1' is not assignable to parameter of type 'PM2'.
-  Invalid assignment of type PM1 tot type PM2. Check if predicates are correct
+  Invalid assignment of type PM1 to type PM2. Check if predicates are correct
 tests/cases/compiler/ifElseWithStatements7.ts(20,5): error TS2345: Argument of type 'PM1' is not assignable to parameter of type 'PM2'.
-  Invalid assignment of type PM1 tot type PM2. Check if predicates are correct
+  Invalid assignment of type PM1 to type PM2. Check if predicates are correct
 
 
 ==== tests/cases/compiler/ifElseWithStatements7.ts (2 errors) ====
@@ -23,11 +23,11 @@ tests/cases/compiler/ifElseWithStatements7.ts(20,5): error TS2345: Argument of t
     bar(pm1); //NOK
         ~~~
 !!! error TS2345: Argument of type 'PM1' is not assignable to parameter of type 'PM2'.
-!!! error TS2345:   Invalid assignment of type PM1 tot type PM2. Check if predicates are correct
+!!! error TS2345:   Invalid assignment of type PM1 to type PM2. Check if predicates are correct
     if (pm1.text) {
         bar(pm1); //OK
     }
     bar(pm1); //NOK
         ~~~
 !!! error TS2345: Argument of type 'PM1' is not assignable to parameter of type 'PM2'.
-!!! error TS2345:   Invalid assignment of type PM1 tot type PM2. Check if predicates are correct
+!!! error TS2345:   Invalid assignment of type PM1 to type PM2. Check if predicates are correct

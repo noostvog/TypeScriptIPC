@@ -229,7 +229,7 @@ let obj4:{caption: string, lat?: number, long?: number} = pic; //OK
 >long : Symbol(long, Decl(property_assign_extra_correct.ts, 79, 40))
 >pic : Symbol(pic, Decl(property_assign_extra_correct.ts, 74, 3))
 
-let obj16:{lat?: number, long?: number} = pic; //ERROR
+let obj16:{lat?: number, long?: number} = pic; //OK
 >obj16 : Symbol(obj16, Decl(property_assign_extra_correct.ts, 80, 3))
 >lat : Symbol(lat, Decl(property_assign_extra_correct.ts, 80, 11))
 >long : Symbol(long, Decl(property_assign_extra_correct.ts, 80, 24))
@@ -349,3 +349,4 @@ if (time.ns) {
 >ns : Symbol(ns, Decl(property_assign_extra_correct.ts, 108, 32))
 >time : Symbol(time, Decl(property_assign_extra_correct.ts, 90, 3))
 }
+

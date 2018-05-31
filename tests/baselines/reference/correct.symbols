@@ -62,8 +62,10 @@ function changeIdToName(msg: PrivateMessage, name: string): PrivateMessage {
 >name : Symbol(name, Decl(correct.ts, 23, 44))
 >PrivateMessage : Symbol(PrivateMessage, Decl(correct.ts, 0, 0))
 
-  if (msg.ruserid) {
+  if (msg.userid) {
+>msg.userid : Symbol(PrivateMessage.userid, Decl(correct.ts, 1, 16))
 >msg : Symbol(msg, Decl(correct.ts, 23, 24))
+>userid : Symbol(PrivateMessage.userid, Decl(correct.ts, 1, 16))
 
     let msg2: PrivateMessage = msg;
 >msg2 : Symbol(msg2, Decl(correct.ts, 25, 7))

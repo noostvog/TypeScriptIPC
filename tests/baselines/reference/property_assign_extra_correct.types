@@ -307,7 +307,7 @@ let obj4:{caption: string, lat?: number, long?: number} = pic; //OK
 >long : number | undefined
 >pic : Picture
 
-let obj16:{lat?: number, long?: number} = pic; //ERROR
+let obj16:{lat?: number, long?: number} = pic; //OK
 >obj16 : { lat?: number | undefined; long?: number | undefined; }
 >lat : number | undefined
 >long : number | undefined
@@ -429,3 +429,4 @@ if (time.ns) {
 >ns : undefined
 >time : OSUTime
 }
+

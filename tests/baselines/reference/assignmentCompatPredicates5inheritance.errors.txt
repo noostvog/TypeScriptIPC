@@ -1,5 +1,5 @@
 tests/cases/compiler/assignmentCompatPredicates5inheritance.ts(30,5): error TS2322: Type 'PrivateMessage1' is not assignable to type 'PrivateMessage2'.
-  Invalid assignment of type PrivateMessage1 tot type PrivateMessage2. Check if predicates are correct
+  Invalid assignment of type PrivateMessage1 to type PrivateMessage2. Check if predicates are correct
 
 
 ==== tests/cases/compiler/assignmentCompatPredicates5inheritance.ts (1 errors) ====
@@ -35,5 +35,5 @@ tests/cases/compiler/assignmentCompatPredicates5inheritance.ts(30,5): error TS23
     let pm2: PrivateMessage2 = pm1;
         ~~~
 !!! error TS2322: Type 'PrivateMessage1' is not assignable to type 'PrivateMessage2'.
-!!! error TS2322:   Invalid assignment of type PrivateMessage1 tot type PrivateMessage2. Check if predicates are correct
+!!! error TS2322:   Invalid assignment of type PrivateMessage1 to type PrivateMessage2. Check if predicates are correct
     let pm3: PrivateMessage = pm2;

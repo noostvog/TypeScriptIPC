@@ -1,5 +1,5 @@
 tests/cases/compiler/ifElseWithStatements2inheritance.ts(9,11): error TS2430: Interface 'PrivateMessage' incorrectly extends interface 'PrivateMessage2'.
-  Invalid assignment of type PrivateMessage tot type PrivateMessage2. Check if predicates are correct
+  Invalid assignment of type PrivateMessage to type PrivateMessage2. Check if predicates are correct
 tests/cases/compiler/ifElseWithStatements2inheritance.ts(19,1): error TS95009: Cannot access userid from the object because its interface does not contain the predicate present(userid). Use a non-undefined type guard.
 tests/cases/compiler/ifElseWithStatements2inheritance.ts(20,1): error TS95009: Cannot access screenname from the object because its interface does not contain the predicate present(screenname). Use a non-undefined type guard.
 tests/cases/compiler/ifElseWithStatements2inheritance.ts(24,5): error TS2322: Type '"Alice"' is not assignable to type 'undefined'.
@@ -20,7 +20,7 @@ tests/cases/compiler/ifElseWithStatements2inheritance.ts(31,1): error TS95009: C
     interface PrivateMessage extends PrivateMessage2 {
               ~~~~~~~~~~~~~~
 !!! error TS2430: Interface 'PrivateMessage' incorrectly extends interface 'PrivateMessage2'.
-!!! error TS2430:   Invalid assignment of type PrivateMessage tot type PrivateMessage2. Check if predicates are correct
+!!! error TS2430:   Invalid assignment of type PrivateMessage to type PrivateMessage2. Check if predicates are correct
         // inherit properties
         screenname?: string;
     } constrains {

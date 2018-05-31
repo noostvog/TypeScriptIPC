@@ -42,7 +42,7 @@ A virtual machine with a built version of TypeScript<sub>IPC</sub> can be found 
 TypeScript<sub>IPC</sub> can be found in `Documents/TypeScriptIPC`.
 
 ## Tutorial: programming with inter-property constraints
-TypeScript<sub>IPC</sub> allows programmers to express a dependency logic between het presence of properties, using propositional logic. Moreover, it enforces these enforcing complex dependency logic defined by the programmer when an object is created, accessed or modified.
+TypeScript<sub>IPC</sub> allows programmers to express a dependency logic between the presence of properties, using propositional logic. Moreover, it enforces these enforcing complex dependency logic defined by the programmer when an object is created, accessed or modified.
 
 The `examples` directory contains all code snippets in this tutorial, as well as extra examples.
 ### Defining interfaces with constraints
@@ -126,7 +126,9 @@ Next to assigning object literals to interfaces, it is of course also possible t
 ## Differences between the implementation and the formalisation
 Because TypeScript<sub>IPC</sub> is implemented on top of TypeScript (version 2.1.6), there are some differences between the implementation and the formalisation.
 
-* In order to stay consistent with existing TypeScript programs, we did not replace the existing interface definition of TypeScript with the interface definitions from the paper. Instead, required and optional properties can still be expressed in this implementation. Constraints are an optional extension of interfaces, and should always be combined with properties which are all optional (required properties are not taken into consideration when there is a constraints section). Properties of interfaces with constraints should not have the type "undefined". The interface must contain at least one constraint for it to be considered an _interface with constrainst_ (if there are no presence constraints on any of the objects, this can be circumvented by adding an `or(present(x), not(present(x))))` constraint). For example, the running example from the paper should be defined as follows (underscores in property names are not supported yet):
+* TypeScript is deliberately unsound. The formalisations presented in the paper are based upon a *sound* subset of TypeScript. On the other hand, the implementation is an extension of complete TypeScript. Therefore, the usage of interfaces with inter-parameter constraints is only sound when the unsound features (for example, unsafe casting to `any`) of TypeScript are not used.
+
+* In order to stay consistent with existing TypeScript programs, we did not replace the existing interface definition of TypeScript with the interface definitions from the paper. Instead, required and optional properties can still be expressed in this implementation. Constraints are an optional extension of interfaces, and should always be combined with properties which are all optional (required properties are not allowed when there is a constraints section). Properties of interfaces with constraints should not have the type "undefined". The interface must contain at least one constraint for it to be considered an _interface with constrainst_ (if there are no presence constraints on any of the objects, this can be circumvented by adding an `or(present(x), not(present(x))))` constraint). For example, the running example from the paper should be defined as follows (underscores in property names are not supported yet):
 
   ```typescript
    interface PrivateMessage {
@@ -140,8 +142,9 @@ Because TypeScript<sub>IPC</sub> is implemented on top of TypeScript (version 2.
    }
   ```
 
-* To prevent the existence of _hidden_ properties in objects, the paper limits the creation of objects with as type an interface to the cast of an object literal to that interface.
-Since TypeScript 1.6, object literals cannot contain extra properties anymore. However, it is still possible to have _hidden_ properties when a variable with an interface type is assigned to a variable with an object type (literal or interface). Therefore, our implementation still limits these assignments.
+*  Due to width subtyping, the type of an object does not guarantee that only those properties are present at runtime. Therefore, objects with a special interface type can only be created by casting an object literal to that interface.
+Since TypeScript 1.6, TypeScript has a stricter object literal assignment check that disallows hidden properties when assigning an object literal to an interface anymore. 
+However, it is still possible to have hidden properties when a variable with an interface type is assigned to a variable with an object type (literal or interface). Therefore, our implementation still limits these kinds assignments.
 Variables with interface types can only be assigned to each other if both have or lack constraints.
 
 * Casts are currently not supported, and should not be used in combination with interfaces with constraints.

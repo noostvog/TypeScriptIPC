@@ -1,19 +1,19 @@
 tests/cases/compiler/property_assign_extra_incorrect.ts(57,6): error TS2345: Argument of type 'Picture2' is not assignable to parameter of type 'Picture'.
-  Invalid assignment of type Picture2 tot type Picture. Check if predicates are correct
+  Invalid assignment of type Picture2 to type Picture. Check if predicates are correct
 tests/cases/compiler/property_assign_extra_incorrect.ts(58,6): error TS2345: Argument of type 'Picture' is not assignable to parameter of type 'Picture1'.
-  Invalid assignment of type Picture tot type Picture1. Check if predicates are correct
+  Invalid assignment of type Picture to type Picture1. Check if predicates are correct
 tests/cases/compiler/property_assign_extra_incorrect.ts(59,6): error TS2345: Argument of type 'Picture2' is not assignable to parameter of type 'Picture1'.
-  Invalid assignment of type Picture2 tot type Picture1. Check if predicates are correct
+  Invalid assignment of type Picture2 to type Picture1. Check if predicates are correct
 tests/cases/compiler/property_assign_extra_incorrect.ts(67,7): error TS2345: Argument of type 'OSUTime' is not assignable to parameter of type 'OSUTime2'.
-  Invalid assignment of type OSUTime tot type OSUTime2. Check if predicates are correct
+  Invalid assignment of type OSUTime to type OSUTime2. Check if predicates are correct
 tests/cases/compiler/property_assign_extra_incorrect.ts(68,7): error TS2345: Argument of type 'OSUTime1' is not assignable to parameter of type 'OSUTime2'.
-  Invalid assignment of type OSUTime1 tot type OSUTime2. Check if predicates are correct
+  Invalid assignment of type OSUTime1 to type OSUTime2. Check if predicates are correct
 tests/cases/compiler/property_assign_extra_incorrect.ts(69,7): error TS2345: Argument of type 'OSUTime1' is not assignable to parameter of type 'OSUTime'.
-  Invalid assignment of type OSUTime1 tot type OSUTime. Check if predicates are correct
+  Invalid assignment of type OSUTime1 to type OSUTime. Check if predicates are correct
 tests/cases/compiler/property_assign_extra_incorrect.ts(70,7): error TS2345: Argument of type 'OSUTime' is not assignable to parameter of type 'OSUTime1'.
-  Invalid assignment of type OSUTime tot type OSUTime1. Check if predicates are correct
+  Invalid assignment of type OSUTime to type OSUTime1. Check if predicates are correct
 tests/cases/compiler/property_assign_extra_incorrect.ts(76,11): error TS2345: Argument of type 'OSUTime' is not assignable to parameter of type 'OSUTime2'.
-  Invalid assignment of type OSUTime tot type OSUTime2. Check if predicates are correct
+  Invalid assignment of type OSUTime to type OSUTime2. Check if predicates are correct
 tests/cases/compiler/property_assign_extra_incorrect.ts(81,5): error TS2322: Type 'Picture' is not assignable to type '{ caption: string; picture: string; }'.
   Property 'picture' is not present in type 'Picture'.
 tests/cases/compiler/property_assign_extra_incorrect.ts(82,5): error TS2322: Type 'Picture' is not assignable to type '{ caption: string; picture: string; lat: number; long: number; }'.
@@ -111,15 +111,15 @@ tests/cases/compiler/property_assign_extra_incorrect.ts(111,9): error TS2322: Ty
     pic0(p2); //ERROR
          ~~
 !!! error TS2345: Argument of type 'Picture2' is not assignable to parameter of type 'Picture'.
-!!! error TS2345:   Invalid assignment of type Picture2 tot type Picture. Check if predicates are correct
+!!! error TS2345:   Invalid assignment of type Picture2 to type Picture. Check if predicates are correct
     pic1(p0); //ERROR
          ~~
 !!! error TS2345: Argument of type 'Picture' is not assignable to parameter of type 'Picture1'.
-!!! error TS2345:   Invalid assignment of type Picture tot type Picture1. Check if predicates are correct
+!!! error TS2345:   Invalid assignment of type Picture to type Picture1. Check if predicates are correct
     pic1(p2); //ERROR
          ~~
 !!! error TS2345: Argument of type 'Picture2' is not assignable to parameter of type 'Picture1'.
-!!! error TS2345:   Invalid assignment of type Picture2 tot type Picture1. Check if predicates are correct
+!!! error TS2345:   Invalid assignment of type Picture2 to type Picture1. Check if predicates are correct
     
     let var0: OSUTime = {times: 5};
     let var1: OSUTime1 = {times: 5};
@@ -130,19 +130,19 @@ tests/cases/compiler/property_assign_extra_incorrect.ts(111,9): error TS2322: Ty
     time2(var0); //ERROR
           ~~~~
 !!! error TS2345: Argument of type 'OSUTime' is not assignable to parameter of type 'OSUTime2'.
-!!! error TS2345:   Invalid assignment of type OSUTime tot type OSUTime2. Check if predicates are correct
+!!! error TS2345:   Invalid assignment of type OSUTime to type OSUTime2. Check if predicates are correct
     time2(var1); //ERROR
           ~~~~
 !!! error TS2345: Argument of type 'OSUTime1' is not assignable to parameter of type 'OSUTime2'.
-!!! error TS2345:   Invalid assignment of type OSUTime1 tot type OSUTime2. Check if predicates are correct
+!!! error TS2345:   Invalid assignment of type OSUTime1 to type OSUTime2. Check if predicates are correct
     time0(var1); //ERROR
           ~~~~
 !!! error TS2345: Argument of type 'OSUTime1' is not assignable to parameter of type 'OSUTime'.
-!!! error TS2345:   Invalid assignment of type OSUTime1 tot type OSUTime. Check if predicates are correct
+!!! error TS2345:   Invalid assignment of type OSUTime1 to type OSUTime. Check if predicates are correct
     time1(var0); //ERROR
           ~~~~
 !!! error TS2345: Argument of type 'OSUTime' is not assignable to parameter of type 'OSUTime1'.
-!!! error TS2345:   Invalid assignment of type OSUTime tot type OSUTime1. Check if predicates are correct
+!!! error TS2345:   Invalid assignment of type OSUTime to type OSUTime1. Check if predicates are correct
     if (var0.ns) {
     
     } else if (var0.times) {
@@ -151,7 +151,7 @@ tests/cases/compiler/property_assign_extra_incorrect.ts(111,9): error TS2322: Ty
         time2(var0); //ERROR
               ~~~~
 !!! error TS2345: Argument of type 'OSUTime' is not assignable to parameter of type 'OSUTime2'.
-!!! error TS2345:   Invalid assignment of type OSUTime tot type OSUTime2. Check if predicates are correct
+!!! error TS2345:   Invalid assignment of type OSUTime to type OSUTime2. Check if predicates are correct
     }
     
     //Interface to Object Assignment

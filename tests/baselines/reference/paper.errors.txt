@@ -12,7 +12,7 @@ tests/cases/compiler/paper.ts(86,28): error TS2322: Type '{ userid: undefined; }
   Predicate or(and(present(userid),not(present(screenname))),and(not(present(userid)),present(screenname))) was not satisfied in type { userid: undefined; }
 tests/cases/compiler/paper.ts(86,28): error TS95021: All properties from the predicates in which the properties of the second argument are mentioned, must be a part of the second argument
 tests/cases/compiler/paper.ts(112,5): error TS2322: Type 'PrivateMessage1' is not assignable to type 'PrivateMessage2'.
-  Invalid assignment of type PrivateMessage1 tot type PrivateMessage2. Check if predicates are correct
+  Invalid assignment of type PrivateMessage1 to type PrivateMessage2. Check if predicates are correct
 tests/cases/compiler/paper.ts(137,5): error TS2322: Type '{ ruserid: undefined; rscreenname: string; }' is not assignable to type 'PrivateMessage3'.
   Predicate present(ruserid) was not satisfied in type { ruserid: undefined; rscreenname: string; }
     Property 'ruserid' is missing in type '{ ruserid: undefined; rscreenname: string; }'.
@@ -154,7 +154,7 @@ tests/cases/compiler/paper.ts(137,5): error TS2322: Type '{ ruserid: undefined; 
     let msg10: PrivateMessage2 = msg9; //ERROR
         ~~~~~
 !!! error TS2322: Type 'PrivateMessage1' is not assignable to type 'PrivateMessage2'.
-!!! error TS2322:   Invalid assignment of type PrivateMessage1 tot type PrivateMessage2. Check if predicates are correct
+!!! error TS2322:   Invalid assignment of type PrivateMessage1 to type PrivateMessage2. Check if predicates are correct
     /*error TS2322: Type 'PrivateMessage1' is not assignable to type 'PrivateMessage2'.
       Invalid assignment of type PrivateMessage1 tot type PrivateMessage2. Check if predicates are correct*/
     let msg11: PrivateMessage = msg10; //OK

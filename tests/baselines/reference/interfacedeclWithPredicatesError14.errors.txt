@@ -1,5 +1,5 @@
 tests/cases/compiler/interfacedeclWithPredicatesError14.ts(13,11): error TS2430: Interface 'UsersShow2' incorrectly extends interface 'UsersShow'.
-  Invalid assignment of type UsersShow2 tot type UsersShow. Check if predicates are correct
+  Invalid assignment of type UsersShow2 to type UsersShow. Check if predicates are correct
 tests/cases/compiler/interfacedeclWithPredicatesError14.ts(13,11): error TS95024: Predicates of interface 'UsersShow2' have to be satisfiable
 
 
@@ -19,7 +19,7 @@ tests/cases/compiler/interfacedeclWithPredicatesError14.ts(13,11): error TS95024
     interface UsersShow2 extends UsersShow{
               ~~~~~~~~~~
 !!! error TS2430: Interface 'UsersShow2' incorrectly extends interface 'UsersShow'.
-!!! error TS2430:   Invalid assignment of type UsersShow2 tot type UsersShow. Check if predicates are correct
+!!! error TS2430:   Invalid assignment of type UsersShow2 to type UsersShow. Check if predicates are correct
               ~~~~~~~~~~
 !!! error TS95024: Predicates of interface 'UsersShow2' have to be satisfiable
         //... inherit everything

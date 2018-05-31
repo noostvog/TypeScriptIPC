@@ -112,6 +112,7 @@ if (pm.screenname) {
     let obj17: {userid: number} = pm; //OK
     let obj18: {text: string, screenname: string} = pm; //ERROR
     let obj19: {text: string, userid: number} = pm; //OK
+    let obj20: {text: string, userid?: number} = pm;  //OK
     let obj21: {text:string, screenname: string, userid: undefined} = pm; //ERROR
     let obj22: {text:string, screenname: undefined, userid: number} = pm; //OK
 }
@@ -192,6 +193,7 @@ else {
     var obj17 = pm; //OK
     var obj18 = pm; //ERROR
     var obj19 = pm; //OK
+    var obj20 = pm; //OK
     var obj21 = pm; //ERROR
     var obj22 = pm; //OK
 }
