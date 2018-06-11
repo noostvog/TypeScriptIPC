@@ -34,7 +34,7 @@ node built/local/tsc.js paper.ts --strictNullChecks
 The file `paper.ts` contains all code examples from the paper. The file `examples/correct.ts` should type check without errors. In case of errors, it might help to run the command without relative paths (to avoid running with different versions of `node` and `npm` dependencies).
 
 There are several `gulp` *shortcuts* for running files in TypeScript<sub>IPC</sub>: `gulp runpaper` runs TypeScript<sub>IPC</sub> with `paper.ts` and `gulp runcorrect` with `examples/correct.ts`.
-To run a TypeScript<sub>IPC</sub>, use `gulp run --file yourfile.ts`, which is identical to the command above.
+To run a TypeScript<sub>IPC</sub> program, use `gulp run --file yourfile.ts`, which is identical to the command above.
 
 ## Virtual Machine
 A virtual machine with a built version of TypeScript<sub>IPC</sub> can be found here: [here](http://soft.vub.ac.be/~noostvog/typescriptipc/TypeScriptIPC.ova.zip) . The username is `ecoop`, and the password is `ecoop` as well.
@@ -113,7 +113,7 @@ function setMsg(msg: PrivateMessage, text: string, userid: number) {
   }
 }
 ```
-Updating multiple properties at once (for example to switch between the user ID and the screen name) can be done using a new built-in function `objupdate`. Note that this function is functional.
+Updating multiple properties at once (for example to switch between the user ID and the screen name) can be done using a new built-in function `objupdate` (this function is called `update` in the paper). Note that this function performs a functional update.
 ```typescript
 let msg6: PrivateMessage = {text: "Hello", userid: 42};
 let msg7: PrivateMessage = objupdate(msg6, {userid: undefined, screenname: "Alice"}); //OK
@@ -126,9 +126,9 @@ Next to assigning object literals to interfaces, it is of course also possible t
 ## Differences between the implementation and the formalisation
 Because TypeScript<sub>IPC</sub> is implemented on top of TypeScript (version 2.1.6), there are some differences between the implementation and the formalisation.
 
-* TypeScript is deliberately unsound. The formalisations presented in the paper are based upon a *sound* subset of TypeScript. On the other hand, the implementation is an extension of complete TypeScript. Therefore, the usage of interfaces with inter-parameter constraints is only sound when the unsound features (for example, unsafe casting to `any`) of TypeScript are not used.
+* TypeScript is deliberately unsound. The formalisations presented in the paper are based upon a *sound* subset of TypeScript. On the other hand, the implementation is an extension of complete TypeScript. Therefore, the usage of interfaces with inter-parameter constraints is only sound when the unsound features (for example: accessing a property of a variable with type `any`) of TypeScript are not used.
 
-* In order to stay consistent with existing TypeScript programs, we did not replace the existing interface definition of TypeScript with the interface definitions from the paper. Instead, required and optional properties can still be expressed in this implementation. Constraints are an optional extension of interfaces, and should always be combined with properties which are all optional (required properties are not allowed when there is a constraints section). Properties of interfaces with constraints should not have the type "undefined". The interface must contain at least one constraint for it to be considered an _interface with constrainst_ (if there are no presence constraints on any of the objects, this can be circumvented by adding an `or(present(x), not(present(x))))` constraint). For example, the running example from the paper should be defined as follows (underscores in property names are not supported yet):
+* In order to stay consistent with existing TypeScript programs, we did not replace the existing interface definition of TypeScript with the interface definitions from the paper. Instead, required and optional properties can still be expressed in this implementation. Constraints are an optional extension of interfaces, and should always be combined with properties which are all optional (required properties are not allowed when there is a constraints section). Properties of interfaces with constraints may not have the type `undefined`. In the paper, constraints are in infix notation, but the implementation expects prefix notation. The interface must contain at least one constraint for it to be considered an _interface with constraints_ (if there are no presence constraints on any of the objects, this can be circumvented by adding an `or(present(x), not(present(x))))` constraint). For example, the running example from the paper should be defined as follows (underscores in property names are not supported yet). The `xor` constraint is not yet supported, but can be expressed using `or`, `and` and `not`, as shown below.
 
   ```typescript
    interface PrivateMessage {
@@ -142,10 +142,7 @@ Because TypeScript<sub>IPC</sub> is implemented on top of TypeScript (version 2.
    }
   ```
 
-*  Due to width subtyping, the type of an object does not guarantee that only those properties are present at runtime. Therefore, objects with a special interface type can only be created by casting an object literal to that interface.
-Since TypeScript 1.6, TypeScript has a stricter object literal assignment check that disallows hidden properties when assigning an object literal to an interface anymore. 
-However, it is still possible to have hidden properties when a variable with an interface type is assigned to a variable with an object type (literal or interface). Therefore, our implementation still limits these kinds assignments.
-Variables with interface types can only be assigned to each other if both have or lack constraints.
+*  Due to width subtyping, the type of an object does not guarantee that only those properties are present in that object at runtime. Therefore, objects with a special interface type can only be created by casting an object literal to that interface. Since TypeScript 1.6, TypeScript has a stricter object literal assignment check that disallows hidden properties when assigning an object literal to an interface anymore. However, it is still possible to have hidden properties when a variable with an interface type is assigned to a variable with an object type (literal or interface). Therefore, our implementation still limits these kinds assignments. Variables with interface types can only be assigned to each other if both have or lack constraints.
 
 * Casts are currently not supported, and should not be used in combination with interfaces with constraints.
   Instead of `<PrivateMessage> {text: "Hi!", userid: 42}` use an assignment:
